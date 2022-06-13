@@ -1,0 +1,43 @@
+body {
+    text-align: center;
+    margin: 0;
+}
+
+#game-container {
+    position: absolute;
+    margin: 0.5% 0;
+    height: 98%;
+    width: 100%;
+
+    display: grid;
+    grid-template: 1fr / 2fr 5fr 2fr;
+}
+
+#left-container {
+    background-color: pink;
+
+    display: grid;
+    grid-template: repeat(3, 1fr) / 1fr;
+}
+
+#center-container {
+    background-color: lightgreen;
+
+    display: grid;
+    grid-template: 1fr 2fr 2fr 1fr / 1fr;
+}
+
+#right-container {
+    background-color: lightblue;
+
+    display: grid;
+    grid-template: 4fr 1fr / 1fr;
+}
+
+.container {
+    border: solid black 2px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
