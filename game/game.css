@@ -1,13 +1,15 @@
 body {
     text-align: center;
     margin: 0;
+
+    background-color: #AAA;
 }
 
 #game-container {
     position: absolute;
-    margin: 0.5% 0;
-    height: 98%;
-    width: 100%;
+    margin: 0 10%;
+    height: 100%;
+    width: 80%;
 
     display: grid;
     grid-template: 1fr / 2fr 5fr 2fr;
@@ -34,10 +36,30 @@ body {
     grid-template: 4fr 1fr / 1fr;
 }
 
-.container {
-    border: solid black 2px;
+.container, .enemy-hand-card, .enemy-natial-space, .friendly-hand-card, .friendly-natial-space {
+    border: solid black 1px;
 
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
+}
+
+#enemy-natial-zone {
+    flex-wrap: wrap-reverse;
+    padding: 0 20%;
+}
+
+#friendly-natial-zone {
+    flex-wrap: wrap;
+    padding: 0 20%;
+}
+
+.enemy-hand-card, .friendly-hand-card {
+    height: 95%;
+    width: 12.6%;
+}
+
+.enemy-natial-space, .friendly-natial-space {
+    height: 47.5%;
+    width: 21%;
 }
