@@ -4,6 +4,24 @@ const ELEMENT_HEAVEN = 2;
 const ELEMENT_EARTH = 3;
 const ELEMENT_WATER = 4;
 
+const PLAYER_FRIENDLY = 0;
+const PLAYER_ENEMY = 1;
+
+const decks = [[], []];
+const hands = [[], []];
+
+
+
+
+
+
+
+
+
+
+
+
+
 const debugCardFire = {
     name: "Debug Fire",
     portrait: null,

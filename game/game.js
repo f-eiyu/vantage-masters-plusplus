@@ -1,5 +1,5 @@
 
-const loadDeck = (cardList) => {
+const loadDeck = (cardList, player) => {
     // cardList will be used later on, when deck building is implemented!
     // for now, decks will simply be five copies of each debug card.
     const thisDeckRaw = [];
@@ -12,10 +12,32 @@ const loadDeck = (cardList) => {
     }
     // using the random seeds, shuffle the deck
     thisDeckRaw.sort((cardOne, cardTwo) => { return cardOne.seed - cardTwo.seed; });
-    // extract the cards from their object wrappers and return
+    // extract the cards from their object wrappers
     const thisDeck = thisDeckRaw.map(cardWrapper => cardWrapper.card);
 
-    return thisDeck;
+    // put the cards in the correct player's deck
+    return decks[player] = thisDeck;
+}
+
+const drawCard = (player) => {
+    // hands can have six cards at most
+    if (hands[player].length >= 6) { return false; }
+
+    // can only draw if there are cards to draw
+    if (decks[player].length === 0) { return false; }
+
+    // if the draw is possible, pop last card in the deck to the player's hand
+    hands[player].push(decks[player].pop());
+
+    renderBoard();
+    return true;
+}
+
+const renderBoard = () => {
+    renderHand(PLAYER_ENEMY);
+    renderHand(PLAYER_FRIENDLY);
+
+    // render natial zone here
 }
 
 const initializeGameBoard = () => {
@@ -35,6 +57,4 @@ const initializeGameBoard = () => {
     addHoverMagnifyListenerToAll("friendly-hand-card");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    initializeGameBoard();
-});
+initializeGameBoard();
