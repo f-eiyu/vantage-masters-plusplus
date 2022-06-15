@@ -1,78 +1,61 @@
-const getPlayerStr = (player) => { return player === PLAYER_FRIENDLY ? "friendly" : "enemy"; }
-const getRowStr = (row) => { return row === ROW_FRONT ? "front" : "back"; }
+// gives click and drag functionality to a card on the board
+const setPlayable = (thisCardDOM) => {
+    thisCardDOM.setAttribute("draggable", "true");
+    thisCardDOM.addEventListener("dragstart", event => event.target.classList.add("dragging"));
+    thisCardDOM.addEventListener("dragend", event => event.target.classList.remove("dragging"));
+}
+
+// renders the card currently controlled by player in zone's position'th place
+const renderCard = (player, zone, position) => {
+    // parse parameters to access the correct DOM element on the game board
+    const playerIsEnemy = (player === PLAYER_ENEMY);
+    const playerStr = (playerIsEnemy ? "enemy" : "friendly");
+    const zoneStr = (zone === ZONE_HAND ? "hand" : `${zone === ZONE_NATIAL_FRONT ? "front" : "back"}`);
+    const thisTileID = `#${playerStr}-${zoneStr}-${position}`;
+    const thisTileDOM = document.querySelector(thisTileID);
+
+    // pull the card object from the appropriate hand/natial array
+    const thisCard = (zone === ZONE_HAND ?
+                      hands[player][position] :
+                      natials[player][zone === ZONE_NATIAL_FRONT ? ROW_FRONT : ROW_BACK][position]);
+
+
+    console.log(playerStr, zoneStr, position, thisCard);
+    
+    // create a card DOM based on the card object to place inside thisTileDOM
+    const thisCardDOM = document.createElement("div");
+
+    // set everything properly on the card DOM...
+    if (thisCard === undefined) { // there isn't actually a card in this spot
+        thisCardDOM.innerText = `${zoneStr} ${position}`;
+        thisCardDOM.setAttribute("draggable", false);
+    } else { // eventually, the card will render something pretty instead of text
+        const cardStr = `${playerIsEnemy ? "??? " : ""}${thisCard.name}
+        Element: ${thisCard.element}
+        HP: ${thisCard.currentHP}/${thisCard.maxHP}
+        ATK: ${thisCard.attack}
+        Cost: ${thisCard.cost}
+        ${thisCard.isRanged ? "R" : ""}${thisCard.isQuick ? "Q" : ""}
+        `;
+
+        thisCardDOM.innerText = cardStr;
+        if (!playerIsEnemy) { setPlayable(thisCardDOM); }
+    }
+
+    // ... and finally, display the card!
+    thisTileDOM.appendChild(thisCardDOM);
+}
 
 // this is obviously not the final version of this function, as it only outputs
 // text, but it'll be good enough for our debugging purposes now
 const renderHand = (player) => {
-    const playerStr = getPlayerStr(player);
-
-    for (let i = 0; i < 6; i++) {
-        const card = hands[player][i];
-        const handDOM = document.querySelector(`#${playerStr}-hand-${i}`);
-
-        if (card === undefined) {
-            handDOM.innerText = `hand ${i}`;
-            handDOM.setAttribute("draggabble", "false");
-        }
-        else {
-            const cardStr = `${player === PLAYER_ENEMY ? "???" : ""} ${card.name}
-            Element: ${card.element}
-            HP: ${card.currentHP}/${card.maxHP}
-            ATK: ${card.attack}
-            Cost: ${card.cost}
-            ${card.isRanged ? "R" : ""}${card.isQuick ? "Q" : ""}`
-
-            handDOM.innerText = cardStr;
-            if (player === PLAYER_FRIENDLY) {
-                handDOM.setAttribute("draggable", "true");
-                handDOM.addEventListener("dragstart", event => event.target.classList.add("dragging"));
-                handDOM.addEventListener("dragend", event => event.target.classList.remove("dragging"));
-            }
-        }
-    }
-}
-
-const renderNatials = (player) => {
-    return;
+    for (let i = 0; i < 6; i++) { renderCard(player, ZONE_HAND, i); }
 }
 
 // and likewise with this. the render calls will be condensed into a single
 // more DRY function later.
 const renderNatialZone = (player) => {
-    const playerStr = getPlayerStr(player);
+    for (let i = 0; i < 4; i++) { renderCard(player, ZONE_NATIAL_FRONT, i); }
 
-    const renderNatialInternal = (card, natialDOM, position) => {
-        if (card === undefined) {
-            natialDOM.innerText = `natial ${position}`;
-            natialDOM.setAttribute("draggabble", "false");}
-        else {
-            const cardStr = `${card.name}
-            Element: ${card.element}
-            HP: ${card.currentHP}/${card.maxHP}
-            ATK: ${card.attack}
-            Cost: ${card.cost}
-            ${card.isRanged ? "R" : ""}${card.isQuick ? "Q" : ""}`
-
-            natialDOM.innerText = cardStr;
-            if (player === PLAYER_FRIENDLY) {
-                natialDOM.setAttribute("draggable", "true");
-                natialDOM.addEventListener("dragstart", event => event.target.classList.add("dragging"));
-                natialDOM.addEventListener("dragend", event => event.target.classList.remove("dragging"));
-            }
-        }
-    }
-
-    for (let i = 0; i < 4; i++) {
-        const thisCard = natials[player][ROW_FRONT][i];
-        const thisNatialDOM = document.querySelector(`#${playerStr}-front-${i}`);
-
-        renderNatialInternal(thisCard, thisNatialDOM, i);
-    }
-
-    for (let i = 0; i < 3; i ++) {
-        const thisCard = natials[player][ROW_BACK][i];
-        const thisNatialDOM = document.querySelector(`#${playerStr}-back-${i}`);
-
-        renderNatialInternal(thisCard, thisNatialDOM, i);
-    }
+    for (let i = 0; i < 3; i ++) { renderCard(player, ZONE_NATIAL_BACK, i); }
 }

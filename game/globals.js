@@ -8,7 +8,8 @@ const PLAYER_FRIENDLY = 0;
 const PLAYER_ENEMY = 1;
 
 const ZONE_HAND = 0;
-const ZONE_NATIAL = 1;
+const ZONE_NATIAL_FRONT = 1;
+const ZONE_NATIAL_BACK = 2;
 
 const decks = [[], []]; // friendly, enemy
 const hands = [[], []]; // friendly, enemy
