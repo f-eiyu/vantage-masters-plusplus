@@ -1,0 +1,27 @@
+a deck is just an array of card objects
+    - valid decks must be exactly 20 cards
+    - to shuffle deck: use .map to put each card object in its own object:
+        {card: cardObj, sort: Math.random()}
+      then, use .sort to sort the keys, and a final .map call to strip the
+      card out of the object
+
+cardObject = {
+    name: string,
+    portrait: string (url),
+
+    element: an ELEMENT_ constant,
+    currentHP: number,
+    maxHP: number,
+    attack: number,
+    manaCost: number,
+
+    isRanged: bool,
+    isQuick: bool,
+    isMaster: bool,
+    
+    hasSkill: bool,
+    skillReady: bool,
+    skill: not sure yet -- maybe some kind of string or numerical identifier?,
+    hasPassive: bool,
+    passive: again, not sure how exactly to implement yet
+}
