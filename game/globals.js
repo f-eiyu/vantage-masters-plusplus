@@ -7,12 +7,24 @@ const ELEMENT_WATER = 4;
 const PLAYER_FRIENDLY = 0;
 const PLAYER_ENEMY = 1;
 
-const decks = [[], []];
-const hands = [[], []];
+const decks = [[], []]; // friendly, enemy
+const hands = [[], []]; // friendly, enemy
+const natials = [
+    [ // friendly
+        [], // front
+        [] // back
+    ],
+    [ // enemy
+        [], // front
+        [] // back
+    ]
+];
 
+const ROW_FRONT = 0;
+const ROW_BACK = 1;
 
-
-
+let friendlyMaster = null;
+let enemyMaster = null;
 
 
 
@@ -114,7 +126,7 @@ const debugCardMaster = {
     currentHP: 30,
     maxHP: 30,
     attack: 1,
-    manaCost: 1,
+    manaCost: 0,
 
     isRanged: false,
     isQuick: false,

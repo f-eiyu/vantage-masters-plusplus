@@ -1,3 +1,4 @@
+'use strict';
 
 const loadDeck = (cardList, player) => {
     // cardList will be used later on, when deck building is implemented!
@@ -34,11 +35,13 @@ const drawCard = (player) => {
 }
 
 const renderBoard = () => {
-    renderHand(PLAYER_ENEMY);
     renderHand(PLAYER_FRIENDLY);
+    renderHand(PLAYER_ENEMY);
 
-    // render natial zone here
+    renderNatialZone(PLAYER_FRIENDLY);
+    renderNatialZone(PLAYER_ENEMY);
 }
+
 
 const initializeGameBoard = () => {
     const addHoverMagnifyEventListener = (domObj) => {
@@ -55,6 +58,14 @@ const initializeGameBoard = () => {
     addHoverMagnifyListenerToAll("enemy-natial-space");
     addHoverMagnifyListenerToAll("friendly-natial-space");
     addHoverMagnifyListenerToAll("friendly-hand-card");
+
+    // both players start with their respective masters on back-1
+    friendlyMaster = Object.create(debugCardMaster);
+    enemyMaster = Object.create(debugCardMaster);
+    placeCardOnBoard(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1);
+    placeCardOnBoard(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1);
+    
+    renderBoard();
 }
 
 initializeGameBoard();
