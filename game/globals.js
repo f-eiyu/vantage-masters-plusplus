@@ -42,7 +42,7 @@ const debugCardFire = {
     currentHP: 2,
     maxHP: 2,
     attack: 1,
-    manaCost: 1,
+    cost: 1,
 
     isRanged: true,
     isQuick: false,
@@ -63,7 +63,7 @@ const debugCardHeaven = {
     currentHP: 1,
     maxHP: 1,
     attack: 1,
-    manaCost: 1,
+    cost: 1,
 
     isRanged: false,
     isQuick: true,
@@ -84,7 +84,7 @@ const debugCardEarth = {
     currentHP: 3,
     maxHP: 3,
     attack: 1,
-    manaCost: 1,
+    cost: 1,
 
     isRanged: false,
     isQuick: false,
@@ -105,7 +105,7 @@ const debugCardWater = {
     currentHP: 1,
     maxHP: 1,
     attack: 2,
-    manaCost: 2,
+    cost: 2,
 
     isRanged: false,
     isQuick: false,
@@ -126,7 +126,7 @@ const debugCardMaster = {
     currentHP: 30,
     maxHP: 30,
     attack: 1,
-    manaCost: 0,
+    cost: 0,
 
     isRanged: false,
     isQuick: false,

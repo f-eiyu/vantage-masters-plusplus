@@ -20,7 +20,7 @@ const loadDeck = (cardList, player) => {
     return decks[player] = thisDeck;
 }
 
-const drawCard = (player) => {
+const drawCard = (player, render = true) => {
     // hands can have six cards at most
     if (hands[player].length >= 6) { return false; }
 
@@ -30,8 +30,14 @@ const drawCard = (player) => {
     // if the draw is possible, pop last card in the deck to the player's hand
     hands[player].push(decks[player].pop());
 
-    renderBoard();
+    if (render) { renderBoard(); }
     return true;
+}
+
+const placeCardOnBoard = (player, card, row, position, render = true) => {
+    if (!natials[player][row][position]) { natials[player][row][position] = card; }
+
+    if (render) { renderBoard(); }
 }
 
 const renderBoard = () => {
@@ -59,13 +65,25 @@ const initializeGameBoard = () => {
     addHoverMagnifyListenerToAll("friendly-natial-space");
     addHoverMagnifyListenerToAll("friendly-hand-card");
 
+    loadDeck(null, PLAYER_FRIENDLY);
+    loadDeck(null, PLAYER_ENEMY);
+
+    // both players start with four cards in hand
+    // a mulligan feature will be added... later
+    for (let i = 0; i < 4; i++) {
+        drawCard(PLAYER_FRIENDLY, false);
+        drawCard(PLAYER_ENEMY, false);
+    }
+
     // both players start with their respective masters on back-1
     friendlyMaster = Object.create(debugCardMaster);
     enemyMaster = Object.create(debugCardMaster);
-    placeCardOnBoard(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1);
-    placeCardOnBoard(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1);
+    placeCardOnBoard(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1, false);
+    placeCardOnBoard(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1, false);
     
     renderBoard();
 }
 
-initializeGameBoard();
+document.addEventListener("DOMContentLoaded", () => {
+    initializeGameBoard();
+});

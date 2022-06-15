@@ -7,12 +7,19 @@ const renderHand = (player) => {
     const playerStr = getPlayerStr(player);
 
     for (let i = 0; i < 6; i++) {
-        const thisCard = hands[player][i];
-        const thisHandDOM = document.querySelector(`#${playerStr}-hand-${i}`);
+        const card = hands[player][i];
+        const handDOM = document.querySelector(`#${playerStr}-hand-${i}`);
 
-        if (thisCard === undefined) { thisHandDOM.innerText = `hand ${i}`; }
+        if (card === undefined) { handDOM.innerText = `hand ${i}`; }
         else {
-            thisHandDOM.innerText = `${player === PLAYER_ENEMY ? "???" : ""} ${thisCard.name}`;
+            const cardStr = `${player === PLAYER_ENEMY ? "???" : ""} ${card.name}
+            Element: ${card.element}
+            HP: ${card.currentHP}/${card.maxHP}
+            ATK: ${card.attack}
+            Cost: ${card.cost}
+            ${card.isRanged ? "R" : ""}${card.isQuick ? "Q" : ""}`
+
+            handDOM.innerText = cardStr;
         }
     }
 }
@@ -21,13 +28,23 @@ const renderNatials = (player) => {
     return;
 }
 
-// and likewise with this
+// and likewise with this. the render calls will be condensed into a single
+// more DRY function later.
 const renderNatialZone = (player) => {
     const playerStr = getPlayerStr(player);
 
     const renderNatialInternal = (card, natialDOM, position) => {
         if (card === undefined) { natialDOM.innerText = `natial ${position}`; }
-        else { natialDOM.innerText = card.name; }
+        else {
+            const cardStr = `${card.name}
+            Element: ${card.element}
+            HP: ${card.currentHP}/${card.maxHP}
+            ATK: ${card.attack}
+            Cost: ${card.cost}
+            ${card.isRanged ? "R" : ""}${card.isQuick ? "Q" : ""}`
+
+            natialDOM.innerText = cardStr;
+        }
     }
 
     for (let i = 0; i < 4; i++) {
@@ -43,8 +60,4 @@ const renderNatialZone = (player) => {
 
         renderNatialInternal(thisCard, thisNatialDOM, i);
     }
-}
-
-const placeCardOnBoard = (player, card, row, position) => {
-    if (!natials[player][row][position]) { natials[player][row][position] = card; }
 }
