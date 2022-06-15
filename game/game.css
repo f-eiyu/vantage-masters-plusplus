@@ -5,6 +5,8 @@ body {
     font-family: sans-serif;
 
     background-color: #AAA;
+
+    user-select: none;
 }
 
 #game-container {
@@ -72,4 +74,8 @@ body {
     width: 21%;
 
     font-size: 9pt;
+}
+
+.dragging {
+    opacity: 0.5;
 }

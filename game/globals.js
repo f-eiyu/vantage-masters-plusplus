@@ -7,6 +7,9 @@ const ELEMENT_WATER = 4;
 const PLAYER_FRIENDLY = 0;
 const PLAYER_ENEMY = 1;
 
+const ZONE_HAND = 0;
+const ZONE_NATIAL = 1;
+
 const decks = [[], []]; // friendly, enemy
 const hands = [[], []]; // friendly, enemy
 const natials = [

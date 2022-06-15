@@ -10,7 +10,10 @@ const renderHand = (player) => {
         const card = hands[player][i];
         const handDOM = document.querySelector(`#${playerStr}-hand-${i}`);
 
-        if (card === undefined) { handDOM.innerText = `hand ${i}`; }
+        if (card === undefined) {
+            handDOM.innerText = `hand ${i}`;
+            handDOM.setAttribute("draggabble", "false");
+        }
         else {
             const cardStr = `${player === PLAYER_ENEMY ? "???" : ""} ${card.name}
             Element: ${card.element}
@@ -20,6 +23,11 @@ const renderHand = (player) => {
             ${card.isRanged ? "R" : ""}${card.isQuick ? "Q" : ""}`
 
             handDOM.innerText = cardStr;
+            if (player === PLAYER_FRIENDLY) {
+                handDOM.setAttribute("draggable", "true");
+                handDOM.addEventListener("dragstart", event => event.target.classList.add("dragging"));
+                handDOM.addEventListener("dragend", event => event.target.classList.remove("dragging"));
+            }
         }
     }
 }
@@ -34,7 +42,9 @@ const renderNatialZone = (player) => {
     const playerStr = getPlayerStr(player);
 
     const renderNatialInternal = (card, natialDOM, position) => {
-        if (card === undefined) { natialDOM.innerText = `natial ${position}`; }
+        if (card === undefined) {
+            natialDOM.innerText = `natial ${position}`;
+            natialDOM.setAttribute("draggabble", "false");}
         else {
             const cardStr = `${card.name}
             Element: ${card.element}
@@ -44,6 +54,11 @@ const renderNatialZone = (player) => {
             ${card.isRanged ? "R" : ""}${card.isQuick ? "Q" : ""}`
 
             natialDOM.innerText = cardStr;
+            if (player === PLAYER_FRIENDLY) {
+                natialDOM.setAttribute("draggable", "true");
+                natialDOM.addEventListener("dragstart", event => event.target.classList.add("dragging"));
+                natialDOM.addEventListener("dragend", event => event.target.classList.remove("dragging"));
+            }
         }
     }
 
