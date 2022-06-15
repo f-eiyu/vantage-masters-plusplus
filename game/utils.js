@@ -6,21 +6,13 @@ const setPlayable = (thisCardDOM) => {
 }
 
 // renders the card currently controlled by player in zone's position'th place
-const renderCard = (player, zone, position) => {
+const renderCard = (thisCard, player, zone, position) => {
     // parse parameters to access the correct DOM element on the game board
     const playerIsEnemy = (player === PLAYER_ENEMY);
     const playerStr = (playerIsEnemy ? "enemy" : "friendly");
     const zoneStr = (zone === ZONE_HAND ? "hand" : `${zone === ZONE_NATIAL_FRONT ? "front" : "back"}`);
     const thisTileID = `#${playerStr}-${zoneStr}-${position}`;
     const thisTileDOM = document.querySelector(thisTileID);
-
-    // pull the card object from the appropriate hand/natial array
-    const thisCard = (zone === ZONE_HAND ?
-                      hands[player][position] :
-                      natials[player][zone === ZONE_NATIAL_FRONT ? ROW_FRONT : ROW_BACK][position]);
-
-
-    console.log(playerStr, zoneStr, position, thisCard);
     
     // create a card DOM based on the card object to place inside thisTileDOM
     const thisCardDOM = document.createElement("div");
@@ -49,13 +41,17 @@ const renderCard = (player, zone, position) => {
 // this is obviously not the final version of this function, as it only outputs
 // text, but it'll be good enough for our debugging purposes now
 const renderHand = (player) => {
-    for (let i = 0; i < 6; i++) { renderCard(player, ZONE_HAND, i); }
+    hands[player].forEach((card, index) => renderCard(card, player, ZONE_HAND, index));
 }
 
 // and likewise with this. the render calls will be condensed into a single
 // more DRY function later.
 const renderNatialZone = (player) => {
-    for (let i = 0; i < 4; i++) { renderCard(player, ZONE_NATIAL_FRONT, i); }
+    natials[player][ROW_FRONT].forEach((card, index) => {
+        renderCard(card, player, ZONE_NATIAL_FRONT, index);
+    });
 
-    for (let i = 0; i < 3; i ++) { renderCard(player, ZONE_NATIAL_BACK, i); }
+    natials[player][ROW_BACK].forEach((card, index) => {
+        renderCard(card, player, ZONE_NATIAL_BACK, index);
+    });
 }
