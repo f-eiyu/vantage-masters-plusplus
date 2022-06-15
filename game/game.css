@@ -76,6 +76,14 @@ body {
     font-size: 9pt;
 }
 
+.live-card {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+}
+
 .dragging {
     opacity: 0.5;
 }

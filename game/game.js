@@ -6,10 +6,10 @@ const loadDeck = (cardList, player) => {
     const thisDeckRaw = [];
     for (let i = 0; i < 5; i++) { // 20 cards in each deck
         // generate each card in a wrapping object, with a random sorting seed
-        thisDeckRaw.push({card: Object.create(debugCardFire), seed: Math.random()});
-        thisDeckRaw.push({card: Object.create(debugCardHeaven), seed: Math.random()});
-        thisDeckRaw.push({card: Object.create(debugCardEarth), seed: Math.random()});
-        thisDeckRaw.push({card: Object.create(debugCardWater), seed: Math.random()});
+        thisDeckRaw.push({card: createCard(getFromDB("Debug Fire")), seed: Math.random()});
+        thisDeckRaw.push({card: createCard(getFromDB("Debug Water")), seed: Math.random()});
+        thisDeckRaw.push({card: createCard(getFromDB("Debug Earth")), seed: Math.random()});
+        thisDeckRaw.push({card: createCard(getFromDB("Debug Heaven")), seed: Math.random()});
     }
     // using the random seeds, shuffle the deck
     thisDeckRaw.sort((cardOne, cardTwo) => { return cardOne.seed - cardTwo.seed; });
@@ -76,8 +76,8 @@ const initializeGameBoard = () => {
     }
 
     // both players start with their respective masters on back-1
-    friendlyMaster = Object.create(debugCardMaster);
-    enemyMaster = Object.create(debugCardMaster);
+    friendlyMaster = createCard(getFromDB("Debug Master"));
+    enemyMaster = createCard(getFromDB("Debug Master"));
     placeCardOnBoard(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1, false);
     placeCardOnBoard(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1, false);
     
