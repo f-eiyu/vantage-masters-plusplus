@@ -44,16 +44,30 @@ const renderBoard = () => {
     renderHand(PLAYER_FRIENDLY);
     renderHand(PLAYER_ENEMY);
 
-    renderNatialZone(PLAYER_FRIENDLY);
-    renderNatialZone(PLAYER_ENEMY);
+    renderNatials(PLAYER_FRIENDLY);
+    renderNatials(PLAYER_ENEMY);
 }
 
+const boardCardMouseover = (event) => {
+    const boardSpace = event.target;
+    const detailZone = document.querySelector("#card-detail-zone");
+
+    detailZone.innerText = boardSpace.innerText;
+    boardSpace.classList.add("hovered");
+}
+
+const boardCardMouseleave = (event) => {
+    const boardSpace = event.target;
+    const detailZone = document.querySelector("#card-detail-zone");
+
+    detailZone.innerText = "";
+    boardSpace.classList.remove("hovered");
+}
 
 const initializeGameBoard = () => {
     const addHoverMagnifyEventListener = (domObj) => {
-        const detailZone = document.querySelector("#card-detail-zone");
-        domObj.addEventListener("mouseover", () => { detailZone.innerText = domObj.innerText; });
-        domObj.addEventListener("mouseleave", () => { detailZone.innerText = ""; });
+        domObj.addEventListener("mouseover", boardCardMouseover);
+        domObj.addEventListener("mouseleave", boardCardMouseleave);
     }
 
     const addHoverMagnifyListenerToAll = (className) => {
@@ -86,4 +100,128 @@ const initializeGameBoard = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeGameBoard();
+
+    const addDragEventListener = (domObj) => {
+        domObj.addEventListener("dragenter", cardDraggedOnSpace);
+        domObj.addEventListener("dragover", cardDraggedOnSpace);
+        domObj.addEventListener("dragleave", dragLeave);
+        domObj.addEventListener("drop", dragDrop);
+    }
+
+    const addDragEventListenerToAll = (className) => {
+        const thisClassList = document.querySelectorAll("." + className);
+        thisClassList.forEach(element => addDragEventListener(element));
+    }
+
+    addDragEventListenerToAll("enemy-hand-space");
+    addDragEventListenerToAll("enemy-natial-space");
+    addDragEventListenerToAll("friendly-natial-space");
+    addDragEventListenerToAll("friendly-hand-card");
 });
+
+
+// ========== FUNCTIONS HANDLING DRAGGING AND DROPPING ==========
+
+// gives click and drag functionality to a card on the board
+const dragStart = (event) => {
+    draggedCard = event.target;
+    event.target.classList.add("dragging");
+    console.log("drag start");
+}
+
+const setDraggable = (thisCardDOM) => {
+    thisCardDOM.setAttribute("draggable", "true");
+    thisCardDOM.addEventListener("dragstart", dragStart)
+    thisCardDOM.addEventListener("dragend", (event) => event.target.classList.remove("dragging"));
+}
+
+
+const cardDraggedOnSpace = (event) => {
+    event.preventDefault();
+    
+    const dragTo = event.target;
+
+    // sanity check
+    if (draggedCard.owner !== PLAYER_FRIENDLY) { return false; }
+    if (draggedCard === dragTo) { return false; }
+
+    const isFrontNatial = draggedCard.classList.contains("front-natial");
+    const isBackNatial = draggedCard.classList.contains("back-natial");
+    const isNatial = isFrontNatial || isBackNatial;
+    const isHandCard = draggedCard.classList.contains("friendly-hand-card");
+
+    const isToFriendlyNatial = dragTo.classList.contains("friendly-natial-space");
+    const isToEnemyNatial = dragTo.classList.contains("enemy-natial-space");
+    const isToHand = dragTo.classList.contains("friendly-hand-card");
+
+    // decide what to do based on what kind of card was dragged where
+    // natial dragged onto empty friendly space: movement possible
+    if (isNatial && isToFriendlyNatial && !dragTo.content) {
+        dragTo.classList.add("drag-over-empty");
+    }
+    // natial dragged onto occupied enemy space: attack possible
+    else if (isNatial && isToEnemyNatial && dragTo.content) {
+        dragTo.classList.add("drag-over-attack");
+    }
+    // hand card dragged onto empty friendly space: summoning possible
+    else if (isHandCard && isToFriendlyNatial && !dragTo.content) {
+        dragTo.classList.add("drag-over-empty");
+    }
+    // special case: spell cards dragged over the field to activate
+    // else if () {}
+    // no other moves are legal
+    else {
+        dragTo.classList.add("drag-over-invalid");
+    }
+
+
+}
+
+const clearDragVisuals = (event) => {
+    event.target.classList.remove("drag-over-empty");
+    event.target.classList.remove("drag-over-attack");
+    event.target.classList.remove("drag-over-invalid");
+}
+
+const dragLeave = (event) => {
+    clearDragVisuals(event);
+}
+
+const dragDrop = (event) => {
+    event.preventDefault();
+    
+    clearDragVisuals(event);
+
+    const dragTo = event.target;
+
+    const isFrontNatial = draggedCard.classList.contains("front-natial");
+    const isBackNatial = draggedCard.classList.contains("back-natial");
+    const isNatial = isFrontNatial || isBackNatial;
+    const isHandCard = draggedCard.classList.contains("friendly-hand-card");
+
+    const isToFriendlyNatial = dragTo.classList.contains("friendly-natial-space");
+    const isToEnemyNatial = dragTo.classList.contains("enemy-natial-space");
+    const isToHand = dragTo.classList.contains("friendly-hand-card");
+
+    // decide what to do based on what was dragged into what
+    
+    // just a test to see if this works!
+    if (isHandCard && isToFriendlyNatial && !dragTo.content) {
+        // work out target and destination from the event objects
+        const handIndex = draggedCard.id.slice(-1);
+        const targetID = dragTo.id.split("-");
+        const targetRow = targetID[1] === "front" ? ZONE_NATIAL_FRONT : ZONE_NATIAL_BACK;
+        const targetIndex = targetID[2]; 
+
+        // move the correct card object's reference from the hand to the board
+        natials[PLAYER_FRIENDLY][targetRow][targetIndex] = hands[PLAYER_FRIENDLY][handIndex];
+        hands[PLAYER_FRIENDLY][handIndex] = null;
+
+        // re-render the appropriate zones
+        renderHand(PLAYER_FRIENDLY);
+        renderNatials(PLAYER_FRIENDLY);
+    }
+    else {
+        draggedCard = null;
+    }
+}

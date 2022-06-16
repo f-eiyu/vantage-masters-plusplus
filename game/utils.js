@@ -14,6 +14,7 @@ const createCard = (cardPrototype) => {
     return newCard;
 }
 
+// takes an ELEMENT_ constant and returns a string with the element's name
 const getElementName = (element) => {
     switch(element) {
         case ELEMENT_FIRE:
@@ -31,30 +32,22 @@ const getElementName = (element) => {
     }
 }
 
-// gives click and drag functionality to a card on the board
-const setPlayable = (thisCardDOM) => {
-    thisCardDOM.setAttribute("draggable", "true");
-    thisCardDOM.addEventListener("dragstart", event => event.target.classList.add("dragging"));
-    thisCardDOM.addEventListener("dragend", event => event.target.classList.remove("dragging"));
-}
-
 // renders the card currently controlled by player in zone's position'th place
-const renderCard = (thisCard, player, zone, position) => {
+const renderCard = (player, zone, position) => {
+    const thisCard = (zone === ZONE_HAND ? hands[player][position] : natials[player][zone][position]);
+
     // parse parameters to access the correct DOM element on the game board
     const playerIsEnemy = (player === PLAYER_ENEMY);
     const playerStr = (playerIsEnemy ? "enemy" : "friendly");
     const zoneStr = (zone === ZONE_HAND ? "hand" : `${zone === ZONE_NATIAL_FRONT ? "front" : "back"}`);
     const thisTileID = `#${playerStr}-${zoneStr}-${position}`;
-    const thisTileDOM = document.querySelector(thisTileID);
-    
-    // create a card DOM based on the card object to place inside thisTileDOM
-    const thisCardDOM = document.createElement("div");
-    thisCardDOM.classList.add("live-card");
+    const thisBoardSpaceDOM = document.querySelector(thisTileID);
 
     // set everything properly on the card DOM...
-    if (thisCard === undefined) { // there isn't actually a card in this spot
-        thisCardDOM.innerText = `${zoneStr} ${position}`;
-        thisCardDOM.setAttribute("draggable", false);
+    if (!thisCard) { // there isn't actually a card in this spot
+        thisBoardSpaceDOM.innerText = `${zoneStr} ${position}`;
+        thisBoardSpaceDOM.setAttribute("draggable", false);
+        thisBoardSpaceDOM.content = null;
     } else { // eventually, the card will render something pretty instead of text
         const cardStr = `${playerIsEnemy ? "??? " : ""}${thisCard.name}
         Element: ${getElementName(thisCard.element)}
@@ -64,24 +57,30 @@ const renderCard = (thisCard, player, zone, position) => {
         ${thisCard.isRanged ? "R" : ""}${thisCard.isQuick ? "Q" : ""}
         `;
 
-        thisCardDOM.innerText = cardStr;
-        if (!playerIsEnemy) { setPlayable(thisCardDOM); }
+        thisBoardSpaceDOM.owner = player;
+        thisBoardSpaceDOM.content = thisCard;
+        thisBoardSpaceDOM.innerText = cardStr;
+        
+        if (!playerIsEnemy) { setDraggable(thisBoardSpaceDOM); }
+    }
+}
+
+// re-renders all cards in the specified player's hand. we cannot use forEach
+// here, because we want the empty places to be rendered correctly as well.
+const renderHand = (player) => {
+    for(let i = 0; i < HAND_SIZE_LIMIT; i++) {
+        renderCard(player, ZONE_HAND, i);
+    }
+}
+
+// re-renders all cards in both of the specified player's natial zones. as
+// above, forEach will not work here.
+const renderNatials = (player) => {
+    for(let i = 0; i < NATIAL_FRONT_CAPACITY; i++) {
+        renderCard(player, ZONE_NATIAL_FRONT, i);
     }
 
-    // ... and finally, display the card!
-    thisTileDOM.appendChild(thisCardDOM);
-}
-
-const renderHand = (player) => {
-    hands[player].forEach((card, index) => renderCard(card, player, ZONE_HAND, index));
-}
-
-const renderNatialZone = (player) => {
-    natials[player][ROW_FRONT].forEach((card, index) => {
-        renderCard(card, player, ZONE_NATIAL_FRONT, index);
-    });
-
-    natials[player][ROW_BACK].forEach((card, index) => {
-        renderCard(card, player, ZONE_NATIAL_BACK, index);
-    });
+    for(let i = 0; i < NATIAL_BACK_CAPACITY; i++) {
+        renderCard(player, ZONE_NATIAL_BACK, i);
+    }
 }
