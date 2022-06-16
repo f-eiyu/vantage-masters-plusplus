@@ -8,6 +8,7 @@ const cardDB = [
         "maxHP": 2,
         "attack": 1,
         "cost": 1,
+        "maxActions": 1,
 
         "isRanged": true,
         "isQuick": false,
@@ -28,6 +29,7 @@ const cardDB = [
         "maxHP": 1,
         "attack": 1,
         "cost": 1,
+        "maxActions": 1,
 
         "isRanged": false,
         "isQuick": true,
@@ -48,6 +50,7 @@ const cardDB = [
         "maxHP": 3,
         "attack": 1,
         "cost": 1,
+        "maxActions": 1,
 
         "isRanged": false,
         "isQuick": false,
@@ -66,8 +69,9 @@ const cardDB = [
         "element": "ELEMENT_WATER",
         "currentHP": 1,
         "maxHP": 1,
-        "attack": 2,
-        "cost": 2,
+        "attack": 1,
+        "cost": 1,
+        "maxActions": 2,
 
         "isRanged": false,
         "isQuick": false,
@@ -86,8 +90,9 @@ const cardDB = [
         "element": "ELEMENT_NONE",
         "currentHP": 30,
         "maxHP": 30,
-        "attack": 1,
+        "attack": 10,
         "cost": 0,
+        "maxActions": 1,
 
         "isRanged": false,
         "isQuick": false,
