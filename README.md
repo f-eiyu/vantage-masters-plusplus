@@ -70,7 +70,7 @@ with as many cards as possible on its turn.
 1. Implement the back-and-forth between player turns and enemy turns, with the
 first turn-taker being random.
 1. Implement victory and loss conditions and a reset button.
-1. **At this stage, I will have a working MVP for the game.**
+1. **Workflow is complete up to here. I now have a functional MVP for the game.**
 1. Create a framework for spell card functionality via callbacks and create two
 straightforward spells to debug with.
 1. Create a framework for card active ability functionality via callbacks and
