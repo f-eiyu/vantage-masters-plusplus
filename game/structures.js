@@ -104,20 +104,23 @@ class NatialSpace extends boardSpace {
     // attacks the opposing natial at the indicated opposing NatialSpace using
     // the natial in the current NatialSpace.
     attackNatial(defenderSpace) {
-        const opponent = defenderSpace.owner;
+        const attacker = this.card;
+        const defender = defenderSpace.card;
+        const thisAttack = this.calculateDamage(defenderSpace);
 
         // perform attack
-        const attacker = this.card;
-        defenderSpace.card.currentHP -= attacker.attack;
+        defender.currentHP -= thisAttack[0];
+        
+        // perform counterattack
+        attacker.currentHP -= thisAttack[1];
 
-        // remove the defender from the board if it dies
-        if (defenderSpace.card.currentHP <= 0) {
-            defenderSpace.destroyCard();
-        }
+        // remove either card if its HP falls to zero
+        if (attacker.currentHP <= 0) { this.destroyCard(); }
+        if (defender.currentHP <= 0) { defenderSpace.destroyCard(); }
 
-        // attacking will generally require re-rendering both natial zones
-        renderNatials(this.owner);
-        renderNatials(opponent);
+        // attacking will require re-rendering both natial zones
+        renderNatials(PLAYER_FRIENDLY);
+        renderNatials(PLAYER_ENEMY);
 
         // check if a player has won as a result of this turn
         checkVictory();

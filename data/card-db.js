@@ -4,8 +4,8 @@ const cardDB = [
         "portrait": null,
 
         "element": "ELEMENT_FIRE",
-        "currentHP": 2,
-        "maxHP": 2,
+        "currentHP": 10,
+        "maxHP": 10,
         "attack": 1,
         "cost": 1,
         "maxActions": 1,
@@ -25,8 +25,8 @@ const cardDB = [
         "portrait": null,
 
         "element": "ELEMENT_HEAVEN",
-        "currentHP": 1,
-        "maxHP": 1,
+        "currentHP": 10,
+        "maxHP": 10,
         "attack": 1,
         "cost": 1,
         "maxActions": 1,
@@ -46,8 +46,8 @@ const cardDB = [
         "portrait": null,
 
         "element": "ELEMENT_EARTH",
-        "currentHP": 3,
-        "maxHP": 3,
+        "currentHP": 10,
+        "maxHP": 10,
         "attack": 1,
         "cost": 1,
         "maxActions": 1,
@@ -67,8 +67,8 @@ const cardDB = [
         "portrait": null,
 
         "element": "ELEMENT_WATER",
-        "currentHP": 1,
-        "maxHP": 1,
+        "currentHP": 10,
+        "maxHP": 10,
         "attack": 1,
         "cost": 1,
         "maxActions": 2,

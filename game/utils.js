@@ -78,21 +78,21 @@ const checkVictory = () => {
     let enemyHP = masters[PLAYER_ENEMY].currentHP;
 
     // draw; not possible right now but will be possible via counterattacking
-    if (friendlyHP === 0 && enemyHP === 0) {
+    if (friendlyHP <= 0 && enemyHP <= 0) {
         console.log("it's a draw!");
         playerCanInteract = false;
         gameEnd = true;
 
         return true;
     }
-    else if (friendlyHP === 0) {
+    else if (friendlyHP <= 0) {
         console.log("computer wins!");
         playerCanInteract = false;
         gameEnd = true;
 
         return true;
     }
-    else if (enemyHP === 0) {
+    else if (enemyHP <= 0) {
         console.log("you win!");
         playerCanInteract = false;
         gameEnd = true;
