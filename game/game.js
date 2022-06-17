@@ -40,13 +40,13 @@ const drawCard = (player, render = true) => {
 }
 
 const boardCardMouseover = (event) => {
-    const boardSpace = event.target;
-    if (!boardSpace.content) { return; }
+    const boardSpace = (new cardDOMEvent(event.target)).spaceObj;
+    if (!boardSpace.card) { return; }
 
     const detailZone = document.querySelector("#card-detail-zone");
 
-    detailZone.innerText = boardSpace.innerText;
-    boardSpace.classList.add("hovered");
+    detailZone.innerText = boardSpace.DOM.innerText;
+    boardSpace.DOM.classList.add("hovered");
 }
 
 const boardCardMouseleave = (event) => {
@@ -104,7 +104,6 @@ const enemyStartTurn = () => {
 }
 
 const enemyEndTurn = () => {
-    
     if (!gameEnd) { friendlyStartTurn(); }
 }
 

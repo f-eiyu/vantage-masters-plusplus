@@ -5,18 +5,18 @@ const setDraggable = (thisCardDOM) => {
 }
 
 const dragStart = (event) => {
-    if (!playerCanInteract) { return; }
+    if (!playerCanInteract || gameEnd) { return; }
 
-    thisDragFrom = new dragInfo(event.target);
+    thisDragFrom = new cardDOMEvent(event.target);
     event.target.classList.add("dragging");
 }
 
 const cardDraggedToSpace = (event) => {
-    if (!playerCanInteract) { return; 
+    if (!playerCanInteract || gameEnd) { return; 
     }
     event.preventDefault();
 
-    thisDragTo = new dragInfo(event.target);
+    thisDragTo = new cardDOMEvent(event.target);
     
     const dragTo = event.target;
 
@@ -53,7 +53,7 @@ const cardDraggedToSpace = (event) => {
 // hovered. this function's sole purpose is to call preventDefault() on the
 // dragover listener so that it's possible for the drop listener to fire.
 const cardDraggedOverSpace = (event) => {
-    if (!playerCanInteract) { return; }
+    if (!playerCanInteract || gameEnd) { return; }
     
     event.preventDefault();
 }
@@ -69,31 +69,38 @@ const dragLeave = (event) => {
 }
 
 const dragDrop = (event) => {
-    if (!playerCanInteract) { return; }
+    if (!playerCanInteract || gameEnd) { return; }
 
     event.preventDefault();
     
     clearDragVisuals(event);
     
     // extract destination information from the event object
-    thisDragTo = new dragInfo(event.target);
+    thisDragTo = new cardDOMEvent(event.target);
+    const thisDragFromSpace = thisDragFrom.spaceObj;
+    const thisDragToSpace = thisDragTo.spaceObj;
 
     const isToFriendlyNatial = (thisDragTo.owner === PLAYER_FRIENDLY && thisDragTo.isNatial);
     const isToEnemyNatial = (thisDragTo.owner === PLAYER_ENEMY && thisDragTo.isNatial);
 
     // decide what to do based on what was dragged into what
-    // prototype for movement: card dragged from board to empty friendly space
-    if (thisDragFrom.isNatial && isToFriendlyNatial && !thisDragTo.spaceObj.card) {
-        // extract target and destination from the event objects
-        thisDragFrom.spaceObj.moveNatial(thisDragTo.spaceObj);
+    // check for movement: card dragged from board to friendly space
+    if (thisDragFrom.isNatial
+        && isToFriendlyNatial
+        && thisDragFromSpace.checkMovementPossible(thisDragToSpace)) {
+        thisDragFromSpace.moveNatial(thisDragToSpace);
     }
-    // prototype for attacking: card dragged from board to occupied enemy space
-    else if (thisDragFrom.isNatial && isToEnemyNatial && thisDragTo.spaceObj.card) {
-        thisDragFrom.spaceObj.attackNatial(thisDragTo.spaceObj);
+    // check for attacking: card dragged from board to enemy space
+    else if (thisDragFrom.isNatial
+        && isToEnemyNatial
+        && thisDragFromSpace.checkAttackPossible(thisDragToSpace)) {
+        thisDragFromSpace.attackNatial(thisDragToSpace);
     }
-    // prototype for summoning: card dragged from hand onto empty friendly space
-    else if (thisDragFrom.isHandCard && isToFriendlyNatial && !thisDragTo.spaceObj.card) {
-        thisDragFrom.spaceObj.summonNatial(thisDragTo.spaceObj);
+    // check for summoning: card dragged from hand onto friendly space
+    else if (thisDragFrom.isHandCard
+        && isToFriendlyNatial
+        && thisDragFromSpace.checkSummonPossible(thisDragToSpace)) {
+        thisDragFromSpace.summonNatial(thisDragToSpace);
     }
 
     return;

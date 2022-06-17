@@ -1,3 +1,5 @@
+// ========== Classes ==========
+
 class boardSpace {
     constructor (owner, index) {
         this.card = null;
@@ -44,6 +46,18 @@ class NatialSpace extends boardSpace {
         this.DOM = document.getElementById(this.DOMId);
     }
 
+    // checks whether movement is possible. failure conditions include the card
+    // having no more movement available or the space already being occupied.
+    // returns true if the movement is allowable, and false otherwise.
+    checkMovementPossible(targetSpace) {
+        // fail if target space is not empty
+        if (targetSpace.card) { return false; }
+        // fail if the card has no moves
+        if (0) { return false; } // to be implemented
+
+        return true;
+    }
+
     // moves the card object from the calling NatialSpace into the requested
     // destination NatialSpace.
     moveNatial(targetSpace) {
@@ -57,12 +71,42 @@ class NatialSpace extends boardSpace {
         return true;
     }
 
+    // calculates the damage that would be dealt if the card in this space
+    // attacked the card at targetSpace. returns an array [damage to target,
+    // counterattack damage to self].
+    calculateDamage(targetSpace) {
+        const myAtk = this.card.attack;
+        const myElement = this.card.element;
+        const oppAtk = targetSpace.card.attack;
+        const oppElement = targetSpace.card.element;
+
+        // all damage is floored at zero, and counterattacks do 1 less damage
+        // than a directed attack
+        const myDmg = Math.max(myAtk + TYPE_CHART[myElement][oppElement], 0);
+        const counterDmg = Math.max(oppAtk + TYPE_CHART[oppElement][myElement] - 1, 0);
+
+        return [myDmg, counterDmg];
+    }
+
+    // checks whether an attack is possible. failure conditions include the
+    // target space being empty and the card not having any attacks left.
+    // returns the result of calculateDamage() above if the attack is
+    // allowable, and false otherwise.
+    checkAttackPossible(targetSpace) {
+        // fail if the target space is empty
+        if (!targetSpace.card) { return false; }
+        // fail if the card has no attacks
+        if (0) { return false; } // to be implemented
+
+        return this.calculateDamage(targetSpace);
+    }
+
     // attacks the opposing natial at the indicated opposing NatialSpace using
     // the natial in the current NatialSpace.
     attackNatial(defenderSpace) {
         const opponent = defenderSpace.owner;
 
-        // perform the attack
+        // perform attack
         const attacker = this.card;
         defenderSpace.card.currentHP -= attacker.attack;
 
@@ -89,6 +133,19 @@ class HandSpace extends boardSpace {
         const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
         this.DOMId = `${playerStr}-hand-${this.index}`
         this.DOM = document.getElementById(this.DOMId);
+    }
+
+    // checks to see whether the natial can be summoned to the target space.
+    // failure conditions include the space already being occupied and having
+    // insufficient mana to perform the summon. returns true if the summon is
+    // allowed and false otherwise.
+    checkSummonPossible(targetSpace) {
+        // fail if target space is not tempty
+        if (targetSpace.card) { return false; }
+        // fail if insufficient mana
+        if (currentMana[this.owner] < this.card.cost) { return false; }
+
+        return true;
     }
 
     // move the card object from the calling HandSpace to the requested
@@ -128,7 +185,7 @@ class cardSpell extends card {
 
 }
 
-class dragInfo {
+class cardDOMEvent {
     constructor(draggedDOM) {
         this.isFrontNatial = draggedDOM.classList.contains("front-natial");
         this.isBackNatial = draggedDOM.classList.contains("back-natial");
@@ -144,3 +201,28 @@ class dragInfo {
             hands[this.owner][this.index]);
     }
 }
+
+
+// ========== Non-class structures ==========
+
+const decks = [[], []]; // friendly, enemy
+const hands = [
+    Array(6).fill(null).map((el, i) => new HandSpace(PLAYER_FRIENDLY, i)), // friendly
+    Array(6).fill(null).map((el, i) => new HandSpace(PLAYER_ENEMY, i)) // enemy
+];
+const natials = [
+    [ // friendly
+        Array(4).fill(null).map((el, i) => new NatialSpace(PLAYER_FRIENDLY, i, true)), // front
+        Array(3).fill(null).map((el, i) => new NatialSpace(PLAYER_FRIENDLY, i, false)), // back
+    ],
+    [ // enemy
+        Array(4).fill(null).map((el, i) => new NatialSpace(PLAYER_ENEMY, i, true)), // front
+        Array(3).fill(null).map((el, i) => new NatialSpace(PLAYER_ENEMY, i, false)) // back
+    ]
+];
+const destroyedCards = [[], []]; // friendly, enemy
+
+let masters = [null, null]; // friendly, enemy
+
+let maxMana = [null, null]; // friendly, enemy
+let currentMana = [null, null] // friendly, enemy
