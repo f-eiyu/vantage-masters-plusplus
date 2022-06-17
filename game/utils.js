@@ -39,7 +39,7 @@ const renderCard = (player, zone, position) => {
     // parse parameters to access the correct DOM element on the game board
     const playerIsEnemy = (player === PLAYER_ENEMY);
     const playerStr = (playerIsEnemy ? "enemy" : "friendly");
-    const zoneStr = (zone === ZONE_HAND ? "hand" : `${zone === ZONE_NATIAL_FRONT ? "front" : "back"}`);
+    const zoneStr = (zone === ZONE_HAND ? "hand" : `${zone === ZONE_NATIAL_FRONT ? "front" : "back"}`); 
     const thisTileID = `#${playerStr}-${zoneStr}-${position}`;
     const thisBoardSpaceDOM = document.querySelector(thisTileID);
 
@@ -65,22 +65,14 @@ const renderCard = (player, zone, position) => {
     }
 }
 
-// re-renders all cards in the specified player's hand. we cannot use forEach
-// here, because we want the empty places to be rendered correctly as well.
+// re-renders all cards in the specified player's hand.
 const renderHand = (player) => {
-    for(let i = 0; i < HAND_SIZE_LIMIT; i++) {
-        renderCard(player, ZONE_HAND, i);
-    }
+    hands[player].forEach(space => space.renderCard());
 }
 
 // re-renders all cards in both of the specified player's natial zones. as
 // above, forEach will not work here.
 const renderNatials = (player) => {
-    for(let i = 0; i < NATIAL_FRONT_CAPACITY; i++) {
-        renderCard(player, ZONE_NATIAL_FRONT, i);
-    }
-
-    for(let i = 0; i < NATIAL_BACK_CAPACITY; i++) {
-        renderCard(player, ZONE_NATIAL_BACK, i);
-    }
+    natials[player][ROW_FRONT].forEach(space => space.renderCard());
+    natials[player][ROW_BACK].forEach(space => space.renderCard());
 }

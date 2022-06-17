@@ -21,21 +21,27 @@ const loadDeck = (cardList, player) => {
 }
 
 const drawCard = (player, render = true) => {
-    // hands can have six cards at most
-    if (hands[player].length >= 6) { return false; }
-
-    // can only draw if there are cards to draw
+    // fail if there are no cards to draw
     if (decks[player].length === 0) { return false; }
 
+    // retrieve the index of the first empty handSpace
+    const getFirstEmpty = hands[player].reduce((firstEmpty, toCheck) => {
+        return (!toCheck.card && toCheck.index < firstEmpty ? toCheck.index : firstEmpty);
+    }, Infinity);
+
+    // fail if there are no empty spaces
+    if (getFirstEmpty > HAND_SIZE_LIMIT - 1) { return false; }
+
     // if the draw is possible, pop last card in the deck to the player's hand
-    hands[player].push(decks[player].pop());
+    hands[player][getFirstEmpty].card = decks[player].pop();
 
     if (render) { renderBoard(); }
     return true;
 }
 
 const placeCardOnBoard = (player, card, row, position, render = true) => {
-    if (!natials[player][row][position]) { natials[player][row][position] = card; }
+    const thisSpace = natials[player][row][position];
+    if (!thisSpace.card) { thisSpace.card = card; }
 
     if (render) { renderBoard(); }
 }
@@ -100,11 +106,15 @@ const initializeGameBoard = () => {
     renderBoard();
 }
 
+const endTurn = () => {
+    // placeholder for now
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     initializeGameBoard();
 
     const addDragEventListener = (domObj) => {
-        domObj.addEventListener("dragenter", cardDraggedOnSpace);
+        domObj.addEventListener("dragenter", cardDraggedToSpace);
         domObj.addEventListener("dragover", cardDraggedOverSpace);
         domObj.addEventListener("dragleave", dragLeave);
         domObj.addEventListener("drop", dragDrop);
@@ -119,17 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
     addDragEventListenerToAll("enemy-natial-space");
     addDragEventListenerToAll("friendly-natial-space");
     addDragEventListenerToAll("friendly-hand-card");
+
+    document.querySelector("#end-turn").addEventListener("click", endTurn);
 });
 
-
 // ========== FUNCTIONS HANDLING DRAGGING AND DROPPING ==========
-
-// gives click and drag functionality to a card on the board
-const dragStart = (event) => {
-    draggedCard = event.target;
-    event.target.classList.add("dragging");
-    console.log("drag start");
-}
 
 const setDraggable = (thisCardDOM) => {
     thisCardDOM.setAttribute("draggable", "true");
@@ -137,36 +141,37 @@ const setDraggable = (thisCardDOM) => {
     thisCardDOM.addEventListener("dragend", (event) => event.target.classList.remove("dragging"));
 }
 
+const dragStart = (event) => {
+    thisDragFrom = new dragInfo(event.target);
+    event.target.classList.add("dragging");
+}
 
-const cardDraggedOnSpace = (event) => {
+const cardDraggedToSpace = (event) => {
     event.preventDefault();
+
+    thisDragTo = new dragInfo(event.target);
     
     const dragTo = event.target;
 
     // sanity check
-    if (draggedCard.owner !== PLAYER_FRIENDLY) { return false; }
-    if (draggedCard === dragTo) { return false; }
-
-    const isFrontNatial = draggedCard.classList.contains("front-natial");
-    const isBackNatial = draggedCard.classList.contains("back-natial");
-    const isNatial = isFrontNatial || isBackNatial;
-    const isHandCard = draggedCard.classList.contains("friendly-hand-card");
+    if (thisDragFrom.owner !== PLAYER_FRIENDLY) { return false; }
+    // prevent the card you just dragged for showing a border on itself
+    if (thisDragFrom.spaceObj.DOM === dragTo) { return false; }
 
     const isToFriendlyNatial = dragTo.classList.contains("friendly-natial-space");
     const isToEnemyNatial = dragTo.classList.contains("enemy-natial-space");
-    const isToHand = dragTo.classList.contains("friendly-hand-card");
 
     // decide what to do based on what kind of card was dragged where
     // natial dragged onto empty friendly space: movement possible
-    if (isNatial && isToFriendlyNatial && !dragTo.content) {
+    if (thisDragFrom.isNatial && isToFriendlyNatial && !thisDragTo.spaceObj.card) {
         dragTo.classList.add("drag-over-empty");
     }
     // natial dragged onto occupied enemy space: attack possible
-    else if (isNatial && isToEnemyNatial && dragTo.content) {
+    else if (thisDragFrom.isNatial && isToEnemyNatial && thisDragTo.spaceObj.card) {
         dragTo.classList.add("drag-over-attack");
     }
     // hand card dragged onto empty friendly space: summoning possible
-    else if (isHandCard && isToFriendlyNatial && !dragTo.content) {
+    else if (thisDragFrom.isHandCard && isToFriendlyNatial && !thisDragTo.spaceObj.card) {
         dragTo.classList.add("drag-over-empty");
     }
     // special case: spell cards dragged over the field to activate
@@ -177,9 +182,9 @@ const cardDraggedOnSpace = (event) => {
     }
 }
 
-// we don't require any continunous action when a tile is being drag hovered.
-// this function's sole purpose is to call preventDefault() on the dragover
-// listener so that it's possible for the drop listener to fire.
+// we don't actually require any continunous action when a tile is being drag
+// hovered. this function's sole purpose is to call preventDefault() on the
+// dragover listener so that it's possible for the drop listener to fire.
 const cardDraggedOverSpace = (event) => {
     event.preventDefault();
 }
@@ -198,77 +203,27 @@ const dragDrop = (event) => {
     event.preventDefault();
     
     clearDragVisuals(event);
+    
+    // extract destination information from the event object
+    thisDragTo = new dragInfo(event.target);
 
-    const dragTo = event.target;
-
-    // extract originating card's information
-    const isFrontNatial = draggedCard.classList.contains("front-natial");
-    const isBackNatial = draggedCard.classList.contains("back-natial");
-    const isNatial = isFrontNatial || isBackNatial;
-    const inRow = isFrontNatial ? ZONE_NATIAL_FRONT : ZONE_NATIAL_BACK;
-    const isHandCard = draggedCard.classList.contains("friendly-hand-card");
-    const index = draggedCard.id.slice(-1);
-
-    // extract target and destination information from the event object
-    const isToFriendlyNatial = dragTo.classList.contains("friendly-natial-space");
-    const isToEnemyNatial = dragTo.classList.contains("enemy-natial-space");
-    const targetID = dragTo.id.split("-");
-    const targetRow = targetID[1] === "front" ? ZONE_NATIAL_FRONT : ZONE_NATIAL_BACK;
-    const targetIndex = targetID[2];
+    const isToFriendlyNatial = (thisDragTo.owner === PLAYER_FRIENDLY && thisDragTo.isNatial);
+    const isToEnemyNatial = (thisDragTo.owner === PLAYER_ENEMY && thisDragTo.isNatial);
 
     // decide what to do based on what was dragged into what
-    // prototype for movement: card dragged from board to blank friendly space
-    if (isNatial && isToFriendlyNatial && !dragTo.content) {
+    // prototype for movement: card dragged from board to empty friendly space
+    if (thisDragFrom.isNatial && isToFriendlyNatial && !thisDragTo.spaceObj.card) {
         // extract target and destination from the event objects
-        moveNatial(PLAYER_FRIENDLY, inRow, index, targetRow, targetIndex);
+        thisDragFrom.spaceObj.moveNatial(thisDragTo.spaceObj);
     }
     // prototype for attacking: card dragged from board to occupied enemy space
-    else if (isNatial && isToEnemyNatial && dragTo.content) {
-        attackNatial(PLAYER_FRIENDLY, inRow, index, targetRow, targetIndex);
+    else if (thisDragFrom.isNatial && isToEnemyNatial && thisDragTo.spaceObj.card) {
+        thisDragFrom.spaceObj.attackNatial(thisDragTo.spaceObj);
     }
-    // prototype for summoning: card dragged from hand onto blank friendly space
-    else if (isHandCard && isToFriendlyNatial && !dragTo.content) {
-        summonNatial(PLAYER_FRIENDLY, index, targetRow, targetIndex);
-    }
-    else {
-        draggedCard = null;
-    }
-}
-
-const moveNatial = (player, originRow, originIndex, targetRow, targetIndex) => {
-    // moves the card object's reference from one board tile to another
-    natials[player][targetRow][targetIndex] = natials[player][originRow][originIndex];
-    natials[player][originRow][originIndex] = null;
-
-    // re-render the natial zone
-    renderNatials(player);
-}
-
-const attackNatial = (attackingPlayer, attackerRow, attackerIndex, defenderRow, defenderIndex) => {
-    // fetch the attacker and defender objects
-    const defendingPlayer = (attackingPlayer === PLAYER_FRIENDLY ? PLAYER_ENEMY : PLAYER_FRIENDLY);
-    const attacker = natials[attackingPlayer][attackerRow][attackerIndex];
-    const defender = natials[defendingPlayer][defenderRow][defenderIndex];
-
-    // perform the attack
-    defender.currentHP -= attacker.attack;
-
-    // remove the defender from the board if it dies
-    if (defender.currentHP <= 0) {
-        natials[defendingPlayer][defenderRow][defenderIndex] = null;
+    // prototype for summoning: card dragged from hand onto empty friendly space
+    else if (thisDragFrom.isHandCard && isToFriendlyNatial && !thisDragTo.spaceObj.card) {
+        thisDragFrom.spaceObj.summonNatial(thisDragTo.spaceObj);
     }
 
-    // re-render both natial zones
-    renderNatials(PLAYER_FRIENDLY);
-    renderNatials(PLAYER_ENEMY);
-}
-
-const summonNatial = (player, handIndex, targetRow, targetIndex) => {
-    // move the card object's reference from hand to board
-    natials[player][targetRow][targetIndex] = hands[player][handIndex];
-    hands[player][handIndex] = null;
-
-    // re-render the appropriate zones
-    renderHand(player);
-    renderNatials(player);
+    return;
 }
