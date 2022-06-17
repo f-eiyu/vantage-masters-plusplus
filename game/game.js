@@ -64,21 +64,32 @@ const cardToBoardDirect = (player, card, row, position, render = true) => {
     if (render) { renderBoard(); }
 }
 
-const playerStartTurn = () => {
-
+const replenishMana = (player) => {
+    if (maxMana[player] < 10) { maxMana[player]++; }
+    currentMana[player] = maxMana[player];
 }
 
-const playerEndTurn = () => {
+const friendlyStartTurn = () => {
+    replenishMana(PLAYER_FRIENDLY);
+    friendlyControl = true;
+}
 
+const friendlyEndTurn = () => {
+    friendlyControl = false;
+
+    enemyStartTurn();
 }
 
 // most functions encoding actual AI behavior will be in the ai.js file
-const aiStartTurn = () => {
-
+const enemyStartTurn = () => {
+    replenishMana(PLAYER_ENEMY);
+    aiTurn();
 }
 
-const aiEndTurn = () => {
-
+const enemyEndTurn = () => {
+    
+    
+    friendlyStartTurn();
 }
 
 const initializeGameBoard = () => {
@@ -141,5 +152,5 @@ document.addEventListener("DOMContentLoaded", () => {
     addDragEventListenerToAll("friendly-natial-space");
     addDragEventListenerToAll("friendly-hand-card");
 
-    document.querySelector("#end-turn").addEventListener("click", playerEndTurn);
+    document.querySelector("#end-turn").addEventListener("click", friendlyEndTurn);
 });

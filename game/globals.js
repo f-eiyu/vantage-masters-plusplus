@@ -17,6 +17,7 @@ const NATIAL_BACK_CAPACITY = 3;
 
 const ROW_FRONT = 0;
 const ROW_BACK = 1;
+
 const decks = [[], []]; // friendly, enemy
 const hands = [
     Array(6).fill(null).map((el, i) => new HandSpace(PLAYER_FRIENDLY, i)), // friendly [0 = PLAYER_FRIENDLY]
@@ -40,6 +41,8 @@ let enemyMaster = null;
 let turnCounter = 1;
 let maxMana = [null, null]; // friendly, enemy
 let currentMana = [null, null] // friendly, enemy
+
+let friendlyControl = false;
 
 let thisDragFrom = null;
 let thisDragTo = null;

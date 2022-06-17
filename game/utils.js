@@ -49,7 +49,7 @@ const renderMana = (player) => {
     const playerStr = (player === PLAYER_FRIENDLY ? "friendly" : "enemy");
     const manaDOM = document.getElementById(`${playerStr}-portrait`);
 
-    manaDOM.innerText = `${maxMana[player]}/${currentMana[player]}`;
+    manaDOM.innerText = `${currentMana[player]}/${maxMana[player]}`;
 }
 
 // re-renders everything on the board that isn't guaranteed to be static

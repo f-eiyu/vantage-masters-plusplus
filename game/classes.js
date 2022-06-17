@@ -91,15 +91,18 @@ class HandSpace extends boardSpace {
     // move the card object from the calling HandSpace to the requested
     // NatialSpace on the board.
     summonNatial(targetSpace) {
+        // summoning will almost always require mana
+        if (currentMana[this.owner] < this.card.cost) { return false; }
+        currentMana[this.owner] -= this.card.cost;
+        renderMana(this.owner);
+
+        // move the specified card!
         targetSpace.card = this.card;
         this.card = null;
 
         // summoning will always require a re-render
         renderHand(this.owner);
         renderNatials(this.owner);
-
-        // summoning will almost always change current mana
-        ///////////////
 
         return true;
     }
