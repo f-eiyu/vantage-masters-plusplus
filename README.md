@@ -14,9 +14,20 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
     - On each turn, players draw one card from their deck. Then, players can
     summon natials from their hand, play spell cards, move the natials on their
     board, attack with the natials on their board, or use a natial special ability.
+    - The natial zone has two rows. Natials in the back row cannot attack, unless
+    they have the "ranged" flag. Natials in the front row cannot attack natials
+    in the opposing back row if there are natials in the opposing front row, unless
+    the attacker has the "ranged" flag.
+    - Natials cannot take any action on the turn they're summoned, unless they
+    have the "quick" flag.
+    - The deck master is automatically placed on the back row of the natial zone
+    at the start of the game, and behaves like a natial in all respects except two:
+        1. A player will immediately lose the game if the deck master's HP is zero.
+        2. A deck master's special ability (if it has one) costs mana and can be
+        used once per turn instead of one time only.
     - Each player starts with an amount of mana specified by their deck master
     and automatically gains one maximum mana every turn.
-        Mana increases from spells or effects will not increase maximum mana,
+        - Mana increases from spells or effects will not increase maximum mana,
         but can allow mana to temporarily exceed the current maximum.
     - Natial summoning and spell usage are both gated by mana.
     - Mana refills to the current maximum at the start of every turn.
