@@ -13,12 +13,9 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
     - This is a turn-based card game based on summoning monsters known as natials
     to the board to attack the opponent's deck master.
     - On each turn, players draw one card from their deck. Then, players can
-    summon natials from their hand, play spell cards, move the natials on their
-    board, attack with the natials on their board, or use a natial special ability.
-    - The natial zone has two rows. Natials in the back row cannot attack, unless
-    they have the "ranged" flag. Natials in the front row cannot attack natials
-    in the opposing back row if there are natials in the opposing front row, unless
-    the attacker has the "ranged" flag.
+    summon natials from their hand, move the natials around on their board, or
+    attack with the natials on their board.
+    - The natial zone has a front row and a back row.
     - Natials cannot take any action on the turn they're summoned, unless they
     have the "quick" flag.
     - The deck master is automatically placed on the back row of the natial zone
@@ -33,16 +30,21 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
     - The computer opponent will summon natials to the board and attack with them.
 
 ### Gameplay goals
-- Play Vantage Masters with all of the cards and mechanics that exist in Trails
-of Cold Steel IV.
-    - Some deck masters will have special abilities, which cost mana and can be
-    used once per turn instead of one time only.
+- Implement additional, more complicated gameplay mechanics.
+    - Natials in the back row cannot attack, unless they have the "ranged" flag.
+    Natials in the front row cannot attack natials in the opposing back row if
+    there are natials in the opposing front row, unless the attacker has the
+    "ranged" flag.
     - Some monsters will have special abilities, which can be activated at will,
     once per monster.
-    - Implement spells, which are activated directly from the hand and have a
+    - Some deck masters will have special abilities, which cost mana and can be
+    used once per turn instead of one time only.
+    - Add spells, which are activated directly from the hand and have a
     variety of effects. Spell usage costs mana.
 
 ### Stretch goals
+- Play Vantage Masters with all of the cards and mechanics that exist in Trails
+of Cold Steel IV.
 - Play Vantage Masters against a smarter computer.
     - The computer will have some more sophisticated behavior, such as trying to
     maintain board control, saving spell cards for a "lethal", or focusing down
@@ -67,14 +69,14 @@ when the "End Turn" button is clicked.
 with as many cards as possible on its turn.
 1. Implement the back-and-forth between player turns and enemy turns, with the
 first turn-taker being random.
+1. Implement victory and loss conditions and a reset button.
 1. **At this stage, I will have a working MVP for the game.**
 1. Create a framework for spell card functionality via callbacks and create two
 straightforward spells to debug with.
 1. Create a framework for card active ability functionality via callbacks and
 create two straightforward active effects to debug with.
-1. Implement victory and loss conditions and a reset button.
-1. **At this stage, the core gameplay is fully functional and project requirements
-are met.**
+1. **At this stage, all core gameplay features are functional. Anything after
+this point can be considered a stretch goal..**
 1. Create a wireframe of the deck builder, game start screen, and title screen.
 1. Implement the deck builder, which lets the player choose cards to form their
 deck with and save a list of decks in local storage for long term replayability.
