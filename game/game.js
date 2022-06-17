@@ -105,8 +105,7 @@ const enemyStartTurn = () => {
 
 const enemyEndTurn = () => {
     
-    
-    friendlyStartTurn();
+    if (!gameEnd) { friendlyStartTurn(); }
 }
 
 const initializeGameBoard = () => {
