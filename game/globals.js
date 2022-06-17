@@ -35,14 +35,14 @@ const natials = [
 ];
 const destroyedCards = [[], []]; // friendly, enemy
 
-let friendlyMaster = null;
-let enemyMaster = null;
+let masters = [null, null]; // friendly, enemy
 
 let turnCounter = 0;
 let maxMana = [null, null]; // friendly, enemy
 let currentMana = [null, null] // friendly, enemy
 
-let friendlyControl = false;
+let playerCanInteract = false;
+let gameEnd = false;
 
 let thisDragFrom = null;
 let thisDragTo = null;

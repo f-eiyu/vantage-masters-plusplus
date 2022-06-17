@@ -5,11 +5,15 @@ const setDraggable = (thisCardDOM) => {
 }
 
 const dragStart = (event) => {
+    if (!playerCanInteract) { return; }
+
     thisDragFrom = new dragInfo(event.target);
     event.target.classList.add("dragging");
 }
 
 const cardDraggedToSpace = (event) => {
+    if (!playerCanInteract) { return; 
+    }
     event.preventDefault();
 
     thisDragTo = new dragInfo(event.target);
@@ -49,6 +53,8 @@ const cardDraggedToSpace = (event) => {
 // hovered. this function's sole purpose is to call preventDefault() on the
 // dragover listener so that it's possible for the drop listener to fire.
 const cardDraggedOverSpace = (event) => {
+    if (!playerCanInteract) { return; }
+    
     event.preventDefault();
 }
 
@@ -63,6 +69,8 @@ const dragLeave = (event) => {
 }
 
 const dragDrop = (event) => {
+    if (!playerCanInteract) { return; }
+
     event.preventDefault();
     
     clearDragVisuals(event);

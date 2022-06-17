@@ -57,7 +57,7 @@ const aiAttack = () => {
         return natials[PLAYER_FRIENDLY][pos[0]][pos[1]];
     });
 
-    while(attackers.length && attackTargets.length) {
+    while(attackers.length && attackTargets.length && !gameEnd) {
         // each natial can only attack once...
         const attackerSpace = attackers.pop();
         // .. but each natial can BE attacked more than once, so this can't pop

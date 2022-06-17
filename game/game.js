@@ -77,10 +77,13 @@ const incrementTurnCounter = () => {
 }
 
 const friendlyStartTurn = () => {
-    replenishMana(PLAYER_FRIENDLY);
     incrementTurnCounter();
     renderTurnCounter();
-    friendlyControl = true;
+
+    replenishMana(PLAYER_FRIENDLY);
+    drawCard(PLAYER_FRIENDLY);
+
+    playerCanInteract = true;
 }
 
 const friendlyEndTurn = () => {
@@ -91,9 +94,12 @@ const friendlyEndTurn = () => {
 
 // most functions encoding actual AI behavior will be in the ai.js file
 const enemyStartTurn = () => {
-    replenishMana(PLAYER_ENEMY);
     incrementTurnCounter();
     renderTurnCounter();
+
+    replenishMana(PLAYER_ENEMY);
+    drawCard(PLAYER_ENEMY);
+
     aiTurn();
 }
 
@@ -129,15 +135,15 @@ const initializeGameBoard = () => {
     }
 
     // both players start with their respective masters on back-1
-    friendlyMaster = createCard(getFromDB("Debug Master"));
-    enemyMaster = createCard(getFromDB("Debug Master"));
-    cardToBoardDirect(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1, false);
-    cardToBoardDirect(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1, false);
+    masters[PLAYER_FRIENDLY] = createCard(getFromDB("Debug Master"));
+    masters[PLAYER_ENEMY] = createCard(getFromDB("Debug Master"));
+    cardToBoardDirect(PLAYER_FRIENDLY, masters[PLAYER_FRIENDLY], ROW_BACK, 1, false);
+    cardToBoardDirect(PLAYER_ENEMY, masters[PLAYER_ENEMY], ROW_BACK, 1, false);
 
     // set starting mana values
-    maxMana[PLAYER_FRIENDLY] = friendlyMaster.cost;
+    maxMana[PLAYER_FRIENDLY] = masters[PLAYER_FRIENDLY].cost;
     currentMana[PLAYER_FRIENDLY] = maxMana[PLAYER_FRIENDLY];
-    maxMana[PLAYER_ENEMY] = enemyMaster.cost;
+    maxMana[PLAYER_ENEMY] = masters[PLAYER_ENEMY].cost;
     currentMana[PLAYER_ENEMY] = maxMana[PLAYER_ENEMY];
 
     // choose a random player to start

@@ -75,6 +75,9 @@ class NatialSpace extends boardSpace {
         renderNatials(this.owner);
         renderNatials(opponent);
 
+        // check if a player has won as a result of this turn
+        checkVictory();
+
         return true;
     }
 }
