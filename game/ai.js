@@ -4,6 +4,8 @@
 
 // looks for all valid places to move or place an enemy card.
 // returns an array of [row, index] pairs if any exist, or false otherwise
+const aiVerbose = true;
+
 const aiFindEmptySpaces = () => {
     const emptySpaces = [];
 
@@ -29,7 +31,7 @@ const aiFindNatials = (player) => {
         });
     });
 
-    if (!foundNatials.length) { alert("Logic error reached in ai.js/findNatials -- no natials found on the board"); }
+    if (!foundNatials.length && aiVerbose) { alert("Logic error reached in ai.js/findNatials -- no natials found on the board"); }
     return foundNatials;
 }
 
@@ -43,7 +45,9 @@ const aiSummonNatials = () => {
             const emptyIndex = thisEmptySpace[1];
 
             space.summonNatial(natials[PLAYER_ENEMY][emptyRow][emptyIndex]);
-            console.log("Hand card", index, "summoned to", thisEmptySpace);
+            if (aiVerbose) {
+                console.log("Hand card", index, "summoned to", thisEmptySpace);
+            }
         }
     });
 }
@@ -63,12 +67,21 @@ const aiAttack = () => {
         // .. but each natial can BE attacked more than once, so this can't pop
         const attackTargetSpace = attackTargets[0];
 
-        console.log("Attacking!")
+        if (aiVerbose) {
+            console.log("Attacking", attackTargetSpace.card.name, "with", attackerSpace.card.name);
+            const calcedDmg = attackerSpace.calculateDamage(attackTargetSpace);
+            console.log("Expected damage done:", calcedDmg[0]);
+            console.log("Expected damage taken:", calcedDmg[1]);
+        }
         attackerSpace.attackNatial(attackTargetSpace);
-        if (!attackTargetSpace.card) { attackTargets.shift(); }
+        if (aiVerbose) { console.log("Attack resolved."); }
+        if (!attackTargetSpace.card) { 
+            if (aiVerbose) { console.log("Target destroyed."); }
+            attackTargets.shift();
+        }
     }
 
-    console.log("finished attacking!");
+    console.log("Finished attacking!");
 }
 
 // lets the AI take its turn
