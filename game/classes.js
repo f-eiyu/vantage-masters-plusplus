@@ -98,6 +98,9 @@ class HandSpace extends boardSpace {
         renderHand(this.owner);
         renderNatials(this.owner);
 
+        // summoning will almost always change current mana
+        ///////////////
+
         return true;
     }
 

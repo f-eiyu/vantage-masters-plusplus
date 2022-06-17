@@ -32,39 +32,6 @@ const getElementName = (element) => {
     }
 }
 
-// renders the card currently controlled by player in zone's position'th place
-const renderCard = (player, zone, position) => {
-    const thisCard = (zone === ZONE_HAND ? hands[player][position] : natials[player][zone][position]);
-
-    // parse parameters to access the correct DOM element on the game board
-    const playerIsEnemy = (player === PLAYER_ENEMY);
-    const playerStr = (playerIsEnemy ? "enemy" : "friendly");
-    const zoneStr = (zone === ZONE_HAND ? "hand" : `${zone === ZONE_NATIAL_FRONT ? "front" : "back"}`); 
-    const thisTileID = `#${playerStr}-${zoneStr}-${position}`;
-    const thisBoardSpaceDOM = document.querySelector(thisTileID);
-
-    // set everything properly on the card DOM...
-    if (!thisCard) { // there isn't actually a card in this spot
-        thisBoardSpaceDOM.innerText = `${zoneStr} ${position}`;
-        thisBoardSpaceDOM.setAttribute("draggable", false);
-        thisBoardSpaceDOM.content = null;
-    } else { // eventually, the card will render something pretty instead of text
-        const cardStr = `${playerIsEnemy ? "??? " : ""}${thisCard.name}
-        Element: ${getElementName(thisCard.element)}
-        HP: ${thisCard.currentHP}/${thisCard.maxHP}
-        ATK: ${thisCard.attack}
-        Cost: ${thisCard.cost}
-        ${thisCard.isRanged ? "R" : ""}${thisCard.isQuick ? "Q" : ""}
-        `;
-
-        thisBoardSpaceDOM.owner = player;
-        thisBoardSpaceDOM.content = thisCard;
-        thisBoardSpaceDOM.innerText = cardStr;
-        
-        if (!playerIsEnemy) { setDraggable(thisBoardSpaceDOM); }
-    }
-}
-
 // re-renders all cards in the specified player's hand.
 const renderHand = (player) => {
     hands[player].forEach(space => space.renderCard());
@@ -75,4 +42,21 @@ const renderHand = (player) => {
 const renderNatials = (player) => {
     natials[player][ROW_FRONT].forEach(space => space.renderCard());
     natials[player][ROW_BACK].forEach(space => space.renderCard());
+}
+
+// renders the mana display for the specified player
+const renderMana = (player) => {
+    const playerStr = (player === PLAYER_FRIENDLY ? "friendly" : "enemy");
+    const manaDOM = document.getElementById(`${playerStr}-portrait`);
+
+    manaDOM.innerText = `${maxMana[player]}/${currentMana[player]}`;
+}
+
+// re-renders everything on the board that isn't guaranteed to be static
+const renderBoard = () => {
+    for (player of [PLAYER_FRIENDLY, PLAYER_ENEMY]) {
+        renderHand(player);
+        renderNatials(player);
+        renderMana(player);
+    }
 }

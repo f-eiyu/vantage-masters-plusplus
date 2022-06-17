@@ -91,7 +91,7 @@ const cardDB = [
         "currentHP": 30,
         "maxHP": 30,
         "attack": 10,
-        "cost": 0,
+        "cost": 2,
         "maxActions": 1,
 
         "isRanged": false,

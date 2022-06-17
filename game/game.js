@@ -39,21 +39,6 @@ const drawCard = (player, render = true) => {
     return true;
 }
 
-const placeCardOnBoard = (player, card, row, position, render = true) => {
-    const thisSpace = natials[player][row][position];
-    if (!thisSpace.card) { thisSpace.card = card; }
-
-    if (render) { renderBoard(); }
-}
-
-const renderBoard = () => {
-    renderHand(PLAYER_FRIENDLY);
-    renderHand(PLAYER_ENEMY);
-
-    renderNatials(PLAYER_FRIENDLY);
-    renderNatials(PLAYER_ENEMY);
-}
-
 const boardCardMouseover = (event) => {
     const boardSpace = event.target;
     if (!boardSpace.content) { return; }
@@ -70,6 +55,30 @@ const boardCardMouseleave = (event) => {
 
     detailZone.innerText = "";
     boardSpace.classList.remove("hovered");
+}
+
+const cardToBoardDirect = (player, card, row, position, render = true) => {
+    const thisSpace = natials[player][row][position];
+    if (!thisSpace.card) { thisSpace.card = card; }
+
+    if (render) { renderBoard(); }
+}
+
+const playerStartTurn = () => {
+
+}
+
+const playerEndTurn = () => {
+
+}
+
+// most functions encoding actual AI behavior will be in the ai.js file
+const aiStartTurn = () => {
+
+}
+
+const aiEndTurn = () => {
+
 }
 
 const initializeGameBoard = () => {
@@ -100,14 +109,16 @@ const initializeGameBoard = () => {
     // both players start with their respective masters on back-1
     friendlyMaster = createCard(getFromDB("Debug Master"));
     enemyMaster = createCard(getFromDB("Debug Master"));
-    placeCardOnBoard(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1, false);
-    placeCardOnBoard(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1, false);
+    cardToBoardDirect(PLAYER_FRIENDLY, friendlyMaster, ROW_BACK, 1, false);
+    cardToBoardDirect(PLAYER_ENEMY, enemyMaster, ROW_BACK, 1, false);
+
+    // set starting mana values
+    maxMana[PLAYER_FRIENDLY] = friendlyMaster.cost;
+    currentMana[PLAYER_FRIENDLY] = maxMana[PLAYER_FRIENDLY];
+    maxMana[PLAYER_ENEMY] = enemyMaster.cost;
+    currentMana[PLAYER_ENEMY] = maxMana[PLAYER_ENEMY];
     
     renderBoard();
-}
-
-const endTurn = () => {
-    // placeholder for now
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -130,5 +141,5 @@ document.addEventListener("DOMContentLoaded", () => {
     addDragEventListenerToAll("friendly-natial-space");
     addDragEventListenerToAll("friendly-hand-card");
 
-    document.querySelector("#end-turn").addEventListener("click", endTurn);
+    document.querySelector("#end-turn").addEventListener("click", playerEndTurn);
 });

@@ -38,6 +38,8 @@ let friendlyMaster = null;
 let enemyMaster = null;
 
 let turnCounter = 1;
+let maxMana = [null, null]; // friendly, enemy
+let currentMana = [null, null] // friendly, enemy
 
 let thisDragFrom = null;
 let thisDragTo = null;
