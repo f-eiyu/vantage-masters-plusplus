@@ -87,7 +87,7 @@ const friendlyStartTurn = () => {
 }
 
 const friendlyEndTurn = () => {
-    friendlyControl = false;
+    playerCanInteract = false;
 
     enemyStartTurn();
 }
