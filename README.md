@@ -69,4 +69,6 @@ opponent for the first time unlocks a card for the deck, new cards and mechanics
 of my own design, etc.
 
 ## Wireframes
-place image links here
+![Fei's board and card wireframes](https://i.imgur.com/ViWxwoZ.jpg)
+![Fei's deck builder and title screen wireframes](https://i.imgur.com/qQ64iug.jpg)
+![Fei's game start screen wireframe](https://i.imgur.com/zfpqqii.jpg)
