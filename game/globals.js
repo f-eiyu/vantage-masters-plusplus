@@ -38,7 +38,7 @@ const destroyedCards = [[], []]; // friendly, enemy
 let friendlyMaster = null;
 let enemyMaster = null;
 
-let turnCounter = 1;
+let turnCounter = 0;
 let maxMana = [null, null]; // friendly, enemy
 let currentMana = [null, null] // friendly, enemy
 

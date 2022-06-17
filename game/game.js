@@ -35,7 +35,7 @@ const drawCard = (player, render = true) => {
     // if the draw is possible, pop last card in the deck to the player's hand
     hands[player][getFirstEmpty].card = decks[player].pop();
 
-    if (render) { renderBoard(); }
+    if (render) { renderAll(); }
     return true;
 }
 
@@ -61,16 +61,25 @@ const cardToBoardDirect = (player, card, row, position, render = true) => {
     const thisSpace = natials[player][row][position];
     if (!thisSpace.card) { thisSpace.card = card; }
 
-    if (render) { renderBoard(); }
+    if (render) { renderAll(); }
 }
 
 const replenishMana = (player) => {
     if (maxMana[player] < 10) { maxMana[player]++; }
     currentMana[player] = maxMana[player];
+    renderMana(player);
+}
+
+const incrementTurnCounter = () => {
+    // one full turn consists of both players making a move. in this way, we
+    // can have an accurate counter for full turns regardless of who goes first.
+    turnCounter += 0.5;
 }
 
 const friendlyStartTurn = () => {
     replenishMana(PLAYER_FRIENDLY);
+    incrementTurnCounter();
+    renderTurnCounter();
     friendlyControl = true;
 }
 
@@ -83,6 +92,8 @@ const friendlyEndTurn = () => {
 // most functions encoding actual AI behavior will be in the ai.js file
 const enemyStartTurn = () => {
     replenishMana(PLAYER_ENEMY);
+    incrementTurnCounter();
+    renderTurnCounter();
     aiTurn();
 }
 
@@ -128,8 +139,10 @@ const initializeGameBoard = () => {
     currentMana[PLAYER_FRIENDLY] = maxMana[PLAYER_FRIENDLY];
     maxMana[PLAYER_ENEMY] = enemyMaster.cost;
     currentMana[PLAYER_ENEMY] = maxMana[PLAYER_ENEMY];
-    
-    renderBoard();
+
+    // choose a random player to start
+    (Math.random() > 0.5) ? friendlyStartTurn() : enemyStartTurn();
+    renderAll();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

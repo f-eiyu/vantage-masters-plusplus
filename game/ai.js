@@ -75,4 +75,5 @@ const aiAttack = () => {
 const aiTurn = () => {
     aiSummonNatials();
     aiAttack();
+    enemyEndTurn();
 }

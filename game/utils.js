@@ -52,11 +52,20 @@ const renderMana = (player) => {
     manaDOM.innerText = `${currentMana[player]}/${maxMana[player]}`;
 }
 
-// re-renders everything on the board that isn't guaranteed to be static
-const renderBoard = () => {
+// displays the current turn
+const renderTurnCounter = () => {
+    const turnDOM = document.getElementById("misc-container");
+
+    turnDOM.innerText = Math.ceil(turnCounter);
+}
+
+// re-renders everything on the game screen that isn't guaranteed to be static
+const renderAll = () => {
     for (player of [PLAYER_FRIENDLY, PLAYER_ENEMY]) {
         renderHand(player);
         renderNatials(player);
         renderMana(player);
     }
+
+    renderTurnCounter();
 }
