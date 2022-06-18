@@ -11,7 +11,10 @@ const aiFindEmptySpaces = () => {
 
     natials[PLAYER_ENEMY].forEach((rowArray, rowIndex) => {
         rowArray.forEach((space, spaceIndex) => {
-            if (!space.card) { emptySpaces.push([rowIndex, spaceIndex]); }
+            // unshift instead of push here makes the AI summon cards to the
+            // front row instead of the back row, which is generally
+            // considerably more effective given the AI's intelligence level
+            if (!space.card) { emptySpaces.unshift([rowIndex, spaceIndex]); }
         });
     });
 
@@ -39,12 +42,14 @@ const aiFindNatials = (player) => {
 const aiSummonNatials = () => {
     const emptySpaces = aiFindEmptySpaces();
     hands[PLAYER_ENEMY].forEach((space, index) => {
-        if (emptySpaces.length && space.card) {
-            const thisEmptySpace = emptySpaces.pop();
-            const emptyRow = thisEmptySpace[0];
-            const emptyIndex = thisEmptySpace[1];
+        const thisEmptySpace = emptySpaces.pop();
+        const emptyRow = thisEmptySpace[0];
+        const emptyIndex = thisEmptySpace[1];
 
-            space.summonNatial(natials[PLAYER_ENEMY][emptyRow][emptyIndex]);
+        const targetSpace = natials[PLAYER_ENEMY][emptyRow][emptyIndex];
+
+        if (emptySpaces.length && space.card && space.checkSummonPossible(targetSpace)) {
+            space.summonNatial(targetSpace);
             if (aiVerbose) {
                 console.log("Hand card", index, "summoned to", thisEmptySpace);
             }

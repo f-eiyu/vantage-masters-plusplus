@@ -197,7 +197,6 @@ class HandSpace extends boardSpace {
         // summoning will almost always require mana
         if (currentMana[this.owner] < this.card.cost) { return false; }
         currentMana[this.owner] -= this.card.cost;
-        renderMana(this.owner);
 
         // move the specified card!
         targetSpace.card = this.card;
@@ -206,6 +205,7 @@ class HandSpace extends boardSpace {
         // summoning will always require a re-render
         renderHand(this.owner);
         renderNatials(this.owner);
+        renderMana(this.owner);
 
         return true;
     }
