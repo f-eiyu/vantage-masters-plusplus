@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeGameBoard();
 
     const addDragEventListener = (domObj) => {
-        domObj.addEventListener("dragenter", cardDraggedToSpace);
+        domObj.addEventListener("dragenter", cardDragEnterSpace);
         domObj.addEventListener("dragover", cardDraggedOverSpace);
         domObj.addEventListener("dragleave", dragLeave);
         domObj.addEventListener("drop", dragDrop);
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         thisClassList.forEach(element => addDragEventListener(element));
     }
 
-    addDragEventListenerToAll("enemy-hand-space");
+    addDragEventListenerToAll("enemy-hand-card");
     addDragEventListenerToAll("enemy-natial-space");
     addDragEventListenerToAll("friendly-natial-space");
     addDragEventListenerToAll("friendly-hand-card");

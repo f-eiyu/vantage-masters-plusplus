@@ -188,6 +188,9 @@ class cardSpell extends card {
 
 }
 
+// to be honest, this is mostly a wrapper for the actual javascript object that
+// corresponds to the specified event.target DOM. however, it ended up being
+// useful for the wrapper to have a bit of self-awareness, so here we are!
 class cardDOMEvent {
     constructor(draggedDOM) {
         this.isFrontNatial = draggedDOM.classList.contains("front-natial");
