@@ -71,6 +71,18 @@ class NatialSpace extends boardSpace {
         return true;
     }
 
+    // returns true if the card is in the back row and any cards exist in the
+    // front row, and false otherwise
+    hasCardInFront = () => {
+        if (!this.isBackRow) { return false; }
+
+        const inFront = natials[this.owner][ROW_FRONT].reduce((front, space) => {
+            return (front || Boolean(space.card));
+        }, false);
+
+        return inFront;
+    }
+
     // calculates the damage that would be dealt if the card in this space
     // attacked the card at targetSpace. returns an array [damage to target,
     // counterattack damage to self].
@@ -82,21 +94,49 @@ class NatialSpace extends boardSpace {
 
         // all damage is floored at zero, and counterattacks do 1 less damage
         // than a directed attack
-        const myDmg = Math.max(myAtk + TYPE_CHART[myElement][oppElement], 0);
-        const counterDmg = Math.max(oppAtk + TYPE_CHART[oppElement][myElement] - 1, 0);
+        let myDmg = Math.max(myAtk + TYPE_CHART[myElement][oppElement], 0);
+        let counterDmg = Math.max(oppAtk + TYPE_CHART[oppElement][myElement] - 1, 0);
+
+        // there's some nuance as to whether counterattacking is possible:
+        // a ranged card attacking from the back will never be counterattacked.
+        if (this.card.isRanged && this.isBackRow) {
+            counterDmg = 0;
+        }
+        // a ranged card attacking from the front might not be counterattacked.
+        // if the target is in the back and there are cards in front of it,
+        // the attacker will not be counterattacked (even if the target is
+        // ranged). counterattacks will trigger as normal if the attacker hits
+        // the front row or if the front row is empty.
+        else if (this.card.isRanged && targetSpace.isBackRow && targetSpace.hasCardInFront()) {
+            counterDmg = 0;
+        }
+        // sealed units do not counterattack, though that's not implemented
+        // as of right now.
+        // else if (sealed)
+
 
         return [myDmg, counterDmg];
     }
 
     // checks whether an attack is possible. failure conditions include the
-    // target space being empty and the card not having any attacks left.
-    // returns the result of calculateDamage() above if the attack is
-    // allowable, and false otherwise.
+    // target space being empty, the card not having any attacks left, and a
+    // non-ranged card attempting to atttack from the back row. returns the
+    // (truthy) result of calculateDamage() above if the attack is allowable,
+    // and false otherwise.
     checkAttackPossible(targetSpace) {
         // fail if the target space is empty
         if (!targetSpace.card) { return false; }
         // fail if the card has no attacks
         if (0) { return false; } // to be implemented
+        // fail if attacker is not ranged and targeting the back and there's
+        // anything in the target's front row
+        if (!this.card.isRanged && targetSpace.isBackRow && targetSpace.hasCardInFront()) {
+            return false;
+        }
+        // fail if attacker is not ranged, in the back, and behind another card
+        if (!this.card.isRanged && this.isBackRow && this.hasCardInFront()){
+            return false;
+        }
 
         return this.calculateDamage(targetSpace);
     }

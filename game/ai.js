@@ -67,17 +67,20 @@ const aiAttack = () => {
         // .. but each natial can BE attacked more than once, so this can't pop
         const attackTargetSpace = attackTargets[0];
 
-        if (aiVerbose) {
-            console.log("Attacking", attackTargetSpace.card.name, "with", attackerSpace.card.name);
-            const calcedDmg = attackerSpace.calculateDamage(attackTargetSpace);
-            console.log("Expected damage done:", calcedDmg[0]);
-            console.log("Expected damage taken:", calcedDmg[1]);
-        }
-        attackerSpace.attackNatial(attackTargetSpace);
-        if (aiVerbose) { console.log("Attack resolved."); }
-        if (!attackTargetSpace.card) { 
-            if (aiVerbose) { console.log("Target destroyed."); }
-            attackTargets.shift();
+        // perform an attack, if possible
+        if (attackerSpace.checkAttackPossible(attackTargetSpace)) {
+            if (aiVerbose) {
+                console.log("Attacking", attackTargetSpace.card.name, "with", attackerSpace.card.name);
+                const calcedDmg = attackerSpace.calculateDamage(attackTargetSpace);
+                console.log("Expected damage done:", calcedDmg[0]);
+                console.log("Expected damage countered:", calcedDmg[1]);
+            }
+            attackerSpace.attackNatial(attackTargetSpace);
+            if (aiVerbose) { console.log("Attack resolved."); }
+            if (!attackTargetSpace.card) { 
+                if (aiVerbose) { console.log("Target destroyed."); }
+                attackTargets.shift();
+            }
         }
     }
 
