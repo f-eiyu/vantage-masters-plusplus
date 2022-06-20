@@ -2,12 +2,12 @@ const cardDB = [
     {
         "name": "Debug Fire",
         "portrait": null,
+        "cost": 1,
+        "type": "natial",
 
         "element": "ELEMENT_FIRE",
-        "currentHP": 10,
         "maxHP": 10,
-        "attack": 1,
-        "cost": 1,
+        "attack": 3,
         "maxActions": 1,
 
         "isRanged": true,
@@ -23,12 +23,12 @@ const cardDB = [
     {
         "name": "Debug Heaven",
         "portrait": null,
+        "cost": 1,
+        "type": "natial",
 
         "element": "ELEMENT_HEAVEN",
-        "currentHP": 10,
         "maxHP": 10,
-        "attack": 1,
-        "cost": 1,
+        "attack": 3,
         "maxActions": 1,
 
         "isRanged": false,
@@ -44,12 +44,12 @@ const cardDB = [
     {
         "name": "Debug Earth",
         "portrait": null,
+        "cost": 1,
+        "type": "natial",
 
         "element": "ELEMENT_EARTH",
-        "currentHP": 10,
         "maxHP": 10,
-        "attack": 1,
-        "cost": 1,
+        "attack": 3,
         "maxActions": 1,
 
         "isRanged": false,
@@ -65,12 +65,12 @@ const cardDB = [
     {
         "name": "Debug Water",
         "portrait": null,
+        "cost": 1,
+        "type": "natial",
 
         "element": "ELEMENT_WATER",
-        "currentHP": 10,
         "maxHP": 10,
-        "attack": 1,
-        "cost": 1,
+        "attack": 3,
         "maxActions": 2,
 
         "isRanged": false,
@@ -86,12 +86,12 @@ const cardDB = [
     {
         "name": "Debug Master",
         "portrait": null,
+        "cost": 1,
+        "type": "natial",
 
         "element": "ELEMENT_NONE",
-        "currentHP": 30,
         "maxHP": 30,
-        "attack": 10,
-        "cost": 2,
+        "attack": 8,
         "maxActions": 1,
 
         "isRanged": false,
@@ -107,9 +107,7 @@ const cardDB = [
     {
         "name": "Debug Spell",
         "portrait": null,
-
-        "cost": 0,
-
-        "script": null
+        "cost": 3,
+        "type": "spell"
     }
 ]

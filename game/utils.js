@@ -7,9 +7,9 @@ const getFromDB = (cardName) => {
 
 // returns a new copy of the card object indicated by cardPrototype
 const createCard = (cardPrototype) => {
-    const newCard = Object.create(cardPrototype);
-    newCard.element = eval(newCard.element); // here to let cardDB use the
-                                             // ELEMENT_ consts for consistency
+    const newCard = (cardPrototype.type === "natial" ?
+                    new cardNatial(cardPrototype) :
+                    new cardSpell(cardPrototype));
 
     return newCard;
 }

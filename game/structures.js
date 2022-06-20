@@ -217,15 +217,53 @@ class HandSpace extends boardSpace {
 }
 
 class card {
-
+    constructor(cardProto) {
+        this.name = cardProto.name;
+        this.portrait = cardProto.portrait;
+        this.cost = cardProto.cost;
+        this.type = cardProto.type;
+    }
 }
 
 class cardNatial extends card {
+    constructor(cardProto) {
+        super(cardProto);
 
+        // general card attributes
+        this.element = eval(cardProto.element);
+        this.maxHP = cardProto.maxHP;
+        this.currentHP = this.maxHP;
+        this.attack = cardProto.attack;
+
+        // properties relating to whether a card can move/attack
+        this.maxActions = cardProto.maxActions;
+        this.currentActions = 0;
+        this.canMove = false;
+
+        // card flags
+        this.isRanged = cardProto.isRanged;
+        this.isQuick = cardProto.isQuick;
+        this.isMaster = cardProto.isMaster;
+
+        // temporary status effects
+        this.sealed = 0;
+        this.shielded = 0;
+        this.protected = false;
+
+        // passive callbacks - placeholder for now
+        this.hasPassive = cardProto.hasPassive;
+
+        // active callbacks - placeholder for now
+        this.hasSkill = cardProto.hasSkill;
+    }
 }
 
 class cardSpell extends card {
+    constructor(cardProto) {
+        super(cardProto);
 
+        // placeholder for now
+    }
 }
 
 // to be honest, this is mostly a wrapper for the actual javascript object that
