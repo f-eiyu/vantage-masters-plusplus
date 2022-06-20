@@ -53,7 +53,7 @@ class NatialSpace extends boardSpace {
         // fail if target space is not empty
         if (targetSpace.card) { return false; }
         // fail if the card has no moves
-        if (0) { return false; } // to be implemented
+        if (!this.card.canMove) { return false; }
 
         return true;
     }
@@ -61,9 +61,10 @@ class NatialSpace extends boardSpace {
     // moves the card object from the calling NatialSpace into the requested
     // destination NatialSpace.
     moveNatial(targetSpace) {
-
         targetSpace.card = this.card;
         this.card = null;
+
+        targetSpace.card.canMove = false;
 
         // movement will always require a re-render
         renderNatials(this.owner);

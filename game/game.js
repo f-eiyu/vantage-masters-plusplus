@@ -70,6 +70,18 @@ const replenishMana = (player) => {
     renderMana(player);
 }
 
+// sets all natials' actions to their maximum and enables them to move
+const refreshNatials = (player) => {
+    natials[player].forEach(row => {
+        row.forEach(natialSpace => {
+            if (natialSpace.card) {
+                natialSpace.card.currentActions = natialSpace.card.maxActions;
+                natialSpace.card.canMove = true;
+            }
+        });
+    });
+}
+
 const incrementTurnCounter = () => {
     // one full turn consists of both players making a move. in this way, we
     // can have an accurate counter for full turns regardless of who goes first.
@@ -81,6 +93,7 @@ const friendlyStartTurn = () => {
     renderTurnCounter();
 
     replenishMana(PLAYER_FRIENDLY);
+    refreshNatials(PLAYER_FRIENDLY);
     drawCard(PLAYER_FRIENDLY);
 
     playerCanInteract = true;
@@ -98,6 +111,7 @@ const enemyStartTurn = () => {
     renderTurnCounter();
 
     replenishMana(PLAYER_ENEMY);
+    refreshNatials(PLAYER_FRIENDLY);
     drawCard(PLAYER_ENEMY);
 
     aiTurn();
