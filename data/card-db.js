@@ -200,9 +200,20 @@ const cardDB = [
         of the deck instead.`
     },
     {
+        "name": "Reduce",
+        "portrait": null,
+        "cost": 1,
+        "type": "spell",
+
+        "callbackName": "cbSpellReduce",
+        "longdesc": `
+        Halves the mana cost of one card in
+        your hand.`
+    },
+    {
         "name": "Disaster",
         "portrait": null,
-        "cost": 3,
+        "cost": 5,
         "type": "spell",
 
         "callbackName": "cbSpellDisaster",

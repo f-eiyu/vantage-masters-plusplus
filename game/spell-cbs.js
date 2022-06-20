@@ -110,7 +110,8 @@ const spellCallbacks = {
         targetSpace.card = null;
     },
     cbSpellReduce: function(targetSpace) {
-
+        // halves the mana cost of the targeted card, rounded down
+        targetSpace.card.cost = Math.floor(targetSpace.card.cost / 2);
     },
     cbSpellDisaster: function(targetSpace) {
         // deals 4 damage to every card in the same row as the target

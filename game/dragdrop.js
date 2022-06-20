@@ -58,6 +58,15 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
                 return true;
             }
             return false;
+
+        // one-off: targets a card in the user's hand
+        case "cbSpellReduce":
+            if (dragToSpace.card
+                && dragToSpace.owner === dragFromSpace.owner
+                && dragToSpace.isHandSpace) {
+                    return true;
+                }
+                return false;
         
         // natial zone-wide spells: always succeed if a natial space is targeted
         case "cbSpellUptide":
