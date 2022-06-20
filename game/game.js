@@ -4,12 +4,13 @@ const loadDeck = (cardList, player) => {
     // cardList will be used later on, when deck building is implemented!
     // for now, decks will simply be five copies of each debug card.
     const thisDeckRaw = [];
-    for (let i = 0; i < 5; i++) { // 20 cards in each deck
+    for (let i = 0; i < 4; i++) { // 20 cards in each deck
         // generate each card in a wrapping object, with a random sorting seed
         thisDeckRaw.push({card: createCard(getFromDB("Debug Fire")), seed: Math.random()});
         thisDeckRaw.push({card: createCard(getFromDB("Debug Water")), seed: Math.random()});
         thisDeckRaw.push({card: createCard(getFromDB("Debug Earth")), seed: Math.random()});
         thisDeckRaw.push({card: createCard(getFromDB("Debug Heaven")), seed: Math.random()});
+        thisDeckRaw.push({card: createCard(getFromDB("Debug Spell")), seed: Math.random()});
     }
     // using the random seeds, shuffle the deck
     thisDeckRaw.sort((cardOne, cardTwo) => { return cardOne.seed - cardTwo.seed; });
@@ -46,6 +47,9 @@ const boardCardMouseover = (event) => {
     const detailZone = document.querySelector("#card-detail-zone");
 
     detailZone.innerText = boardSpace.DOM.innerText;
+    if (boardSpace.card.type === "spell") {
+        detailZone.innerText += boardSpace.card.longdesc;
+    }
     boardSpace.DOM.classList.add("hovered");
 }
 

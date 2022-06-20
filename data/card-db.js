@@ -107,7 +107,13 @@ const cardDB = [
     {
         "name": "Debug Spell",
         "portrait": null,
-        "cost": 3,
-        "type": "spell"
+        "cost": 1,
+        "type": "spell",
+
+        "callbackName": "cbSpellMedic",
+        "longdesc": `
+        Restores 2 HP to the target.
+        Removes Seal from the target.
+        +1 ATK to Heaven natials.`
     }
 ]

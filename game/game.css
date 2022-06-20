@@ -41,7 +41,7 @@ body {
 }
 
 #card-detail-zone {
-    font-size: 24pt;
+    font-size: 20pt;
 }
 
 .container, .enemy-hand-card, .enemy-natial-space, .friendly-hand-card, .friendly-natial-space {
@@ -80,7 +80,7 @@ body {
     border: solid black 1px;
 }
 
-.drag-over-empty {
+.drag-over-valid {
     background-color: green;
 }
 

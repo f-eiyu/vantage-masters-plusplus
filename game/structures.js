@@ -7,13 +7,16 @@ class boardSpace {
         this.index = index;
     }
 
+    // this function could use a good refactor or two
     renderCard() {
+        let cardStr = null;
+
         // empty spaces in card or hand render as blanks
         if (!this.card) {
             this.DOM.innerText = "";
             this.DOM.setAttribute("draggable", false);
-        } else {
-            const cardStr = `${this.owner === PLAYER_ENEMY ? "??? " : ""}${this.card.name}
+        } else if (this.card.type === "natial") {
+            cardStr = `${this.card.name}
             Element: ${getElementName(this.card.element)}
             HP: ${this.card.currentHP}/${this.card.maxHP}
             ATK: ${this.card.attack}
@@ -21,11 +24,15 @@ class boardSpace {
             Actions: ${this.card.currentActions}
             ${this.card.isRanged ? "R" : ""}${this.card.isQuick ? "Q" : ""}
             `;
-
-            this.DOM.innerText = cardStr;
-
-            if (this.owner !== PLAYER_ENEMY) { setDraggable(this.DOM); }
+        } else { // (this.card.type === "spell")
+            cardStr = `${this.owner === PLAYER_ENEMY ? "??? " : ""}${this.card.name}
+            Cost: ${this.card.cost}
+            `
         }
+
+        if (this.owner !== PLAYER_ENEMY) { setDraggable(this.DOM); }
+        this.DOM.innerText = cardStr;
+        return cardStr;
     }
 
     // removes the card in the current NatialSpace from the board
@@ -40,6 +47,8 @@ class NatialSpace extends boardSpace {
         super(owner, index);
         this.isFrontRow = isFrontRow;
         this.isBackRow = !isFrontRow;
+        this.isNatialSpace = true;
+        this.isHandSpace = false;
 
         const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
         const rowStr = (this.isFrontRow ? "front" : "back");
@@ -173,7 +182,7 @@ class NatialSpace extends boardSpace {
     dealDamage(dmg) {
         this.card.currentHP -= dmg;
 
-        if (this.card.currentHP < 0) { this.destroyCard(); }
+        if (this.card.currentHP <= 0) { this.destroyCard(); }
     }
 }
 
@@ -184,6 +193,9 @@ class HandSpace extends boardSpace {
         const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
         this.DOMId = `${playerStr}-hand-${this.index}`
         this.DOM = document.getElementById(this.DOMId);
+
+        this.isNatialSpace = false;
+        this.isHandSpace = true;
     }
 
     // checks to see whether the natial can be summoned to the target space.
@@ -227,9 +239,12 @@ class HandSpace extends boardSpace {
         return true;
     }
 
-    // activates a spell. to be implemented.
-    activateSpell() {
-        return false;
+    // activates the spell currently contained in handSpace with the target
+    // at targetSpace, and then destroys the spell.
+    activateSpell(targetSpace) {
+        this.card.spellCallback(targetSpace);
+        this.destroyCard();
+        renderAll();
     }
 }
 
@@ -279,7 +294,13 @@ class cardSpell extends card {
     constructor(cardProto) {
         super(cardProto);
 
-        // placeholder for now
+        this.callbackName = cardProto.callbackName;
+        this.longdesc = cardProto.longdesc;
+    }
+
+    // wrapper for the spell effect's callback
+    spellCallback(target) {
+        spellCallbacks[this.callbackName](target);
     }
 }
 
@@ -300,6 +321,13 @@ class cardDOMEvent {
         this.spaceObj = (this.isNatial ? 
             natials[this.owner][this.inRow][this.index] :
             hands[this.owner][this.index]);
+
+        if (this.spaceObj.card
+            && this.spaceObj.card.type === "spell") {
+            this.isSpell = true;
+        } else {
+            this.isSpell = false;
+        }
     }
 }
 

@@ -37,21 +37,27 @@ const aiFindNatials = (player) => {
 
 // summons as many natials from the hand as possible
 const aiSummonNatials = () => {
-    const emptySpaces = aiFindEmptySpaces();
-    hands[PLAYER_ENEMY].forEach((space, index) => {
-        if (!emptySpaces.length) { return false; } // halt if no space to summon
+    const emptyNatialSpaces = aiFindEmptySpaces();
 
-        const thisEmptySpace = emptySpaces[0];
+    // halt if no space to summon
+    if (!emptyNatialSpaces.length) { return false; }
+
+    // ignore empty hand spaces and play everything that we can
+    hands[PLAYER_ENEMY].filter(sp => sp.card).forEach((thisHandSpace, i) => {
+        // halt if card is a spell (we're not smart enough for that yet)
+        if (thisHandSpace.card.type === "spell") { return false; }
+
+        const thisEmptySpace = emptyNatialSpaces[0];
         const emptyRow = thisEmptySpace[0];
         const emptyIndex = thisEmptySpace[1];
 
         const targetSpace = natials[PLAYER_ENEMY][emptyRow][emptyIndex];
 
-        if (emptySpaces.length && space.card && space.checkSummonPossible(targetSpace)) {
-            space.summonNatial(targetSpace);
-            emptySpaces.shift();
+        if (emptyNatialSpaces.length && thisHandSpace.checkSummonPossible(targetSpace)) {
+            thisHandSpace.summonNatial(targetSpace);
+            emptyNatialSpaces.shift();
             if (aiVerbose) {
-                console.log("Hand card", index, "summoned to", thisEmptySpace);
+                console.log("Hand card", i, "summoned to", thisEmptySpace);
             }
         }
     });
