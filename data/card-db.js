@@ -105,7 +105,19 @@ const cardDB = [
         "passive": null
     },
     {
-        "name": "Debug Spell",
+        "name": "Magic Crystal",
+        "portrait": null,
+        "cost": 0,
+        "type": "spell",
+
+        "callbackName": "cbSpellMagicCrystal",
+        "longdesc": `
+        Target gains +1 HP/ATK and can
+        use its Skill again (if it has
+        one). Player receives +1 mana.`
+    },
+    {
+        "name": "Medic",
         "portrait": null,
         "cost": 1,
         "type": "spell",
@@ -115,5 +127,29 @@ const cardDB = [
         Restores 2 HP to the target.
         Removes Seal from the target.
         +1 ATK to Heaven natials.`
+    },
+    {
+        "name": "Blaze",
+        "portrait": null,
+        "cost": 2,
+        "type": "spell",
+
+        "callbackName": "cbSpellBlaze",
+        "longdesc": `
+        Target gains 2 ATK. Fire elemental
+        Natials gain 3 ATK instead.`
+    },
+    {
+        "name": "Wall",
+        "portrait": null,
+        "cost": 2,
+        "type": "spell",
+
+        "callbackName": "cbSpellWall",
+        "longdesc": `
+        Shields the target with a
+        magical barrier that negates
+        damage once. Earth elemental
+        Natials gain 2 HP as well.`
     }
 ]

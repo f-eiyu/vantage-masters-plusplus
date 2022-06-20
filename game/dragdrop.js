@@ -21,6 +21,11 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
         return false;
     }
 
+    // always fail if insufficient mana
+    if (dragFromSpace.card.cost > currentMana[dragFromSpace.owner]) {
+        return false;
+    }
+
     // validate the drag location based on the spell
     switch(dragFromSpace.card.callbackName) {
         // friendly buff spells: succeed if target is friendly natial, else fail

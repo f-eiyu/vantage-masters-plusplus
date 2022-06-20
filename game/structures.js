@@ -25,7 +25,7 @@ class boardSpace {
             ${this.card.isRanged ? "R" : ""}${this.card.isQuick ? "Q" : ""}
             `;
         } else { // (this.card.type === "spell")
-            cardStr = `${this.owner === PLAYER_ENEMY ? "??? " : ""}${this.card.name}
+            cardStr = `${this.card.name}
             Cost: ${this.card.cost}
             `
         }
@@ -180,7 +180,11 @@ class NatialSpace extends boardSpace {
     // does the specified amount of damage to the natial in the current
     // NatialSpace, and destroys the natial if applicable
     dealDamage(dmg) {
-        this.card.currentHP -= dmg;
+        if (this.card.shielded) {
+            this.card.shielded--;
+        } else { 
+            this.card.currentHP -= dmg;
+        }
 
         if (this.card.currentHP <= 0) { this.destroyCard(); }
     }
@@ -243,6 +247,7 @@ class HandSpace extends boardSpace {
     // at targetSpace, and then destroys the spell.
     activateSpell(targetSpace) {
         this.card.spellCallback(targetSpace);
+        currentMana[this.owner] -= this.card.cost;
         this.destroyCard();
         renderAll();
     }
