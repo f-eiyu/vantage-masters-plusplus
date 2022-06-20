@@ -198,9 +198,13 @@ class HandSpace extends boardSpace {
         if (currentMana[this.owner] < this.card.cost) { return false; }
         currentMana[this.owner] -= this.card.cost;
 
-        // move the specified card!
+        // summon the specified natial!
         targetSpace.card = this.card;
         this.card = null;
+
+        // give the natial action(s) if it's quick
+        targetSpace.card.currentActions = targetSpace.card.maxActions;
+        targetSpace.card.canMove = true;
 
         // summoning will always require a re-render
         renderHand(this.owner);
