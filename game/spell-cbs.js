@@ -1,3 +1,4 @@
+// refactor this out of spell-cbs; it's only here now for convenience
 const restoreHP = (card, amount) => {
     // failsafe
     if (amount <= 0) return;
@@ -33,10 +34,14 @@ const spellCallbacks = {
         }
     },
     cbSpellTransmute: function(targetSpace) {
-
+        targetSpace.card.sealed += 2;
+        // the Witch master does not exist yet, so this card's 3-turn sealing
+        // functionality is not implemented yet either
     },
     cbSpellVanish: function(targetSpace) {
-
+        targetSpace.dealDamage(6);
+        // the Paladin master does not exist yet, so this card's bonus damage
+        // functionality is not implemented yet either
     },
     cbSpellUptide: function() {
         // all Water elemental natials gain +1 HP and ATK; all Earth, Fire,
@@ -77,7 +82,26 @@ const spellCallbacks = {
         if (targetCard.element === ELEMENT_EARTH) { restoreHP(targetCard, 2); }
     },
     cbSpellExpel: function(targetSpace) {
+        const oppOwner = targetSpace.owner;
 
+        // determine the card owner's first free hand space. functions like this
+        // are a very good case for REFACTORING MY DAMN CODE TO USE BOARD AND
+        // HAND OBJECTS instead of coding one-offs like a caveman.
+        // this is also not DRY with games.js > drawCard > getFirstEmpty!
+        const freeIndex = hands[oppOwner].reduce((firstEmpty, handSpace) => {
+            return (!handSpace.card && handSpace.index < firstEmpty ? handSpace.index : firstEmpty);
+        }, Infinity);
+
+        // return card to deck if no free hand
+        if (freeIndex > HAND_SIZE_LIMIT - 1) {
+            decks[oppOwner].push(targetSpace.card);
+        }
+        // otherwise, return the card to the hand
+        else {
+            hands[oppOwner][freeIndex].card = targetSpace.card;
+        }
+
+        targetSpace.card = null;
     },
     cbSpellReduce: function(targetSpace) {
 

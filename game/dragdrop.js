@@ -27,7 +27,8 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
     }
 
     // validate the drag location based on the spell
-    switch(dragFromSpace.card.callbackName) {
+    const cbName = dragFromSpace.card.callbackName;
+    switch(cbName) {
         // friendly buff spells: succeed if target is friendly natial, else fail
         case "cbSpellMagicCrystal":
         case "cbSpellMedic":
@@ -40,6 +41,19 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
             if (dragToSpace.card
                 && dragToSpace.owner === dragFromSpace.owner
                 && dragToSpace.isNatialSpace) {
+                return true;
+            }
+            return false;
+        
+        // offensive spells: succeed if target is an opposing natial
+        case "cbSpellTransmute":
+        case "cbSpellVanish":
+        case "cbSpellExpel":
+            if (dragToSpace.card
+                && dragToSpace.owner !== dragFromSpace.owner
+                && dragToSpace.isNatialSpace
+                // Expel can't bounce a deck master off of the field
+                && !(cbName === "cbSpellExpel" && dragToSpace.card.isMaster)) {
                 return true;
             }
             return false;

@@ -129,6 +129,28 @@ const cardDB = [
         +1 ATK to Heaven natials.`
     },
     {
+        "name": "Transmute",
+        "portrait": null,
+        "cost": 4,
+        "type": "spell",
+
+        "callbackName": "cbSpellTransmute",
+        "longdesc": `
+        Seals an enemy's actions for 2 turns,
+        or 3 turns if your master is the Witch.`
+    },
+    {
+        "name": "Vanish",
+        "portrait": null,
+        "cost": 4,
+        "type": "spell",
+
+        "callbackName": "cbSpellVanish",
+        "longdesc": `
+        Target enemy natial takes 6 damage, or
+        7 damage if your master is the Paladin.`
+    },
+    {
         "name": "Uptide",
         "portrait": null,
         "cost": 3,
@@ -163,5 +185,18 @@ const cardDB = [
         magical barrier that negates
         damage once. Earth elemental
         Natials gain 2 HP as well.`
+    },
+    {
+        "name": "Expel",
+        "portrait": null,
+        "cost": 3,
+        "type": "spell",
+
+        "callbackName": "cbSpellExpel",
+        "longdesc": `
+        Target natial is returned to the
+        hand. If the hand is full, the
+        target is returned to the top
+        of the deck instead.`
     }
 ]
