@@ -3,7 +3,12 @@ const restoreHP = (card, amount) => {
     // failsafe
     if (amount <= 0) return;
 
+    // regular natials can stack HP indefinitely, but deck masters are capped
+    // to their innate maximum
     card.currentHP += amount;
+    if (card.isMaster) {
+        card.currentHP = Math.min(card.currentHP, card.maxHP);
+    }
 }
 
 const buffAtk = (card, amount) => {

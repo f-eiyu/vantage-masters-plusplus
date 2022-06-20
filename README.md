@@ -11,6 +11,7 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 - give Wall visual feedback
 - implement sealed cards being unable to attack
 - refactor dealDamage() to be a natialCard method instead of a boardSpace method
+- refactor restoreHP and buffATK into object methods instead of globals
 - refactor the board into its own object with coherent methods
 
 ## User stories

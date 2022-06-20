@@ -36,8 +36,6 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
         case "cbSpellWall":
             // succeed if there is a target natial and the target natial is in 
             // the same natial zone as the spell's owner; fail otherwise.
-            // *** should include a check for whether the spell will actually
-            //     do anything, and fail if it wouldn't!
             if (dragToSpace.card
                 && dragToSpace.owner === dragFromSpace.owner
                 && dragToSpace.isNatialSpace) {
@@ -63,7 +61,8 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
         case "cbSpellReduce":
             if (dragToSpace.card
                 && dragToSpace.owner === dragFromSpace.owner
-                && dragToSpace.isHandSpace) {
+                && dragToSpace.isHandSpace
+                && dragToSpace.card.cost > 0) {
                     return true;
                 }
                 return false;
