@@ -86,7 +86,7 @@ const cardDB = [
     {
         "name": "Debug Master",
         "portrait": null,
-        "cost": 1,
+        "cost": 3,
         "type": "natial",
 
         "element": "ELEMENT_NONE",

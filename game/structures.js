@@ -18,6 +18,7 @@ class boardSpace {
             HP: ${this.card.currentHP}/${this.card.maxHP}
             ATK: ${this.card.attack}
             Cost: ${this.card.cost}
+            Actions: ${this.card.currentActions}
             ${this.card.isRanged ? "R" : ""}${this.card.isQuick ? "Q" : ""}
             `;
 
@@ -115,7 +116,6 @@ class NatialSpace extends boardSpace {
         // as of right now.
         // else if (sealed)
 
-
         return [myDmg, counterDmg];
     }
 
@@ -127,8 +127,8 @@ class NatialSpace extends boardSpace {
     checkAttackPossible(targetSpace) {
         // fail if the target space is empty
         if (!targetSpace.card) { return false; }
-        // fail if the card has no attacks
-        if (0) { return false; } // to be implemented
+        // fail if the card has no actions
+        if (!this.card.currentActions) { return false; }
         // fail if attacker is not ranged and targeting the back and there's
         // anything in the target's front row
         if (!this.card.isRanged && targetSpace.isBackRow && targetSpace.hasCardInFront()) {
@@ -154,6 +154,11 @@ class NatialSpace extends boardSpace {
         
         // perform counterattack
         attacker.currentHP -= thisAttack[1];
+
+        // remove one action for the attacker. if it still has actions left,
+        // it gains a move; otherwise, it cannot move after attacking.
+        attacker.currentActions--;
+        attacker.canMove = attacker.currentActions > 0 ? true : false;
 
         // remove either card if its HP falls to zero
         if (attacker.currentHP <= 0) { this.destroyCard(); }
@@ -204,8 +209,13 @@ class HandSpace extends boardSpace {
         this.card = null;
 
         // give the natial action(s) if it's quick
-        targetSpace.card.currentActions = targetSpace.card.maxActions;
-        targetSpace.card.canMove = true;
+        if (targetSpace.card.isQuick) {
+            targetSpace.card.currentActions = targetSpace.card.maxActions;
+            targetSpace.card.canMove = true;
+        } else {
+            targetSpace.card.currentActions = 0;
+            targetSpace.card.canMove = false;
+        }
 
         // summoning will always require a re-render
         renderHand(this.owner);

@@ -111,7 +111,7 @@ const enemyStartTurn = () => {
     renderTurnCounter();
 
     replenishMana(PLAYER_ENEMY);
-    refreshNatials(PLAYER_FRIENDLY);
+    refreshNatials(PLAYER_ENEMY);
     drawCard(PLAYER_ENEMY);
 
     aiTurn();
