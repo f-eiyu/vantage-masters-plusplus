@@ -49,6 +49,7 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
         case "cbSpellTransmute":
         case "cbSpellVanish":
         case "cbSpellExpel":
+        case "cbSpellDisaster":
             if (dragToSpace.card
                 && dragToSpace.owner !== dragFromSpace.owner
                 && dragToSpace.isNatialSpace

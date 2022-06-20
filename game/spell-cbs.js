@@ -34,11 +34,15 @@ const spellCallbacks = {
         }
     },
     cbSpellTransmute: function(targetSpace) {
+        // seals the target card for 2 (more) turns, or 3 if the user's master
+        // is Witch
         targetSpace.card.sealed += 2;
         // the Witch master does not exist yet, so this card's 3-turn sealing
         // functionality is not implemented yet either
     },
     cbSpellVanish: function(targetSpace) {
+        // deals 6 damage to the target card, or 7 if the user's master is
+        // Paladin
         targetSpace.dealDamage(6);
         // the Paladin master does not exist yet, so this card's bonus damage
         // functionality is not implemented yet either
@@ -82,6 +86,8 @@ const spellCallbacks = {
         if (targetCard.element === ELEMENT_EARTH) { restoreHP(targetCard, 2); }
     },
     cbSpellExpel: function(targetSpace) {
+        // returns the target card to the opponent's hand, or to the top of
+        // their deck if the hand is full
         const oppOwner = targetSpace.owner;
 
         // determine the card owner's first free hand space. functions like this
@@ -107,6 +113,13 @@ const spellCallbacks = {
 
     },
     cbSpellDisaster: function(targetSpace) {
+        // deals 4 damage to every card in the same row as the target
+        const thisRow = targetSpace.isFrontRow ? ROW_FRONT : ROW_BACK;
 
+        natials[targetSpace.owner][thisRow].forEach(natialSpace => {
+            if (!natialSpace.card) { return ;}
+
+            natialSpace.dealDamage(4);
+        });
     }
 };

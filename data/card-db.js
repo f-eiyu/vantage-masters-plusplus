@@ -198,5 +198,16 @@ const cardDB = [
         hand. If the hand is full, the
         target is returned to the top
         of the deck instead.`
+    },
+    {
+        "name": "Disaster",
+        "portrait": null,
+        "cost": 3,
+        "type": "spell",
+
+        "callbackName": "cbSpellDisaster",
+        "longdesc": `
+        All enemies in the same row as the
+        target take 4 damage.`
     }
 ]
