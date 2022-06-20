@@ -29,8 +29,8 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
     // validate the drag location based on the spell
     switch(dragFromSpace.card.callbackName) {
         // friendly buff spells: succeed if target is friendly natial, else fail
-        case "cbSpellMedic":
         case "cbSpellMagicCrystal":
+        case "cbSpellMedic":
         case "cbSpellBlaze":
         case "cbSpellWall":
             // succeed if there is a target natial and the target natial is in 
@@ -43,6 +43,12 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
                 return true;
             }
             return false;
+        
+        // natial zone-wide spells: always succeed if a natial space is targeted
+        case "cbSpellUptide":
+            if (dragToSpace.isNatialSpace) { return true; }
+            return false;
+        
         default: return false;
     }
 }

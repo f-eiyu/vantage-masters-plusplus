@@ -7,6 +7,11 @@ had a lot of fun playing Vantage Masters, so I figured I would try my hand at
 re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 (hence the ++)!
 
+## todo
+- give Wall visual feedback
+- refactor dealDamage() to be a natialCard method instead of a boardSpace method
+- refactor the board into its own object with coherent methods
+
 ## User stories
 ### MVP goals
 - Play the Vantage Masters card game against the computer.

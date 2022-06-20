@@ -1,5 +1,8 @@
 const restoreHP = (card, amount) => {
-    card.currentHP = Math.min(card.currentHP + amount, card.maxHP);
+    // failsafe
+    if (amount <= 0) return;
+
+    card.currentHP += amount;
 }
 
 const buffAtk = (card, amount) => {
@@ -36,7 +39,28 @@ const spellCallbacks = {
 
     },
     cbSpellUptide: function() {
+        // all Water elemental natials gain +1 HP and ATK; all Earth, Fire,
+        // and Heaven elemental Natials take 1 damage. this is a board-wide
+        // effecft, and so no explicit target is defined or needed.
 
+        // this code is actually awful, and is one reason i need to refactor
+        // the board to be its own object...
+        natials.forEach(player => {
+            player.forEach(row => {
+                row.forEach(natialSpace => {
+                    const thisCard = natialSpace.card;
+                    // uptide's effect skips masters, who do not have an element
+                    if (!thisCard || thisCard.isMaster) { return; }
+
+                    if (thisCard.element === ELEMENT_WATER) {
+                        restoreHP(thisCard, 1);
+                        buffAtk(thisCard, 1);
+                    } else {
+                        natialSpace.dealDamage(1); // refactor this
+                    }
+                });
+            });
+        });
     },
     cbSpellBlaze: function(targetSpace) {
         // grants the target natial +2 ATK, or +3 if it's Fire elemental

@@ -96,7 +96,7 @@ const cardDB = [
 
         "isRanged": false,
         "isQuick": false,
-        "isMaster": false,
+        "isMaster": true,
 
         "hasSkill": false,
         "skillReady": false,
@@ -127,6 +127,18 @@ const cardDB = [
         Restores 2 HP to the target.
         Removes Seal from the target.
         +1 ATK to Heaven natials.`
+    },
+    {
+        "name": "Uptide",
+        "portrait": null,
+        "cost": 3,
+        "type": "spell",
+
+        "callbackName": "cbSpellUptide",
+        "longdesc": `
+        All Water elemental natials gain 1
+        HP/ATK. All Earth, Fire, and Heaven
+        elemental natials take 1 damage.`
     },
     {
         "name": "Blaze",

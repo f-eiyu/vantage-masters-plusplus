@@ -10,7 +10,7 @@ const loadDeck = (cardList, player) => {
         thisDeckRaw.push({card: createCard(getFromDB("Debug Water")), seed: Math.random()});
         thisDeckRaw.push({card: createCard(getFromDB("Debug Earth")), seed: Math.random()});
         thisDeckRaw.push({card: createCard(getFromDB("Debug Heaven")), seed: Math.random()});
-        thisDeckRaw.push({card: createCard(getFromDB("Wall")), seed: Math.random()});
+        thisDeckRaw.push({card: createCard(getFromDB("Uptide")), seed: Math.random()});
     }
     // using the random seeds, shuffle the deck
     thisDeckRaw.sort((cardOne, cardTwo) => { return cardOne.seed - cardTwo.seed; });
