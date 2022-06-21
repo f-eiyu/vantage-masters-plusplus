@@ -3,14 +3,50 @@ const skillUseValidation = (targetSpace) => {
 
     const cbName = userSpace.card.skillCallbackName;
     switch(cbName) {
-        // friendly buff skills: succeed if target is friendly natial, else fail
+        // team buff skills: succeed if target is friendly natial
         case "cbSkillSister":
+        case "cbSkillSpirit":
             if (targetSpace.card
                 && targetSpace.owner === userSpace.owner
                 && targetSpace.isNatialSpace) {
                 return true;
             }
             return false;
+
+        // targeted/area offensive skills: succeed if target is opposing natial
+        case "cbSkillWitch":
+        case "cbSkillSwordsman":
+        case "cbSkillBard":
+        case "cbSkillTyrant":
+            if (targetSpace.card
+                && targetSpace.owner !== userSpace.owner
+                && targetSpace.isNatialSpace) {
+                    return true;
+            }
+            return false;
+
+        // targetless skills: targets the skill user for validation
+        case "cbSkillKnight":
+            if (targetSpace.card
+                && targetSpace.card === userSpace.card) {
+                return true;
+            }
+            return false;
+
+        // player hand adders: must check if hand is full - after hand refactor
+        case "cbSkillSorceror":
+        case "cbSkillThief":
+        case "cbSkillBeast":
+
+        // shadow: must check if enemy has a card in hand - after hand refactor
+        case "cbSkillShadow":
+
+        // paladin: must check if the player has dead cards and if board is full - after board refactor
+        case "cbSkillPaladin":
+
+
+
+        default: return false;
     }
 }
 
