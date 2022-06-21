@@ -8,8 +8,8 @@ const getFromDB = (cardName) => {
 // returns a new copy of the card object indicated by cardPrototype
 const createCard = (cardPrototype) => {
     const newCard = (cardPrototype.type === "natial" ?
-                    new cardNatial(cardPrototype) :
-                    new cardSpell(cardPrototype));
+                    new NatialCard(cardPrototype) :
+                    new SpellCard(cardPrototype));
 
     return newCard;
 }

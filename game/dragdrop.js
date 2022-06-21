@@ -1,4 +1,4 @@
-// as the cardDOMEvent object is updated, this code will need additional
+// as the CardDOMEvent object is updated, this code will need additional
 // refactoring in order to prevent its interactions from being a convoluted mess
 
 const setDraggable = (thisCardDOM) => {
@@ -10,7 +10,7 @@ const setDraggable = (thisCardDOM) => {
 const dragStart = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
-    thisDragFrom = new cardDOMEvent(event.target);
+    thisDragFrom = new CardDOMEvent(event.target);
     event.target.classList.add("dragging");
 }
 
@@ -82,7 +82,7 @@ const cardDragEnterSpace = (event) => {
     event.preventDefault();
 
     const thisDragFromSpace = thisDragFrom.spaceObj;
-    thisDragTo = new cardDOMEvent(event.target);
+    thisDragTo = new CardDOMEvent(event.target);
     const thisDragToSpace = thisDragTo.spaceObj;
 
     // sanity check
@@ -152,7 +152,7 @@ const dragDrop = (event) => {
     
     // extract destination information from the event object
     const thisDragFromSpace = thisDragFrom.spaceObj;
-    thisDragTo = new cardDOMEvent(event.target);
+    thisDragTo = new CardDOMEvent(event.target);
     const thisDragToSpace = thisDragTo.spaceObj;
 
     const isToFriendlyNatial = (thisDragTo.owner === PLAYER_FRIENDLY && thisDragTo.isNatial);

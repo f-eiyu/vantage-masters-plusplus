@@ -53,7 +53,7 @@ const skillUseValidation = (targetSpace) => {
 const natialRightClick = (event) => {
     event.preventDefault();
 
-    const thisRightClick = new cardDOMEvent(event.target);
+    const thisRightClick = new CardDOMEvent(event.target);
     const userSpace = thisRightClick.spaceObj;
 
     if (!userSpace.card) { return; }
@@ -74,7 +74,7 @@ const natialLeftClick = (event) => {
     // if no skill is being used, left clicking should never succeed.
     if (!skillUsage.selected) { return; }
 
-    const thisLeftClick = new cardDOMEvent(event.target);
+    const thisLeftClick = new CardDOMEvent(event.target);
     const thisLeftClickSpace = thisLeftClick.spaceObj;
 
     if (skillUseValidation(thisLeftClickSpace)) {

@@ -41,7 +41,7 @@ const drawCard = (player, render = true) => {
 }
 
 const boardCardMouseover = (event) => {
-    const boardSpace = (new cardDOMEvent(event.target)).spaceObj;
+    const boardSpace = (new CardDOMEvent(event.target)).spaceObj;
     if (!boardSpace.card) { return; }
 
     const detailZone = document.querySelector("#card-detail-zone");

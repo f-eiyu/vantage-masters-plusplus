@@ -1,6 +1,6 @@
 // ========== Classes ==========
 
-class boardSpace {
+class BoardSpace {
     constructor (owner, index) {
         this.card = null;
         this.owner = owner;
@@ -41,7 +41,7 @@ class boardSpace {
     }
 }
 
-class NatialSpace extends boardSpace {
+class NatialSpace extends BoardSpace {
     constructor (owner, index, isFrontRow) {
         super(owner, index);
         this.isFrontRow = isFrontRow;
@@ -206,7 +206,7 @@ class NatialSpace extends boardSpace {
     }
 }
 
-class HandSpace extends boardSpace {
+class HandSpace extends BoardSpace {
     constructor (owner, index) {
         super(owner, index);
 
@@ -269,7 +269,7 @@ class HandSpace extends boardSpace {
     }
 }
 
-class card {
+class Card {
     constructor(cardProto) {
         this.name = cardProto.name;
         this.portrait = cardProto.portrait;
@@ -278,7 +278,7 @@ class card {
     }
 }
 
-class cardNatial extends card {
+class NatialCard extends Card {
     constructor(cardProto) {
         super(cardProto);
 
@@ -318,7 +318,7 @@ class cardNatial extends card {
     }
 }
 
-class cardSpell extends card {
+class SpellCard extends Card {
     constructor(cardProto) {
         super(cardProto);
 
@@ -335,7 +335,7 @@ class cardSpell extends card {
 // to be honest, this is mostly a wrapper for the actual javascript object that
 // corresponds to the specified event.target DOM. however, it ended up being
 // useful for the wrapper to have a bit of self-awareness, so here we are!
-class cardDOMEvent {
+class CardDOMEvent {
     constructor(draggedDOM) {
         this.isFrontNatial = draggedDOM.classList.contains("front-natial");
         this.isBackNatial = draggedDOM.classList.contains("back-natial");
