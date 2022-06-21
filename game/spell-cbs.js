@@ -1,22 +1,9 @@
-// refactor this out of spell-cbs; it's only here now for convenience
-const restoreHP = (card, amount) => {
-    // failsafe
-    if (amount <= 0) return;
-
-    // regular natials can stack HP indefinitely, but deck masters are capped
-    // to their innate maximum
-    card.currentHP += amount;
-    if (card.isMaster) {
-        card.currentHP = Math.min(card.currentHP, card.maxHP);
-    }
-}
-
 const buffAtk = (card, amount) => {
     card.attack = Math.max(card.attack + amount, 0);
 }
 
 const spellCallbacks = {
-    cbSpellMagicCrystal: function (targetSpace) {
+    cbSpellMagicCrystal: function(targetSpace) {
         // heals target by 1 HP, grants it +1 ATK, and allows it to use its
         // skill again; also grants the player +1 current mana, which can
         // temporarily exceed their current maximum mana.

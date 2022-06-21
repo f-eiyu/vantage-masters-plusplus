@@ -14,13 +14,12 @@ class boardSpace {
         // empty spaces in card or hand render as blanks
         if (!this.card) {
             this.DOM.innerText = "";
-            this.DOM.setAttribute("draggable", false);
         } else if (this.card.type === "natial") {
             cardStr = `${this.card.name}
             Element: ${getElementName(this.card.element)}
             HP: ${this.card.currentHP}/${this.card.maxHP}
             ATK: ${this.card.attack}
-            Cost: ${this.card.cost}
+            Cost: ${this.card.isMaster ? this.card.skillCost : this.card.cost}
             Actions: ${this.card.currentActions}
             ${this.card.isRanged ? "R" : ""}${this.card.isQuick ? "Q" : ""}
             `;
@@ -30,7 +29,7 @@ class boardSpace {
             `
         }
 
-        if (this.owner !== PLAYER_ENEMY) { setDraggable(this.DOM); }
+        if (this.owner !== PLAYER_ENEMY && this.card) { setDraggable(this.DOM); }
         this.DOM.innerText = cardStr;
         return cardStr;
     }
@@ -128,6 +127,13 @@ class NatialSpace extends boardSpace {
         return [myDmg, counterDmg];
     }
 
+    // removes one action for the card in the NatialSpace. if it still has
+    // actions left, it can take another move.
+    expendAction() {
+        this.card.currentActions--;
+        this.card.canMove = this.card.currentActions > 0 ? true : false;
+    }
+
     // checks whether an attack is possible. failure conditions include the
     // target space being empty, the card not having any attacks left, and a
     // non-ranged card attempting to atttack from the back row. returns the
@@ -156,10 +162,7 @@ class NatialSpace extends boardSpace {
     attackNatial(defenderSpace) {
         const thisAttack = this.calculateDamage(defenderSpace);
 
-        // remove one action for the attacker. if it still has actions left,
-        // it can move as well; otherwise, it cannot move after attacking.
-        this.card.currentActions--;
-        this.card.canMove = this.card.currentActions > 0 ? true : false;
+        this.expendAction();
 
         // deal damage to enemy
         defenderSpace.dealDamage(thisAttack[0]);
@@ -187,6 +190,19 @@ class NatialSpace extends boardSpace {
         }
 
         if (this.card.currentHP <= 0) { this.destroyCard(); }
+    }
+
+    // activates the skill on the currently selected card, on the target at
+    // targetSpace, then flags the natial's skill as used.
+    activateSkill(targetSpace) {
+        this.card.skillCallback(targetSpace);
+        if (this.card.isMaster) { // masters use mana for skills
+            currentMana[this.owner] -= this.card.skillCost;
+        } else { // regular natials' skills are one time use
+            this.card.skillReady = false;
+        }
+        skillUsage.userSpace.expendAction();
+        renderAll();
     }
 }
 
@@ -290,8 +306,15 @@ class cardNatial extends card {
         // passive callbacks - placeholder for now
         this.hasPassive = cardProto.hasPassive;
 
-        // active callbacks - placeholder for now
+        // active callbacks
         this.hasSkill = cardProto.hasSkill;
+        this.skillReady = this.hasSkill;
+        this.skillCost = cardProto.skillCost;
+        this.skillCallbackName = cardProto.skillCallbackName;
+    }
+
+    skillCallback(target) {
+        natialActiveCallbacks[this.skillCallbackName](target);
     }
 }
 
@@ -336,6 +359,18 @@ class cardDOMEvent {
     }
 }
 
+class NatialSkillEvent {
+    constructor(userSpace, skillSelection = true) {
+        this.userSpace = userSpace;
+        this.selected = skillSelection;
+    }
+
+    purge() {
+        this.userSpace = null;
+        this.selected = false;
+    }
+}
+
 
 // ========== Non-class structures ==========
 
@@ -360,3 +395,5 @@ let masters = [null, null]; // friendly, enemy
 
 let maxMana = [null, null]; // friendly, enemy
 let currentMana = [null, null] // friendly, enemy
+
+let skillUsage = new NatialSkillEvent(null, false);

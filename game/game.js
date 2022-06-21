@@ -140,6 +140,31 @@ const initializeGameBoard = () => {
     addHoverMagnifyListenerToAll("friendly-natial-space");
     addHoverMagnifyListenerToAll("friendly-hand-card");
 
+    const addRightClickListener = (domObj) => {
+        domObj.addEventListener("contextmenu", natialRightClick);
+    }
+
+    const addRightClickListenerToAll = (className) => {
+        const thisClassList = document.querySelectorAll("." + className);
+        thisClassList.forEach(element => addRightClickListener(element));
+    }
+
+    addRightClickListenerToAll("friendly-natial-space");
+
+    const addLeftClickListener = (domObj) => {
+        domObj.addEventListener("click", natialLeftClick);
+    }
+
+    const addLeftClickListenerToAll = (className) => {
+        const thisClassList = document.querySelectorAll("." + className);
+        thisClassList.forEach(element => addLeftClickListener(element));
+    }
+
+    // addLeftClickListenerToAll("enemy-hand-card");
+    addLeftClickListenerToAll("enemy-natial-space");
+    addLeftClickListenerToAll("friendly-natial-space");
+    // addLeftClickListenerToAll("enemy-hand-card");
+
     loadDeck(null, PLAYER_FRIENDLY);
     loadDeck(null, PLAYER_ENEMY);
 
@@ -151,8 +176,8 @@ const initializeGameBoard = () => {
     }
 
     // both players start with their respective masters on back-1
-    masters[PLAYER_FRIENDLY] = createCard(getFromDB("Debug Master"));
-    masters[PLAYER_ENEMY] = createCard(getFromDB("Debug Master"));
+    masters[PLAYER_FRIENDLY] = createCard(getFromDB("Sister"));
+    masters[PLAYER_ENEMY] = createCard(getFromDB("Sister"));
     cardToBoardDirect(PLAYER_FRIENDLY, masters[PLAYER_FRIENDLY], ROW_BACK, 1, false);
     cardToBoardDirect(PLAYER_ENEMY, masters[PLAYER_ENEMY], ROW_BACK, 1, false);
 
@@ -186,6 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
     addDragEventListenerToAll("enemy-natial-space");
     addDragEventListenerToAll("friendly-natial-space");
     addDragEventListenerToAll("friendly-hand-card");
+
+    document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.querySelector("#end-turn").addEventListener("click", friendlyEndTurn);
 });

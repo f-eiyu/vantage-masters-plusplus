@@ -80,18 +80,22 @@ body {
     border: solid black 1px;
 }
 
-.drag-over-valid {
+.target-valid {
     background-color: green;
 }
 
-.drag-over-invalid {
+.target-invalid {
     background-color: red;
 }
 
-.drag-over-attack {
+.target-attack {
     background-color: orange;
 }
 
 .hovered {
     box-shadow: 3px 3px 1px black;
+}
+
+.skill-selected {
+    background-color: cyan;
 }

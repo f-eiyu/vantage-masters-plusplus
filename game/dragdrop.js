@@ -8,7 +8,7 @@ const setDraggable = (thisCardDOM) => {
 }
 
 const dragStart = (event) => {
-    if (!playerCanInteract || gameEnd) { return; }
+    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
     thisDragFrom = new cardDOMEvent(event.target);
     event.target.classList.add("dragging");
@@ -77,7 +77,7 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
 }
 
 const cardDragEnterSpace = (event) => {
-    if (!playerCanInteract || gameEnd) { return; 
+    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; 
     }
     event.preventDefault();
 
@@ -97,30 +97,30 @@ const cardDragEnterSpace = (event) => {
     // spell: handle differently based on the specific spell
     if (thisDragFrom.isSpell
         && spellDragValidation(thisDragFromSpace, thisDragToSpace)) {
-            thisDragToSpace.DOM.classList.add("drag-over-valid");
+            thisDragToSpace.DOM.classList.add("target-valid");
     }
     // natial dragged onto empty friendly space: movement possible
     else if (thisDragFrom.isNatial
         && isToFriendlyNatial
         && thisDragFromSpace.checkMovementPossible(thisDragToSpace)) {
-        thisDragToSpace.DOM.classList.add("drag-over-valid");
+        thisDragToSpace.DOM.classList.add("target-valid");
     }
     // natial dragged onto occupied enemy space: attack possible
     else if (thisDragFrom.isNatial
         && isToEnemyNatial
         && thisDragFromSpace.checkAttackPossible(thisDragToSpace)) {
-        thisDragToSpace.DOM.classList.add("drag-over-attack");
+        thisDragToSpace.DOM.classList.add("target-attack");
     }
     // hand natial dragged onto empty friendly space: summoning possible
     else if (thisDragFrom.isHandCard
         && !thisDragFrom.isSpell
         && isToFriendlyNatial
         && thisDragFromSpace.checkSummonPossible(thisDragToSpace)) {
-        thisDragToSpace.DOM.classList.add("drag-over-valid");
+        thisDragToSpace.DOM.classList.add("target-valid");
     }
     // no other moves are legal
     else {
-        thisDragToSpace.DOM.classList.add("drag-over-invalid");
+        thisDragToSpace.DOM.classList.add("target-invalid");
     }
 }
 
@@ -128,15 +128,15 @@ const cardDragEnterSpace = (event) => {
 // hovered. this function's sole purpose is to call preventDefault() on the
 // dragover listener so that it's possible for the drop listener to fire.
 const cardDraggedOverSpace = (event) => {
-    if (!playerCanInteract || gameEnd) { return; }
+    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
     
     event.preventDefault();
 }
 
 const clearDragVisuals = (event) => {
-    event.target.classList.remove("drag-over-valid");
-    event.target.classList.remove("drag-over-attack");
-    event.target.classList.remove("drag-over-invalid");
+    event.target.classList.remove("target-valid");
+    event.target.classList.remove("target-attack");
+    event.target.classList.remove("target-invalid");
 }
 
 const dragLeave = (event) => {
@@ -144,7 +144,7 @@ const dragLeave = (event) => {
 }
 
 const dragDrop = (event) => {
-    if (!playerCanInteract || gameEnd) { return; }
+    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
     event.preventDefault();
     

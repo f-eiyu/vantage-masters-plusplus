@@ -1,4 +1,5 @@
 const cardDB = [
+    // ========== Natials ==========
     {
         "name": "Debug Fire",
         "portrait": null,
@@ -15,10 +16,9 @@ const cardDB = [
         "isMaster": false,
 
         "hasSkill": false,
-        "skillReady": false,
-        "skill": null,
+        "skillCallbackName": null,
         "hasPassive": false,
-        "passive": null
+        "passiveCallbackName": null
     },
     {
         "name": "Debug Heaven",
@@ -36,10 +36,9 @@ const cardDB = [
         "isMaster": false,
 
         "hasSkill": false,
-        "skillReady": false,
-        "skill": null,
+        "skillCallbackName": null,
         "hasPassive": false,
-        "passive": null
+        "passiveCallbackName": null
     },
     {
         "name": "Debug Earth",
@@ -57,10 +56,9 @@ const cardDB = [
         "isMaster": false,
 
         "hasSkill": false,
-        "skillReady": false,
-        "skill": null,
+        "skillCallbackName": null,
         "hasPassive": false,
-        "passive": null
+        "passiveCallbackName": null
     },
     {
         "name": "Debug Water",
@@ -78,11 +76,12 @@ const cardDB = [
         "isMaster": false,
 
         "hasSkill": false,
-        "skillReady": false,
-        "skill": null,
+        "skillCallbackName": null,
         "hasPassive": false,
-        "passive": null
+        "passiveCallbackName": null
     },
+
+    // ========== Masters ==========
     {
         "name": "Debug Master",
         "portrait": null,
@@ -99,11 +98,307 @@ const cardDB = [
         "isMaster": true,
 
         "hasSkill": false,
-        "skillReady": false,
+        "skillCost": null,
         "skill": null,
         "hasPassive": false,
         "passive": null
     },
+    {
+        "name": "Fighter",
+        "portrait": null,
+        "cost": 1,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 20,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": false,
+        "skillCost": null,
+        "skillCallbackName": null,
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Ranger",
+        "portrait": null,
+        "cost": 2,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 18,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": false,
+        "skillCost": null,
+        "skillCallbackName": null,
+        "hasPassive": false,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Sister",
+        "portrait": null,
+        "cost": 3,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 18,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 2,
+        "skillCallbackName": "cbSkillSister",
+        "hasPassive": false,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Knight",
+        "portrait": null,
+        "cost": 2,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 30,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": false,
+        "skillCost": null,
+        "skillCallbackName": null,
+        "hasPassive": false,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Thief",
+        "portrait": null,
+        "cost": 2,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 26,
+        "attack": 1,
+        "maxActions": 2,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 2,
+        "skillCallbackName": "cbSkillThief",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Witch",
+        "portrait": null,
+        "cost": 5,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 24,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": "cbSkillWitch",
+        "skillCost": 3,
+        "skillCallbackName": null,
+        "hasPassive": false,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Paladin",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 30,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 4,
+        "skillCallbackName": "cbSkillPaladin",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Beast",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 30,
+        "attack": 4,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 1,
+        "skillCallbackName": "cbSkillBeast",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Swordsman",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 27,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 2,
+        "skillCallbackName": "cbSkillSwordsman",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Sorceror",
+        "portrait": null,
+        "cost": 5,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 25,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 3,
+        "skillCallbackName": "cbSkillSorceror",
+        "hasPassive": false,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Shadow",
+        "portrait": null,
+        "cost": 2,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 20,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 4,
+        "skillCallbackName": "cbSkillShadow",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Spirit",
+        "portrait": null,
+        "cost": 5,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 20,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 3,
+        "skillCallbackName": "cbSkillSpirit",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Bard",
+        "portrait": null,
+        "cost": 3,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 22,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 3,
+        "skillCallbackName": "cbSkillBard",
+        "hasPassive": false,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Tyrant",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_NONE",
+        "maxHP": 30,
+        "attack": 5,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": true,
+
+        "hasSkill": true,
+        "skillCost": 7,
+        "skillCallbackName": "cbSkillTyrant",
+        "hasPassive": true,
+        "passiveCallbackName": null
+    },
+
+    // ========== Spells ==========
     {
         "name": "Magic Crystal",
         "portrait": null,
