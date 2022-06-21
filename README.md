@@ -10,10 +10,9 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 ## todo
 - give Wall visual feedback
 - implement sealed cards being unable to attack
-- refactor dealDamage() to be a natialCard method instead of a boardSpace method
-- refactor restoreHP and buffATK into object methods instead of globals
 - refactor all the event listeners in the latter part of game.js
-- refactor the board into its own object with coherent methods
+- refactor the board, hand, and deck into classes with coherent methods
+- rework the extremely useful but VERY clunky CardDOMEvent class
 
 ## User stories
 ### MVP goals

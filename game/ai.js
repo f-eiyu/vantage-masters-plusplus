@@ -11,7 +11,7 @@ const aiFindEmptySpaces = () => {
 
     natials[PLAYER_ENEMY].forEach((rowArray, rowIndex) => {
         rowArray.forEach((space, spaceIndex) => {
-            if (!space.card) { emptySpaces.push([rowIndex, spaceIndex]); }
+            if (!space.hasCard) { emptySpaces.push([rowIndex, spaceIndex]); }
         });
     });
 
@@ -27,7 +27,7 @@ const aiFindNatials = (player) => {
 
     natials[player].forEach((rowArray, rowIndex) => {
         rowArray.forEach((space, spaceIndex) => {
-            if (space.card) { foundNatials.push([rowIndex, spaceIndex]); }
+            if (space.hasCard) { foundNatials.push([rowIndex, spaceIndex]); }
         });
     });
 
@@ -43,9 +43,9 @@ const aiSummonNatials = () => {
     if (!emptyNatialSpaces.length) { return false; }
 
     // ignore empty hand spaces and play everything that we can
-    hands[PLAYER_ENEMY].filter(sp => sp.card).forEach((thisHandSpace, i) => {
+    hands[PLAYER_ENEMY].filter(sp => sp.innerCard).forEach((thisHandSpace, i) => {
         // halt if card is a spell (we're not smart enough for that yet)
-        if (thisHandSpace.card.type === "spell") { return false; }
+        if (thisHandSpace.innerCard.type === "spell") { return false; }
 
         const thisEmptySpace = emptyNatialSpaces[0];
         const emptyRow = thisEmptySpace[0];
@@ -81,14 +81,14 @@ const aiAttack = () => {
         // perform an attack, if possible
         if (attackerSpace.checkAttackPossible(attackTargetSpace)) {
             if (aiVerbose) {
-                console.log("Attacking", attackTargetSpace.card.name, "with", attackerSpace.card.name);
+                console.log("Attacking", attackTargetSpace.innerCard.name, "with", attackerSpace.innerCard.name);
                 const calcedDmg = attackerSpace.calculateDamage(attackTargetSpace);
                 console.log("Expected damage done:", calcedDmg[0]);
                 console.log("Expected damage countered:", calcedDmg[1]);
             }
             attackerSpace.attackNatial(attackTargetSpace);
             if (aiVerbose) { console.log("Attack resolved."); }
-            if (!attackTargetSpace.card) { 
+            if (!attackTargetSpace.hasCard) { 
                 if (aiVerbose) { console.log("Target destroyed."); }
                 attackTargets.shift();
             }

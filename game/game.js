@@ -15,7 +15,7 @@ const loadDeck = (cardList, player) => {
     // using the random seeds, shuffle the deck
     thisDeckRaw.sort((cardOne, cardTwo) => { return cardOne.seed - cardTwo.seed; });
     // extract the cards from their object wrappers
-    const thisDeck = thisDeckRaw.map(cardWrapper => cardWrapper.card);
+    const thisDeck = thisDeckRaw.map(cardWrapper => cardWrapper.innerCard);
 
     // put the cards in the correct player's deck
     return decks[player] = thisDeck;
@@ -27,14 +27,14 @@ const drawCard = (player, render = true) => {
 
     // retrieve the index of the first empty handSpace
     const getFirstEmpty = hands[player].reduce((firstEmpty, toCheck) => {
-        return (!toCheck.card && toCheck.index < firstEmpty ? toCheck.index : firstEmpty);
+        return (!toCheck.innerCard && toCheck.index < firstEmpty ? toCheck.index : firstEmpty);
     }, Infinity);
 
     // fail if there are no empty spaces
     if (getFirstEmpty > HAND_SIZE_LIMIT - 1) { return false; }
 
     // if the draw is possible, pop last card in the deck to the player's hand
-    hands[player][getFirstEmpty].card = decks[player].pop();
+    hands[player][getFirstEmpty].innerCard = decks[player].pop();
 
     if (render) { renderAll(); }
     return true;
@@ -42,13 +42,13 @@ const drawCard = (player, render = true) => {
 
 const boardCardMouseover = (event) => {
     const boardSpace = (new CardDOMEvent(event.target)).spaceObj;
-    if (!boardSpace.card) { return; }
+    if (!boardSpace.hasCard) { return; }
 
     const detailZone = document.querySelector("#card-detail-zone");
 
     detailZone.innerText = boardSpace.DOM.innerText;
-    if (boardSpace.card.type === "spell") {
-        detailZone.innerText += boardSpace.card.longdesc;
+    if (boardSpace.innerCard.type === "spell") {
+        detailZone.innerText += boardSpace.innerCard.longdesc;
     }
     boardSpace.DOM.classList.add("hovered");
 }
@@ -63,7 +63,7 @@ const boardCardMouseleave = (event) => {
 
 const cardToBoardDirect = (player, card, row, position, render = true) => {
     const thisSpace = natials[player][row][position];
-    if (!thisSpace.card) { thisSpace.card = card; }
+    if (!thisSpace.hasCard) { thisSpace.innerCard = card; }
 
     if (render) { renderAll(); }
 }
@@ -78,9 +78,9 @@ const replenishMana = (player) => {
 const refreshNatials = (player) => {
     natials[player].forEach(row => {
         row.forEach(natialSpace => {
-            if (natialSpace.card) {
-                natialSpace.card.currentActions = natialSpace.card.maxActions;
-                natialSpace.card.canMove = true;
+            if (natialSpace.hasCard) {
+                natialSpace.innerCard.currentActions = natialSpace.innerCard.maxActions;
+                natialSpace.innerCard.canMove = true;
             }
         });
     });

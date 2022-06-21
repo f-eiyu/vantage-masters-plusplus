@@ -3,7 +3,7 @@ const spellCallbacks = {
         // heals target by 1 HP, grants it +1 ATK, and allows it to use its
         // skill again; also grants the player +1 current mana, which can
         // temporarily exceed their current maximum mana.
-        const targetCard = targetSpace.card;
+        const targetCard = targetSpace.innerCard;
 
         targetCard.restoreHP(1);
         targetCard.buffAtk(1);
@@ -13,7 +13,7 @@ const spellCallbacks = {
     cbSpellMedic: function(targetSpace) {
         // heals target by 2 HP and removes seal; if target is Heaven element,
         // also grants it +1 ATK.
-        const targetCard = targetSpace.card;
+        const targetCard = targetSpace.innerCard;
 
         targetCard.restoreHP(2);
         targetCard.sealed = 0;
@@ -24,7 +24,7 @@ const spellCallbacks = {
     cbSpellTransmute: function(targetSpace) {
         // seals the target card for 2 (more) turns, or 3 if the user's master
         // is Witch
-        targetSpace.card.sealed += 2;
+        targetSpace.innerCard.sealed += 2;
         // the Witch master does not exist yet, so this card's 3-turn sealing
         // functionality is not implemented yet either
     },
@@ -45,7 +45,7 @@ const spellCallbacks = {
         natials.forEach(player => {
             player.forEach(row => {
                 row.forEach(natialSpace => {
-                    const thisCard = natialSpace.card;
+                    const thisCard = natialSpace.innerCard;
                     // uptide's effect skips masters, who do not have an element
                     if (!thisCard || thisCard.isMaster) { return; }
 
@@ -53,7 +53,7 @@ const spellCallbacks = {
                         thisCard.restoreHP(1);
                         thisCard.buffAtk(1);
                     } else {
-                        natialSpace.dealDamageToContainedCard(1);
+                        natialSpace.dealDamageToInnerCard(1);
                     }
                 });
             });
@@ -61,14 +61,14 @@ const spellCallbacks = {
     },
     cbSpellBlaze: function(targetSpace) {
         // grants the target natial +2 ATK, or +3 if it's Fire elemental
-        const targetCard = targetSpace.card;
+        const targetCard = targetSpace.innerCard;
 
         targetCard.buffAtk(targetCard.element === ELEMENT_FIRE ? 3 : 2);
     },
     cbSpellWall: function(targetSpace) {
         // places a barrier on the target that negates damage once, and heals 2
         // HP if the target is Earth elemental
-        const targetCard = targetSpace.card;
+        const targetCard = targetSpace.innerCard;
 
         targetCard.shielded++;
         if (targetCard.element === ELEMENT_EARTH) { targetCard.restoreHP(2); }
@@ -83,32 +83,32 @@ const spellCallbacks = {
         // HAND OBJECTS instead of coding one-offs like a caveman.
         // this is also not DRY with games.js > drawCard > getFirstEmpty!
         const freeIndex = hands[oppOwner].reduce((firstEmpty, handSpace) => {
-            return (!handSpace.card && handSpace.index < firstEmpty ? handSpace.index : firstEmpty);
+            return (!handSpace.innerCard && handSpace.index < firstEmpty ? handSpace.index : firstEmpty);
         }, Infinity);
 
         // return card to deck if no free hand
         if (freeIndex > HAND_SIZE_LIMIT - 1) {
-            decks[oppOwner].push(targetSpace.card);
+            decks[oppOwner].push(targetSpace.innerCard);
         }
         // otherwise, return the card to the hand
         else {
-            hands[oppOwner][freeIndex].card = targetSpace.card;
+            hands[oppOwner][freeIndex].innerCard = targetSpace.innerCard;
         }
 
-        targetSpace.card = null;
+        targetSpace.innerCard = null;
     },
     cbSpellReduce: function(targetSpace) {
         // halves the mana cost of the targeted card, rounded down
-        targetSpace.card.cost = Math.floor(targetSpace.card.cost / 2);
+        targetSpace.innerCard.cost = Math.floor(targetSpace.innerCard.cost / 2);
     },
     cbSpellDisaster: function(targetSpace) {
         // deals 4 damage to every card in the same row as the target
         const thisRow = targetSpace.isFrontRow ? ROW_FRONT : ROW_BACK;
 
         natials[targetSpace.owner][thisRow].forEach(natialSpace => {
-            if (!natialSpace.card) { return; }
+            if (!natialSpace.hasCard) { return; }
 
-            natialSpace.dealDamageToContainedCard(4);
+            natialSpace.dealDamageToInnerCard(4);
         });
     }
 };

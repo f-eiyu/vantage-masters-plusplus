@@ -22,12 +22,12 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
     }
 
     // always fail if insufficient mana
-    if (dragFromSpace.card.cost > currentMana[dragFromSpace.owner]) {
+    if (dragFromSpace.innerCard.cost > currentMana[dragFromSpace.owner]) {
         return false;
     }
 
     // validate the drag location based on the spell
-    const cbName = dragFromSpace.card.callbackName;
+    const cbName = dragFromSpace.innerCard.callbackName;
     switch(cbName) {
         // friendly buff spells: succeed if target is friendly natial, else fail
         case "cbSpellMagicCrystal":
@@ -36,7 +36,7 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
         case "cbSpellWall":
             // succeed if there is a target natial and the target natial is in 
             // the same natial zone as the spell's owner; fail otherwise.
-            if (dragToSpace.card
+            if (dragToSpace.innerCard
                 && dragToSpace.owner === dragFromSpace.owner
                 && dragToSpace.isNatialSpace) {
                 return true;
@@ -48,21 +48,21 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
         case "cbSpellVanish":
         case "cbSpellExpel":
         case "cbSpellDisaster":
-            if (dragToSpace.card
+            if (dragToSpace.innerCard
                 && dragToSpace.owner !== dragFromSpace.owner
                 && dragToSpace.isNatialSpace
                 // Expel can't bounce a deck master off of the field
-                && !(cbName === "cbSpellExpel" && dragToSpace.card.isMaster)) {
+                && !(cbName === "cbSpellExpel" && dragToSpace.innerCard.isMaster)) {
                 return true;
             }
             return false;
 
         // one-off: targets a card in the user's hand
         case "cbSpellReduce":
-            if (dragToSpace.card
+            if (dragToSpace.innerCard
                 && dragToSpace.owner === dragFromSpace.owner
                 && dragToSpace.isHandSpace
-                && dragToSpace.card.cost > 0) {
+                && dragToSpace.innerCard.cost > 0) {
                     return true;
                 }
                 return false;

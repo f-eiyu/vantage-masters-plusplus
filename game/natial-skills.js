@@ -1,12 +1,12 @@
 const skillUseValidation = (targetSpace) => {
     const userSpace = skillUsage.userSpace;
 
-    const cbName = userSpace.card.skillCallbackName;
+    const cbName = userSpace.innerCard.skillCallbackName;
     switch(cbName) {
         // team buff skills: succeed if target is friendly natial
         case "cbSkillSister":
         case "cbSkillSpirit":
-            if (targetSpace.card
+            if (targetSpace.innerCard
                 && targetSpace.owner === userSpace.owner
                 && targetSpace.isNatialSpace) {
                 return true;
@@ -18,7 +18,7 @@ const skillUseValidation = (targetSpace) => {
         case "cbSkillSwordsman":
         case "cbSkillBard":
         case "cbSkillTyrant":
-            if (targetSpace.card
+            if (targetSpace.innerCard
                 && targetSpace.owner !== userSpace.owner
                 && targetSpace.isNatialSpace) {
                     return true;
@@ -27,8 +27,8 @@ const skillUseValidation = (targetSpace) => {
 
         // targetless skills: targets the skill user for validation
         case "cbSkillKnight":
-            if (targetSpace.card
-                && targetSpace.card === userSpace.card) {
+            if (targetSpace.innerCard
+                && targetSpace.innerCard === userSpace.innerCard) {
                 return true;
             }
             return false;
@@ -56,14 +56,14 @@ const natialRightClick = (event) => {
     const thisRightClick = new CardDOMEvent(event.target);
     const userSpace = thisRightClick.spaceObj;
 
-    if (!userSpace.card) { return; }
-    if (!userSpace.card.skillReady) { return; }
-    if (!userSpace.card.currentActions) { return; }
+    if (!userSpace.hasCard) { return; }
+    if (!userSpace.innerCard.skillReady) { return; }
+    if (!userSpace.innerCard.currentActions) { return; }
 
     if (skillUsage.selected) {
         skillUsage.purge();
         event.target.classList.remove("skill-selected");
-    } else if (currentMana[userSpace.owner] >= userSpace.card.skillCost) {
+    } else if (currentMana[userSpace.owner] >= userSpace.innerCard.skillCost) {
         skillUsage = new NatialSkillEvent(userSpace);
         event.target.classList.add("skill-selected");
     }
