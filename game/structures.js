@@ -26,21 +26,32 @@
 
 class BoardSpace {
     constructor (owner, index) {
-        this.containedCard = null;
-        this.owner = owner;
-        this.index = index;
+        this._containedCard = null;
+        this._owner = owner;
+        this._index = index;
     }
 
-    get hasCard() { return (this.containedCard !== null); }
-    get innerCard() { return this.containedCard; }
+    get hasCard() { return (this._containedCard !== null); }
+    get innerCard() { return this._containedCard; }
 
     get card() { throw "old .innerCard property; refactor this!"; }
 
-    set innerCard(newCard) {
-        if (this.hasCard) {
-            
-        }
 
+    // only intended to be called by methods like Player.drawCard(). there is
+    // no public method to replace the contents of a BoardSpace instance!
+    _cardToSpace(cardObj) {
+        if (cardObj && cardObj instanceof Card) {
+            this._containedCard = cardObj;
+        }
+        else { throw "invalid object passed to BoardSpace!"; }
+    }
+
+    // removes the reference to the card contained in the current BoardSpace
+    // instance, without any additional action. not intended to be used to clear
+    // spaces by itself -- for regular gameplay use, destroyCard() is the
+    // method to use!
+    _clear() {
+        this.innerCard = null;
     }
 
     // this function could use a good refactor or two
@@ -65,30 +76,30 @@ class BoardSpace {
             `
         }
 
-        if (this.owner !== PLAYER_ENEMY && this.hasCard) { setDraggable(this.DOM); }
+        if (this._owner !== PLAYER_ENEMY && this.hasCard) { setDraggable(this.DOM); }
         this.DOM.innerText = cardStr;
         return cardStr;
     }
 
-    // removes the card in the current NatialSpace from the board
+    // removes a card from the board or hand via regular gameplay
     destroyCard() {
-        destroyedCards[this.owner].push(this.innerCard);
-        this.innerCard = null;
+        destroyedCards[this._owner].push(this.innerCard);
+        this._clear();
     }
 }
 
 class NatialSpace extends BoardSpace {
     constructor (owner, index, isFrontRow) {
         super(owner, index);
-        this.isFrontRow = isFrontRow;
-        this.isBackRow = !isFrontRow;
-        this.isNatialSpace = true;
-        this.isHandSpace = false;
+        this._isFrontRow = isFrontRow;
+        this._isBackRow = !isFrontRow;
+        this._isNatialSpace = true;
+        this._isHandSpace = false;
 
-        const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
-        const rowStr = (this.isFrontRow ? "front" : "back");
-        this.DOMId = `${playerStr}-${rowStr}-${this.index}`
-        this.DOM = document.getElementById(this.DOMId);
+        const playerStr = (this._owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
+        const rowStr = (this._isFrontRow ? "front" : "back");
+        this._DOMId = `${playerStr}-${rowStr}-${this._index}`
+        this._DOM = document.getElementById(this._DOMId);
     }
 
     // checks whether movement is possible. failure conditions include the card
@@ -112,7 +123,7 @@ class NatialSpace extends BoardSpace {
         targetSpace.innerCard.canMove = false;
 
         // movement will always require a re-render
-        renderNatials(this.owner);
+        renderNatials(this._owner);
 
         return true;
     }
@@ -120,9 +131,9 @@ class NatialSpace extends BoardSpace {
     // returns true if the card is in the back row and any cards exist in the
     // front row, and false otherwise
     hasCardInFront = () => { // ### belongs in Board class
-        if (!this.isBackRow) { return false; }
+        if (!this._isBackRow) { return false; }
 
-        const inFront = natials[this.owner][ROW_FRONT].reduce((front, space) => {
+        const inFront = natials[this._owner][ROW_FRONT].reduce((front, space) => {
             return (front || Boolean(space.innerCard));
         }, false);
 
@@ -145,7 +156,7 @@ class NatialSpace extends BoardSpace {
 
         // there's some nuance as to whether counterattacking is possible:
         // a ranged card attacking from the back will never be counterattacked.
-        if (this.innerCard.isRanged && this.isBackRow) {
+        if (this.innerCard.isRanged && this._isBackRow) {
             counterDmg = 0;
         }
         // a ranged card attacking from the front might not be counterattacked.
@@ -186,7 +197,7 @@ class NatialSpace extends BoardSpace {
             return false;
         }
         // fail if attacker is not ranged, in the back, and behind another card
-        if (!this.innerCard.isRanged && this.isBackRow && this.hasCardInFront()){
+        if (!this.innerCard.isRanged && this._isBackRow && this.hasCardInFront()){
             return false;
         }
 
@@ -228,7 +239,7 @@ class NatialSpace extends BoardSpace {
     activateSkill(targetSpace) { // belongs in Card class, wrapper and logic here
         this.innerCard.skillCallback(targetSpace);
         if (this.innerCard.isMaster) { // masters use mana for skills
-            currentMana[this.owner] -= this.innerCard.skillCost;
+            currentMana[this._owner] -= this.innerCard.skillCost;
         } else { // regular natials' skills are one time use
             this.innerCard.skillReady = false;
         }
@@ -241,12 +252,12 @@ class HandSpace extends BoardSpace {
     constructor (owner, index) {
         super(owner, index);
 
-        const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
-        this.DOMId = `${playerStr}-hand-${this.index}`
-        this.DOM = document.getElementById(this.DOMId);
+        const playerStr = (this._owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
+        this._DOMId = `${playerStr}-hand-${this._index}`
+        this._DOM = document.getElementById(this._DOMId);
 
-        this.isNatialSpace = false;
-        this.isHandSpace = true;
+        this._isNatialSpace = false;
+        this._isHandSpace = true;
     }
 
     // checks to see whether the natial can be summoned to the target space.
@@ -257,7 +268,7 @@ class HandSpace extends BoardSpace {
         // fail if target space is not tempty
         if (targetSpace.hasCard) { return false; }
         // fail if insufficient mana
-        if (currentMana[this.owner] < this.innerCard.cost) { return false; }
+        if (currentMana[this._owner] < this.innerCard.cost) { return false; }
 
         return true;
     }
@@ -266,8 +277,8 @@ class HandSpace extends BoardSpace {
     // NatialSpace on the board.
     summonNatial(targetSpace) {
         // summoning will almost always require mana
-        if (currentMana[this.owner] < this.innerCard.cost) { return false; }
-        currentMana[this.owner] -= this.innerCard.cost;
+        if (currentMana[this._owner] < this.innerCard.cost) { return false; }
+        currentMana[this._owner] -= this.innerCard.cost;
 
         // summon the specified natial!
         targetSpace.innerCard = this.innerCard;
@@ -283,9 +294,9 @@ class HandSpace extends BoardSpace {
         }
 
         // summoning will always require a re-render
-        renderHand(this.owner);
-        renderNatials(this.owner);
-        renderMana(this.owner);
+        renderHand(this._owner);
+        renderNatials(this._owner);
+        renderMana(this._owner);
 
         return true;
     }
@@ -294,7 +305,7 @@ class HandSpace extends BoardSpace {
     // at targetSpace, and then destroys the spell.
     activateSpell(targetSpace) {
         this.innerCard.spellCallback(targetSpace);
-        currentMana[this.owner] -= this.innerCard.cost;
+        currentMana[this._owner] -= this.innerCard.cost;
         this.destroyCard();
         renderAll();
     }
@@ -302,19 +313,19 @@ class HandSpace extends BoardSpace {
 
 class Card {
     constructor(cardProto) {
-        this.innerCardName = cardProto.name;
-        this.innerCardPortrait = cardProto.portrait;
-        this.innerCardCost = cardProto.cost;
-        this.innerCardType = cardProto.type;
+        this._cardName = cardProto.name;
+        this._cardPortrait = cardProto.portrait;
+        this._cardCost = cardProto.cost;
+        this._cardType = cardProto.type;
     }
 
-    get name() { return this.innerCardName; }
-    get portraitURL() { return this.innerCardPortrait; }
-    get cost() { return this.innerCardCost; }
-    get type() { return this.innerCardType; }
+    get name() { return this._cardName; }
+    get portraitURL() { return this._cardPortrait; }
+    get cost() { return this._cardCost; }
+    get type() { return this._cardType; }
 
     // cost is the only changeable property here; all others should be read-only
-    set cost(newCost) { this.innerCardCost = Math.max(newCost, 0); }
+    set cost(newCost) { this._cardCost = Math.max(newCost, 0); }
 }
 
 class NatialCard extends Card {
@@ -329,75 +340,75 @@ class NatialCard extends Card {
             "ELEMENT_EARTH": ELEMENT_EARTH,
             "ELEMENT_WATER": ELEMENT_WATER
         }
-        this.innerCardElement = ELEMENT_NAMES[cardProto.element]
-        this.innerCardMaxHP = cardProto.maxHP;
-        this.innerCardCurrentHP = this.maxHP;
-        this.innerCardAttack = cardProto.attack;
+        this._cardElement = ELEMENT_NAMES[cardProto.element]
+        this._cardMaxHP = cardProto.maxHP;
+        this._cardCurrentHP = this.maxHP;
+        this._cardAttack = cardProto.attack;
 
         // properties relating to whether a card can move/attack
-        this.innerCardMaxActions = cardProto.maxActions;
-        this.innerCardCurrentActions = 0;
-        this.innerCardCanMove = false;
+        this._cardMaxActions = cardProto.maxActions;
+        this._cardCurrentActions = 0;
+        this._cardCanMove = false;
 
         // card flags
-        this.innerCardIsRanged = cardProto.isRanged;
-        this.innerCardIsQuick = cardProto.isQuick;
-        this.innerCardIsMaster = cardProto.isMaster;
+        this._cardIsRanged = cardProto.isRanged;
+        this._cardIsQuick = cardProto.isQuick;
+        this._cardIsMaster = cardProto.isMaster;
 
         // temporary status effects
-        this.sealedTurns = 0;
-        this.shieldedTurns = 0;
-        this.protectedStatus = false;
+        this._sealedTurns = 0;
+        this._shieldedTurns = 0;
+        this._protectedStatus = false;
 
         // passive callbacks - placeholder for now
-        this.innerCardPassiveCbName = cardProto.passiveCallbackName;
+        this._cardPassiveCbName = cardProto.passiveCallbackName;
 
         // skill callbacks
-        this.innerCardSkillCbName = cardProto.skillCallbackName;
-        this.innerCardSkillReady = Boolean(this.skillCallbackName);
-        this.innerCardSkillCost = cardProto.skillCost;
+        this._cardSkillCbName = cardProto.skillCallbackName;
+        this._cardSkillReady = Boolean(this.skillCallbackName);
+        this._cardSkillCost = cardProto.skillCost;
     }
 
-    get element() { return this.innerCardElement; }
-    get curHP() { return this.innerCardCurrentHP; }
-    get maxHP() { return this.innerCardMaxHP; }
-    get attack() { return this.innerCardAttack; }
-    get maxActions() { return this.innerCardMaxActions; }
-    get currentActions() { return this.innerCardCurrentActions; }
-    get canMove() { return this.innerCardCanMove; }
-    get isRanged() { return this.innerCardIsRanged; }
-    get isQuick() { return this.innerCardIsQuick; }
-    get isMaster() { return this.innerCardIsMaster; }
-    get sealed() { return this.sealedTurns; }
-    get shielded() { return this.shieldedTurns; }
-    get protected() { return this.protectedStatus; }
-    get hasPassive() { return Boolean(this.innerCardPassiveCbName); }
-    get passiveCbName() { return this.innerCardPassiveCbName; }
-    get hasSkill() { return Boolean(this.innerCardSkillCbName); }
-    get skillCbName() { return this.innerCardSkillCbName; }
-    get skillReady() { return this.innerCardSkillReady; }
-    get skillCost() { return this.innerCardSkillCost; }
+    get element() { return this._cardElement; }
+    get curHP() { return this._cardCurrentHP; }
+    get maxHP() { return this._cardMaxHP; }
+    get attack() { return this._cardAttack; }
+    get maxActions() { return this._cardMaxActions; }
+    get currentActions() { return this._cardCurrentActions; }
+    get canMove() { return this._cardCanMove; }
+    get isRanged() { return this._cardIsRanged; }
+    get isQuick() { return this._cardIsQuick; }
+    get isMaster() { return this._cardIsMaster; }
+    get sealed() { return this._sealedTurns; }
+    get shielded() { return this._shieldedTurns; }
+    get protected() { return this._protectedStatus; }
+    get hasPassive() { return Boolean(this._cardPassiveCbName); }
+    get passiveCbName() { return this._cardPassiveCbName; }
+    get hasSkill() { return Boolean(this._cardSkillCbName); }
+    get skillCbName() { return this._cardSkillCbName; }
+    get skillReady() { return this._cardSkillReady; }
+    get skillCost() { return this._cardSkillCost; }
 
     set element(newElement) {
         if (newElement >= ELEMENT_NONE && newElement <= ELEMENT_WATER) {
-            this.innerCardElement = newElement;
+            this._cardElement = newElement;
         } else {
-            this.innerCardElement = ELEMENT_NONE;
+            this._cardElement = ELEMENT_NONE;
         }
     }
     set curHP(newHP) { // deck masters capped by their max HP, natials are not
-        this.innerCardCurrentHP = newHP;
-        if (this.innerCardIsMaster && this.innerCardCurrentHP > this.innerCardMaxHP) { 
-            this.innerCardCurrentHP = this.innerCardMaxHP;
+        this._cardCurrentHP = newHP;
+        if (this._cardIsMaster && this._cardCurrentHP > this._cardMaxHP) { 
+            this._cardCurrentHP = this._cardMaxHP;
         }
     }
-    set attack(newAtk) { this.innerCardAttack = Math.max(newAtk, 0); }
-    set currentActions(newActions) { this.innerCardCurrentActions = newActions; }
-    set canMove(newCanMove) { this.innerCardCanMove = newCanMove; }
-    set sealed(newSealed) { this.sealedTurns = Math.max(newSealed, 0); }
-    set shielded(newShield) { this.shieldedTurns = Math.max(newShield, 0); }
-    set protected(newProt) { this.protectedStatus = newProt; }
-    set skillReady(newReady) { this.innerCardSkillReady = newReady; }
+    set attack(newAtk) { this._cardAttack = Math.max(newAtk, 0); }
+    set currentActions(newActions) { this._cardCurrentActions = newActions; }
+    set canMove(newCanMove) { this._cardCanMove = newCanMove; }
+    set sealed(newSealed) { this._sealedTurns = Math.max(newSealed, 0); }
+    set shielded(newShield) { this._shieldedTurns = Math.max(newShield, 0); }
+    set protected(newProt) { this._protectedStatus = newProt; }
+    set skillReady(newReady) { this._cardSkillReady = newReady; }
 
     // deals the specified amount of damage to this natial, if applicable
     takeDamage(dmg) {
@@ -424,13 +435,13 @@ class SpellCard extends Card {
     constructor(cardProto) {
         super(cardProto);
 
-        this.callbackName = cardProto.callbackName;
-        this.longdesc = cardProto.longdesc;
+        this._callbackName = cardProto.callbackName;
+        this._longdesc = cardProto.longdesc;
     }
 
     // wrapper for the spell effect's callback
     spellCallback(target) {
-        spellCallbacks[this.callbackName](target);
+        spellCallbacks[this._callbackName](target);
     }
 }
 
@@ -482,16 +493,39 @@ class Hand extends Array {
 
     }
 
-    countCards() {
+    // returns the HandSpace instance at the specified index
+    getSpaceAt(index) {
+        if (index < 0 || index >= HAND_SIZE_LIMIT) {
+            throw "Hand index out of bounds!";
+        }
 
+        return this[index];
+    }
+    // returns the index of the first empty handSpace in Hand. if there are 
+    // no empty handSpaces, returns HAND_SIZE_LIMIT.
+    get firstEmpty() {
+        let firstEmpty = 0;
+
+        for(firstEmpty; firstEmpty < HAND_SIZE_LIMIT; firstEmpty++) {
+            if (!this.getSpaceAt(firstEmpty).hasCard) { return firstEmpty; }
+        }
+
+        return firstEmpty;
+    }
+    get isFull() { return (this.firstEmpty() === HAND_SIZE_LIMIT); }
+    get isEmpty() { return (this.firstEmpty() === 0); }
+    get cardCount() {
+        return this.reduce((cardTotal, nextSpace) => {
+            return cardTotal + (nextSpace.hasCard ? 1 : 0);
+        }, 0);
     }
 
-    isEmpty() {
+    cardToHand(index, cardObj) {
+        if (this.getSpaceAt(index).hasCard) {
+            throw "assignment to occupied Hand index!"
+        }
 
-    }
-
-    isFull() {
-
+        this.getSpaceAt(index)._cardToSpace(cardObj);
     }
 }
 
@@ -502,13 +536,24 @@ class Deck extends Array {
 class Player {
     constructor() {
         
-        this.natialZone = new NatialZone();
-        this.hand = new Hand();
-        this.deck = new Deck();
+        this._natialZone = new NatialZone();
+        this._hand = new Hand();
+        this._deck = new Deck();
     }
 
-    drawCard(n = 1) {
-        return;
+    get hand() { return this._hand; }
+    get deck() { return this._deck; }
+
+    drawCard(n = 1, render = true) {
+        if (!this.deck.length) { return false; }
+        if (this.hand.isFull) { return false; }
+
+        const firstEmpty = this._hand.firstEmpty;
+        const drawnCard = this._deck.pop();
+
+        this.hand.cardToHand(firstEmpty, drawnCard);
+
+        if (render) { renderAll(); }
     }
 }
 

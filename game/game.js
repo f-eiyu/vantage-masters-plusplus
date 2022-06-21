@@ -21,13 +21,13 @@ const loadDeck = (cardList, player) => {
     return decks[player] = thisDeck;
 }
 
-const drawCard = (player, render = true) => {
+const drawCard = (player, render = true) => {/*
     // fail if there are no cards to draw
     if (decks[player].length === 0) { return false; }
 
     // retrieve the index of the first empty handSpace
     const getFirstEmpty = hands[player].reduce((firstEmpty, toCheck) => {
-        return (!toCheck.innerCard && toCheck.index < firstEmpty ? toCheck.index : firstEmpty);
+        return (!toCheck.innerCard && toCheck._index < firstEmpty ? toCheck._index : firstEmpty);
     }, Infinity);
 
     // fail if there are no empty spaces
@@ -37,7 +37,8 @@ const drawCard = (player, render = true) => {
     hands[player][getFirstEmpty].innerCard = decks[player].pop();
 
     if (render) { renderAll(); }
-    return true;
+    return true;*/
+    throw "drawCard call -- replace with class method!"
 }
 
 const boardCardMouseover = (event) => {
@@ -46,11 +47,11 @@ const boardCardMouseover = (event) => {
 
     const detailZone = document.querySelector("#card-detail-zone");
 
-    detailZone.innerText = boardSpace.DOM.innerText;
+    detailZone.innerText = boardSpace._DOM.innerText;
     if (boardSpace.innerCard.type === "spell") {
         detailZone.innerText += boardSpace.innerCard.longdesc;
     }
-    boardSpace.DOM.classList.add("hovered");
+    boardSpace._DOM.classList.add("hovered");
 }
 
 const boardCardMouseleave = (event) => {

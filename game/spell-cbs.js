@@ -83,7 +83,7 @@ const spellCallbacks = {
         // HAND OBJECTS instead of coding one-offs like a caveman.
         // this is also not DRY with games.js > drawCard > getFirstEmpty!
         const freeIndex = hands[oppOwner].reduce((firstEmpty, handSpace) => {
-            return (!handSpace.innerCard && handSpace.index < firstEmpty ? handSpace.index : firstEmpty);
+            return (!handSpace.innerCard && handSpace._index < firstEmpty ? handSpace._index : firstEmpty);
         }, Infinity);
 
         // return card to deck if no free hand
