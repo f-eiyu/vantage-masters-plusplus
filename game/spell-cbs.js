@@ -1,7 +1,3 @@
-const buffAtk = (card, amount) => {
-    card.attack = Math.max(card.attack + amount, 0);
-}
-
 const spellCallbacks = {
     cbSpellMagicCrystal: function(targetSpace) {
         // heals target by 1 HP, grants it +1 ATK, and allows it to use its
@@ -9,8 +5,8 @@ const spellCallbacks = {
         // temporarily exceed their current maximum mana.
         const targetCard = targetSpace.card;
 
-        restoreHP(targetCard, 1);
-        buffAtk(targetCard, 1);
+        targetCard.restoreHP(1);
+        targetCard.buffAtk(1);
         // refresh natial skill - not yet implemented
         currentMana[targetSpace.owner]++;
     },
@@ -19,7 +15,7 @@ const spellCallbacks = {
         // also grants it +1 ATK.
         const targetCard = targetSpace.card;
 
-        restoreHP(targetCard, 2);
+        targetCard.restoreHP(2);
         targetCard.sealed = 0;
         if (targetCard.element === ELEMENT_HEAVEN) {
             buffAtk(targetCard, 1);
@@ -35,7 +31,7 @@ const spellCallbacks = {
     cbSpellVanish: function(targetSpace) {
         // deals 6 damage to the target card, or 7 if the user's master is
         // Paladin
-        targetSpace.dealDamage(6);
+        targetSpace.dealDamageToContainedCard(6);
         // the Paladin master does not exist yet, so this card's bonus damage
         // functionality is not implemented yet either
     },
@@ -54,10 +50,10 @@ const spellCallbacks = {
                     if (!thisCard || thisCard.isMaster) { return; }
 
                     if (thisCard.element === ELEMENT_WATER) {
-                        restoreHP(thisCard, 1);
-                        buffAtk(thisCard, 1);
+                        thisCard.restoreHP(1);
+                        thisCard.buffAtk(1);
                     } else {
-                        natialSpace.dealDamage(1); // refactor this
+                        natialSpace.dealDamageToContainedCard(1);
                     }
                 });
             });
@@ -67,7 +63,7 @@ const spellCallbacks = {
         // grants the target natial +2 ATK, or +3 if it's Fire elemental
         const targetCard = targetSpace.card;
 
-        buffAtk(targetCard, targetCard.element === ELEMENT_FIRE ? 3 : 2);
+        targetCard.buffAtk(targetCard.element === ELEMENT_FIRE ? 3 : 2);
     },
     cbSpellWall: function(targetSpace) {
         // places a barrier on the target that negates damage once, and heals 2
@@ -75,7 +71,7 @@ const spellCallbacks = {
         const targetCard = targetSpace.card;
 
         targetCard.shielded++;
-        if (targetCard.element === ELEMENT_EARTH) { restoreHP(targetCard, 2); }
+        if (targetCard.element === ELEMENT_EARTH) { targetCard.restoreHP(2); }
     },
     cbSpellExpel: function(targetSpace) {
         // returns the target card to the opponent's hand, or to the top of
@@ -110,9 +106,9 @@ const spellCallbacks = {
         const thisRow = targetSpace.isFrontRow ? ROW_FRONT : ROW_BACK;
 
         natials[targetSpace.owner][thisRow].forEach(natialSpace => {
-            if (!natialSpace.card) { return ;}
+            if (!natialSpace.card) { return; }
 
-            natialSpace.dealDamage(4);
+            natialSpace.dealDamageToContainedCard(4);
         });
     }
 };

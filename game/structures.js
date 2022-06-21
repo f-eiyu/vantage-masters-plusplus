@@ -1,5 +1,26 @@
 // ========== Classes ==========
 
+/*
+    general hierarchy of organization:
+      - each player contains a deck, hand, and natial zone.
+      - a Hand instance holds six HandSpace object instances, each of which can
+        hold up to one HandCard instance (or be empty).
+      - a NatialZone instance holds up to seven NatialSpace instances, three
+        in the back row and four in the front row. each NatialSpace instance
+        can hold up to one NatialCard instance (or be empty).
+      - Hand and Deck have mostly informational methods to faciliate card
+        effects, and a handful of functional ones (ex. placing a card in the
+        hand, shuffling the deck, etc).
+      - Player tracks properties for the current player (ex. mana) and has
+        methods and wrappers that interface with different aspects of player
+        control (ex. drawing a card touches both the deck and the hand).
+      - NatialSpace and HandSpace contain information about their position,
+        some informational methods, and wrappers for methods in their
+        contained card.
+      - Card instances contain all the information about one specific card
+        on the board, in the hand, or in the deck.
+*/
+
 class BoardSpace {
     constructor (owner, index) {
         this.card = null;
@@ -17,7 +38,7 @@ class BoardSpace {
         } else if (this.card.type === "natial") {
             cardStr = `${this.card.name}
             Element: ${getElementName(this.card.element)}
-            HP: ${this.card.currentHP}/${this.card.maxHP}
+            HP: ${this.card.curHP}/${this.card.maxHP}
             ATK: ${this.card.attack}
             Cost: ${this.card.isMaster ? this.card.skillCost : this.card.cost}
             Actions: ${this.card.currentActions}
@@ -157,6 +178,13 @@ class NatialSpace extends BoardSpace {
         return this.calculateDamage(targetSpace);
     }
 
+    // wrapper for dealing damage to the card contained in this NatialSpace;
+    // also destroys the card if applicable
+    dealDamageToContainedCard(dmg) {
+        this.card.takeDamage(dmg);
+        if (this.card.curHP <= 0) { this.destroyCard(); }
+    }
+
     // attacks the opposing natial at the indicated opposing NatialSpace using
     // the natial in the current NatialSpace.
     attackNatial(defenderSpace) {
@@ -165,9 +193,9 @@ class NatialSpace extends BoardSpace {
         this.expendAction();
 
         // deal damage to enemy
-        defenderSpace.dealDamage(thisAttack[0]);
+        defenderSpace.dealDamageToContainedCard(thisAttack[0]);
         // deal counterattack damage to self
-        this.dealDamage(thisAttack[1]);
+        this.dealDamageToContainedCard(thisAttack[1]);
         // perform attack
 
         // attacking will require re-rendering both natial zones
@@ -178,18 +206,6 @@ class NatialSpace extends BoardSpace {
         checkVictory();
 
         return true;
-    }
-
-    // does the specified amount of damage to the natial in the current
-    // NatialSpace, and destroys the natial if applicable
-    dealDamage(dmg) {
-        if (this.card.shielded) {
-            this.card.shielded--;
-        } else { 
-            this.card.currentHP -= dmg;
-        }
-
-        if (this.card.currentHP <= 0) { this.destroyCard(); }
     }
 
     // activates the skill on the currently selected card, on the target at
@@ -271,11 +287,19 @@ class HandSpace extends BoardSpace {
 
 class Card {
     constructor(cardProto) {
-        this.name = cardProto.name;
-        this.portrait = cardProto.portrait;
-        this.cost = cardProto.cost;
-        this.type = cardProto.type;
+        this.cardName = cardProto.name;
+        this.cardPortrait = cardProto.portrait;
+        this.cardCost = cardProto.cost;
+        this.cardType = cardProto.type;
     }
+
+    get name() { return this.cardName; }
+    get portraitURL() { return this.cardPortrait; }
+    get cost() { return this.cardCost; }
+    get type() { return this.cardType; }
+
+    // cost is the only changeable property here
+    set cost(newCost) { this.cardCost = Math.max(newCost, 0); }
 }
 
 class NatialCard extends Card {
@@ -283,38 +307,101 @@ class NatialCard extends Card {
         super(cardProto);
 
         // general card attributes
-        this.element = eval(cardProto.element);
-        this.maxHP = cardProto.maxHP;
-        this.currentHP = this.maxHP;
-        this.attack = cardProto.attack;
+        const ELEMENT_NAMES = {
+            "ELEMENT_NONE": ELEMENT_NONE,
+            "ELEMENT_FIRE": ELEMENT_FIRE,
+            "ELEMENT_HEAVEN": ELEMENT_HEAVEN,
+            "ELEMENT_EARTH": ELEMENT_EARTH,
+            "ELEMENT_WATER": ELEMENT_WATER
+        }
+        this.cardElement = ELEMENT_NAMES[cardProto.element]
+        this.cardMaxHP = cardProto.maxHP;
+        this.cardCurrentHP = this.maxHP;
+        this.cardAttack = cardProto.attack;
 
         // properties relating to whether a card can move/attack
-        this.maxActions = cardProto.maxActions;
-        this.currentActions = 0;
-        this.canMove = false;
+        this.cardMaxActions = cardProto.maxActions;
+        this.cardCurrentActions = 0;
+        this.cardCanMove = false;
 
         // card flags
-        this.isRanged = cardProto.isRanged;
-        this.isQuick = cardProto.isQuick;
-        this.isMaster = cardProto.isMaster;
+        this.cardIsRanged = cardProto.isRanged;
+        this.cardIsQuick = cardProto.isQuick;
+        this.cardIsMaster = cardProto.isMaster;
 
         // temporary status effects
-        this.sealed = 0;
-        this.shielded = 0;
-        this.protected = false;
+        this.sealedTurns = 0;
+        this.shieldedTurns = 0;
+        this.protectedStatus = false;
 
         // passive callbacks - placeholder for now
-        this.hasPassive = cardProto.hasPassive;
+        this.cardPassiveCbName = cardProto.passiveCallbackName;
 
-        // active callbacks
-        this.hasSkill = cardProto.hasSkill;
-        this.skillReady = this.hasSkill;
-        this.skillCost = cardProto.skillCost;
-        this.skillCallbackName = cardProto.skillCallbackName;
+        // skill callbacks
+        this.cardSkillCbName = cardProto.skillCallbackName;
+        this.cardSkillReady = Boolean(this.skillCallbackName);
+        this.cardSkillCost = cardProto.skillCost;
+    }
+
+    get element() { return this.cardElement; }
+    get curHP() { return this.cardCurrentHP; }
+    get maxHP() { return this.cardMaxHP; }
+    get attack() { return this.cardAttack; }
+    get maxActions() { return this.cardMaxActions; }
+    get currentActions() { return this.cardCurrentActions; }
+    get canMove() { return this.cardCanMove; }
+    get isRanged() { return this.cardIsRanged; }
+    get isQuick() { return this.cardIsQuick; }
+    get isMaster() { return this.cardIsMaster; }
+    get sealed() { return this.sealedTurns; }
+    get shielded() { return this.shieldedTurns; }
+    get protected() { return this.protectedStatus; }
+    get hasPassive() { return Boolean(this.cardPassiveCbName); }
+    get passiveCbName() { return this.cardPassiveCbName; }
+    get hasSkill() { return Boolean(this.cardSkillCbName); }
+    get skillCbName() { return this.cardSkillCbName; }
+    get skillReady() { return this.cardSkillReady; }
+    get skillCost() { return this.cardSkillCost; }
+
+    set element(newElement) {
+        if (newElement >= ELEMENT_NONE && newElement <= ELEMENT_WATER) {
+            this.cardElement = newElement;
+        } else {
+            this.cardElement = ELEMENT_NONE;
+        }
+    }
+    set curHP(newHP) { // deck masters capped by their max HP, natials are not
+        this.cardCurrentHP = newHP;
+        if (this.cardIsMaster && this.cardCurrentHP > this.cardMaxHP) { 
+            this.cardCurrentHP = this.cardMaxHP;
+        }
+    }
+    set attack(newAtk) { this.cardAttack = Math.max(newAtk, 0); }
+    set currentActions(newActions) { this.cardCurrentActions = newActions; }
+    set canMove(newCanMove) { this.cardCanMove = newCanMove; }
+    set sealed(newSealed) { this.sealedTurns = Math.max(newSealed, 0); }
+    set shielded(newShield) { this.shieldedTurns = Math.max(newShield, 0); }
+    set protected(newProt) { this.protectedStatus = newProt; }
+    set skillReady(newReady) { this.cardSkillReady = newReady; }
+
+    // deals the specified amount of damage to this natial, if applicable
+    takeDamage(dmg) {
+        if (this.shielded) { this.shielded--; }
+        else { this.curHP -= dmg; }
+    }
+
+    // restores the card's HP by the specified amount.
+    restoreHP(amount) {
+        this.card.curHP += amount;
+    }
+
+    // increases the card's attack stat by the specified amount
+    buffAtk = (amount) => {
+        this.attack = Math.max(this.attack + amount, 0);
     }
 
     skillCallback(target) {
-        natialActiveCallbacks[this.skillCallbackName](target);
+        natialActiveCallbacks[this.cardSkillCallbackName](target);
     }
 }
 
@@ -368,6 +455,45 @@ class NatialSkillEvent {
     purge() {
         this.userSpace = null;
         this.selected = false;
+    }
+}
+
+class NatialZone {
+
+}
+
+class Hand extends Array {
+    constructor() {
+
+    }
+
+    countCards() {
+
+    }
+
+    isEmpty() {
+
+    }
+
+    isFull() {
+
+    }
+}
+
+class Deck extends Array {
+
+}
+
+class Player {
+    constructor() {
+        
+        this.natialZone = new NatialZone();
+        this.hand = new Hand();
+        this.deck = new Deck();
+    }
+
+    drawCard(n = 1) {
+        return;
     }
 }
 

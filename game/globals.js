@@ -3,6 +3,13 @@ const ELEMENT_FIRE = 1;
 const ELEMENT_HEAVEN = 2;
 const ELEMENT_EARTH = 3;
 const ELEMENT_WATER = 4;
+const ELEMENT_NAMES = {
+    "ELEMENT_NONE": ELEMENT_NONE,
+    "ELEMENT_FIRE": ELEMENT_FIRE,
+    "ELEMENT_HEAVEN": ELEMENT_HEAVEN,
+    "ELEMENT_EARTH": ELEMENT_EARTH,
+    "ELEMENT_WATER": ELEMENT_WATER
+}
 
 const TYPE_CHART = [ // row = attacker, col = defender
     [0, 0, 0, 0, 0], // ELEMENT_NONE attacker
@@ -33,16 +40,3 @@ let gameEnd = false;
 
 let thisDragFrom = null;
 let thisDragTo = null;
-
-// refactor this out of globals; it's only here now for convenience
-const restoreHP = (card, amount) => {
-    // failsafe
-    if (amount <= 0) return;
-
-    // regular natials can stack HP indefinitely, but deck masters are capped
-    // to their innate maximum
-    card.currentHP += amount;
-    if (card.isMaster) {
-        card.currentHP = Math.min(card.currentHP, card.maxHP);
-    }
-}
