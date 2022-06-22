@@ -126,12 +126,13 @@ const initializeGameBoard = () => {
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
             _enemyDeckTemplate.push(createCard(getFromDB("Uptide")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Tyrant")));
+        _playerDeckTemplate.push(createCard(getFromDB("Sister")));
         _enemyDeckTemplate.push(createCard(getFromDB("Ranger")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
     enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
     game = new GameBoard();
+    destroyedCards = new DestroyedCards();
 
     // both players start with three cards in hand.
     // a mulligan feature will be added... later.

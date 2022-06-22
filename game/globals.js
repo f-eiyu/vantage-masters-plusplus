@@ -29,3 +29,4 @@ let thisDragTo = null;
 let friendlyPlayer = null;
 let enemyPlayer = null;
 let game = null;
+let destroyedCards = null;

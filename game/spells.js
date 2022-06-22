@@ -11,7 +11,7 @@ const spellValidators = {
         return true;
     },
     validateOffensiveGeneric: function(spellSpace, targetSpace) {
-        // fail if trying to use on own card
+        // fail if trying to use on a friendly
         if (spellSpace.owner === targetSpace.owner) { return false; }
         // fail if the target space is empty
         if (!targetSpace.hasCard) { return false; }
@@ -169,3 +169,19 @@ const spellCallbacks = {
         });
     }
 };
+
+const spellDragValidation = (dragFromSpace, dragToSpace) => {
+    // sanity check
+    if (!dragFromSpace.isHand) {
+        alert("Error! Spell in natial zone!");
+        return false;
+    }
+
+    // always fail if insufficient mana
+    const player = getPlayer(dragFromSpace.owner);
+    if (dragFromSpace.innerCard.cost > player.currentMana) { return false; }
+
+    // validate the drag location based on the spell
+    const cbName = dragFromSpace.innerCard.callbackName;
+    return spellValidators[cbName](dragFromSpace, dragToSpace);
+}

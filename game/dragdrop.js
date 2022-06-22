@@ -8,22 +8,6 @@ const dragStart = (event) => {
     event.target.classList.add("dragging");
 }
 
-const spellDragValidation = (dragFromSpace, dragToSpace) => {
-    // sanity check
-    if (!dragFromSpace.isHand) {
-        alert("Error! Spell in natial zone!");
-        return false;
-    }
-
-    // always fail if insufficient mana
-    const spellUser = getPlayer(dragFromSpace.owner);
-    if (dragFromSpace.innerCard.cost > spellUser.currentMana) { return false; }
-
-    // validate the drag location based on the spell
-    const cbName = dragFromSpace.innerCard.callbackName;
-    return spellValidators[cbName](dragFromSpace, dragToSpace);
-}
-
 const cardDragEnter = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; 
     }
@@ -90,19 +74,16 @@ const cardDragLeave = (event) => {
     clearDragVisuals(event);
 }
 
-// ### all of this code needs significant cleanup
 const cardDragDrop = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
     event.preventDefault();
-
     clearDragVisuals(event);
     
     // extract destination information from the event object
     const fromSpace = thisDragFrom.spaceObj;
     thisDragTo = new CardDOMEvent(event.target);
     const toSpace = thisDragTo.spaceObj;
-
     const isToFriendlyNatial = (thisDragTo.owner === PLAYER_FRIENDLY && thisDragTo.isNatial);
     const isToEnemyNatial = (thisDragTo.owner === PLAYER_ENEMY && thisDragTo.isNatial);
 
@@ -110,7 +91,7 @@ const cardDragDrop = (event) => {
     // spells have special validation and should be handled case-by-case
     if (thisDragFrom.isSpell
         && spellDragValidation(fromSpace, toSpace)) {
-            fromSpace.activateSpell(toSpace); // ###
+            fromSpace.activateSpell(toSpace);
     }
     // check for movement: card dragged from board to friendly space
     else if (thisDragFrom.isNatial
@@ -130,6 +111,4 @@ const cardDragDrop = (event) => {
         && game.validateSummon(fromSpace, toSpace)) {
         game.summonNatial(fromSpace, toSpace);
     }
-
-    return;
 }

@@ -219,7 +219,7 @@ class NatialCard extends Card {
 
         // skill callbacks
         this._cardSkillCbName = cardProto.skillCallbackName;
-        this._cardSkillReady = Boolean(this.skillCallbackName);
+        this._cardSkillReady = Boolean(this._cardSkillCbName);
         this._cardSkillCost = cardProto.skillCost;
     }
 
@@ -390,6 +390,10 @@ class NatialZone {
         empty.push(...this._front.filter(sp => !sp.hasCard));
         empty.push(...this._back.filter(sp => ~sp.hasCard));
         return empty;
+    }
+
+    get isFull() {
+        return (this.empty.length === 0);
     }
 
     // returns true if the specified natial is occluded and false otherwise. a
@@ -846,6 +850,21 @@ class GameBoard {
     }
 }
 
+class DestroyedCards {
+    constructor() {
+        this._friendlyDestroyed = [];
+        this._enemyDestroyed = [];
+    }
+
+    byPlayer(player) {
+        if (player === PLAYER_FRIENDLY) { return this._friendlyDestroyed; }
+        else if (player === PLAYER_ENEMY) { return this._enemyDestroyed; }
+    }
+
+    listNatials(player) {
+        return this.byPlayer(player).filter(card => card.type === "natial");
+    }
+}
 
 // ========== Non-class structures ==========
 
