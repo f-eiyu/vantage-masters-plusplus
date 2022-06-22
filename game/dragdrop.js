@@ -76,7 +76,7 @@ const spellDragValidation = (dragFromSpace, dragToSpace) => {
     }
 }
 
-const cardDragEnterSpace = (event) => {
+const cardDragEnter = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; 
     }
     event.preventDefault();
@@ -127,7 +127,7 @@ const cardDragEnterSpace = (event) => {
 // we don't actually require any continunous action when a tile is being drag
 // hovered. this function's sole purpose is to call preventDefault() on the
 // dragover listener so that it's possible for the drop listener to fire.
-const cardDraggedOverSpace = (event) => {
+const cardDragOver = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
     
     event.preventDefault();
@@ -139,11 +139,11 @@ const clearDragVisuals = (event) => {
     event.target.classList.remove("target-invalid");
 }
 
-const dragLeave = (event) => {
+const cardDragLeave = (event) => {
     clearDragVisuals(event);
 }
 
-const dragDrop = (event) => {
+const cardDragDrop = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
     event.preventDefault();

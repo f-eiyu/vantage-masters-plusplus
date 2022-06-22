@@ -37,8 +37,8 @@ class BoardSpace {
     get card() { throw "old .innerCard property; refactor this!"; }
 
 
-    // only intended to be called by methods like Player.drawCard(). there is
-    // no public method to replace the contents of a BoardSpace instance!
+    // places a card into a BoardSpace, only checking if the parameter is a Card
+    // instance. only intended to be called by methods like Player.drawCard()!
     _cardToSpace(cardObj) {
         if (cardObj && cardObj instanceof Card) {
             this._containedCard = cardObj;
@@ -489,6 +489,24 @@ class NatialZone {
         this._front = Array(4).fill(null).map((el, i) => new NatialSpace(player, i, true));
         this._back = Array(3).fill(null).map((el, i) => new NatialSpace(player, i, false));
     }
+
+    cardToZone(row, index, card) {
+        if (row !== ROW_FRONT && row !== ROW_BACK) {
+            throw "invalid row argument of cardToZone!";
+        }
+
+        const thisRow = (row === ROW_FRONT ? this._front : this._back);
+        if (index < 0 || index >= thisRow.length) {
+            throw "invalid index argument of cardToZone!";
+        }
+
+        const thisSpace = thisRow[index];
+        if (thisSpace.hasCard) {
+            throw "already occupied natial space in cardToZone!";
+        }
+
+        thisSpace._cardToSpace(card);
+    }
 }
 
 class Hand {
@@ -567,19 +585,29 @@ class Player {
         this._natialZone = new NatialZone(player);
         this._hand = new Hand(player);
         this._deck = new Deck(player, deckCards);
+
+        this._maxMana = this._master.cost;
+        this._currentMana = this._maxMana;
+
+        // players always start with their master on the middle of the back row
+        this._natialZone.cardToZone(ROW_BACK, 1, this._master);
     }
 
     get hand() { return this._hand; }
     get deck() { return this._deck; }
 
+    // transfers up to n cards from the deck to the hand. will automatically
+    // terminate if the number of cards to draw exceeds the hand size.
     drawCard(n = 1, render = true) {
-        if (!this._deck.length) { return false; }
-        if (this._hand.isFull) { return false; }
+        for (let i = 0; i < n; i++) {
+            if (!this._deck.length) { return false; }
+            if (this._hand.isFull) { return false; }
 
-        const firstEmpty = this.hand.firstEmpty;
-        const drawnCard = this.deck.pop();
+            const firstEmpty = this.hand.firstEmpty;
+            const drawnCard = this.deck.pop();
 
-        this.hand.cardToHand(firstEmpty, drawnCard);
+            this.hand.cardToHand(firstEmpty, drawnCard);
+        }
 
         if (render) { renderAll(); }
         return true;

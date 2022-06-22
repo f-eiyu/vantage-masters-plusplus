@@ -35,6 +35,7 @@ const replenishMana = (player) => {
 }
 
 // sets all natials' actions to their maximum and enables them to move
+// please refactor this i am begging you
 const refreshNatials = (player) => {
     natials[player].forEach(row => {
         row.forEach(natialSpace => {
@@ -85,15 +86,15 @@ const enemyEndTurn = () => {
     if (!gameEnd) { friendlyStartTurn(); }
 }
 
-const initializeGameBoard = () => {
-    // attach events to DOMs
-    const addListenerToAll = (listenerName, callback, className) => {
-        const classList = document.querySelectorAll("." + className);
-        classList.forEach(dom => {
-            dom.addEventListener(listenerName, callback);
-        });
-    }
+// adds the specified listener and cb to every DOM element with className
+const addListenerToAll = (listenerName, callback, className) => {
+    const classList = document.querySelectorAll("." + className);
+    classList.forEach(dom => {
+        dom.addEventListener(listenerName, callback);
+    });
+}
 
+const attachEventListeners = () => {
     addListenerToAll("mouseover", boardCardMouseover, "enemy-natial-space");
     addListenerToAll("mouseover", boardCardMouseover, "friendly-natial-space");
     addListenerToAll("mouseover", boardCardMouseover, "friendly-hand-space");
@@ -107,6 +108,26 @@ const initializeGameBoard = () => {
     addListenerToAll("click", natialLeftClick, "enemy-natial-space");
     addListenerToAll("click", natialLeftClick, "friendly-natial-space");
     // addListenerToAll("click", natialLeftClick, "friendly-hand-space");
+
+    const addDragListenerToAll = (className) => {
+        addListenerToAll("dragenter", cardDragEnter, className)
+        addListenerToAll("dragover", cardDragOver, className)
+        addListenerToAll("dragleave", cardDragLeave, className)
+        addListenerToAll("dragdrop", cardDragDrop, className)
+    }
+
+    addDragListenerToAll("enemy-hand-card");
+    addDragListenerToAll("enemy-natial-space");
+    addDragListenerToAll("friendly-natial-space");
+    addDragListenerToAll("friendly-hand-card");
+
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    document.querySelector("#end-turn").addEventListener("click", friendlyEndTurn);
+}
+
+const initializeGameBoard = () => {
+    attachEventListeners();
     
     // instantiate players
     const _playerDeckTemplate = [];
@@ -130,24 +151,10 @@ const initializeGameBoard = () => {
     players[PLAYER_FRIENDLY] = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
     players[PLAYER_ENEMY] = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
 
-    // both players start with three cards in hand
-    // a mulligan feature will be added... later
-    for (let i = 0; i < 3; i++) {
-        players[PLAYER_FRIENDLY].drawCard();
-        players[PLAYER_ENEMY].drawCard();
-    }
-
-    // both players start with their respective masters on back-1
-    masters[PLAYER_FRIENDLY] = createCard(getFromDB("Sister"));
-    masters[PLAYER_ENEMY] = createCard(getFromDB("Sister"));
-    cardToBoardDirect(PLAYER_FRIENDLY, masters[PLAYER_FRIENDLY], ROW_BACK, 1, false);
-    cardToBoardDirect(PLAYER_ENEMY, masters[PLAYER_ENEMY], ROW_BACK, 1, false);
-
-    // set starting mana values
-    maxMana[PLAYER_FRIENDLY] = masters[PLAYER_FRIENDLY].cost;
-    currentMana[PLAYER_FRIENDLY] = maxMana[PLAYER_FRIENDLY];
-    maxMana[PLAYER_ENEMY] = masters[PLAYER_ENEMY].cost;
-    currentMana[PLAYER_ENEMY] = maxMana[PLAYER_ENEMY];
+    // both players start with three cards in hand.
+    // a mulligan feature will be added... later.
+    players[PLAYER_FRIENDLY].drawCard(3, false);
+    players[PLAYER_ENEMY].drawCard(3, false);
 
     // choose a random player to start
     (Math.random() > 0.5) ? friendlyStartTurn() : enemyStartTurn();
@@ -156,25 +163,4 @@ const initializeGameBoard = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeGameBoard();
-
-    const addDragEventListener = (domObj) => {
-        domObj.addEventListener("dragenter", cardDragEnterSpace);
-        domObj.addEventListener("dragover", cardDraggedOverSpace);
-        domObj.addEventListener("dragleave", dragLeave);
-        domObj.addEventListener("drop", dragDrop);
-    }
-
-    const addDragEventListenerToAll = (className) => {
-        const thisClassList = document.querySelectorAll("." + className);
-        thisClassList.forEach(element => addDragEventListener(element));
-    }
-
-    addDragEventListenerToAll("enemy-hand-card");
-    addDragEventListenerToAll("enemy-natial-space");
-    addDragEventListenerToAll("friendly-natial-space");
-    addDragEventListenerToAll("friendly-hand-card");
-
-    document.addEventListener("contextmenu", e => e.preventDefault());
-
-    document.querySelector("#end-turn").addEventListener("click", friendlyEndTurn);
 });
