@@ -8,10 +8,7 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 (hence the ++)!
 
 ## todo
-- give Wall visual feedback
-- implement sealed cards being unable to attack
-- refactor the board, hand, and deck into classes with coherent methods
-- rework the extremely useful but VERY clunky CardDOMEvent class
+- give wall and seal visual feedback
 
 ## User stories
 ### MVP goals

@@ -94,13 +94,13 @@ const attachEventListeners = () => {
         addListenerToAll("dragenter", cardDragEnter, className)
         addListenerToAll("dragover", cardDragOver, className)
         addListenerToAll("dragleave", cardDragLeave, className)
-        addListenerToAll("dragdrop", cardDragDrop, className)
+        addListenerToAll("drop", cardDragDrop, className)
     }
 
-    addDragListenerToAll("enemy-hand-card");
+    addDragListenerToAll("enemy-hand-space");
     addDragListenerToAll("enemy-natial-space");
     addDragListenerToAll("friendly-natial-space");
-    addDragListenerToAll("friendly-hand-card");
+    addDragListenerToAll("friendly-hand-space");
 
     document.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -119,7 +119,7 @@ const initializeGameBoard = () => {
             _playerDeckTemplate.push(createCard(getFromDB("Debug Water")));
             _playerDeckTemplate.push(createCard(getFromDB("Debug Earth")));
             _playerDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
-            _playerDeckTemplate.push(createCard(getFromDB("Uptide")));
+            _playerDeckTemplate.push(createCard(getFromDB("Disaster")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Fire")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Water")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Earth")));

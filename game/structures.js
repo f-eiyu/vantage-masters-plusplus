@@ -122,6 +122,12 @@ class NatialSpace extends BoardSpace {
     get isBackRow() { return this._row === ROW_BACK; }
     get DOM() { return this._DOM; }
 
+    // wrapper for dealing damage to the contained card instance
+    dealDamage(dmg) {
+        this.innerCard.takeDamage(dmg);
+        if (this.innerCard.curHP <= 0) { this.destroyCard(); }
+    }
+
     // activates the skill on the currently selected card, on the target at
     // targetSpace, then flags the natial's skill as used.
     activateSkill(targetSpace) { // belongs in Card class, wrapper and logic here
@@ -143,59 +149,17 @@ class HandSpace extends BoardSpace {
         const playerStr = (this._owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
         this._DOMId = `${playerStr}-hand-${this._index}`
         this._DOM = document.getElementById(this._DOMId);
-
-        this._isNatialSpace = false;
-        this._isHandSpace = true;
     }
 
+    get isNatial() { return false; }
+    get isHand() { return true; }
     get DOM() { return this._DOM; }
-
-    // checks to see whether the natial can be summoned to the target space.
-    // failure conditions include the space already being occupied and having
-    // insufficient mana to perform the summon. returns true if the summon is
-    // allowed and false otherwise.
-    checkSummonPossible(targetSpace) {
-        // fail if target space is not tempty
-        if (targetSpace.hasCard) { return false; }
-        // fail if insufficient mana
-        if (currentMana[this._owner] < this.innerCard.cost) { return false; }
-
-        return true;
-    }
-
-    // move the card object from the calling HandSpace to the requested
-    // NatialSpace on the board.
-    summonNatial(targetSpace) {
-        // summoning will almost always require mana
-        if (currentMana[this._owner] < this.innerCard.cost) { return false; }
-        currentMana[this._owner] -= this.innerCard.cost;
-
-        // summon the specified natial!
-        targetSpace.innerCard = this.innerCard;
-        this.innerCard = null;
-
-        // give the natial action(s) if it's quick
-        if (targetSpace.innerCard.isQuick) {
-            targetSpace.innerCard.currentActions = targetSpace.innerCard.maxActions;
-            targetSpace.innerCard.canMove = true;
-        } else {
-            targetSpace.innerCard.currentActions = 0;
-            targetSpace.innerCard.canMove = false;
-        }
-
-        // summoning will always require a re-render
-        renderHand(this._owner);
-        renderNatials(this._owner);
-        renderMana(this._owner);
-
-        return true;
-    }
 
     // activates the spell currently contained in handSpace with the target
     // at targetSpace, and then destroys the spell.
     activateSpell(targetSpace) {
         this.innerCard.spellCallback(targetSpace);
-        currentMana[this._owner] -= this.innerCard.cost;
+        getPlayer(this.owner).currentMana -= this.innerCard.cost;
         this.destroyCard();
         game.renderAll();
     }
@@ -316,7 +280,7 @@ class NatialCard extends Card {
 
     // restores the card's HP by the specified amount.
     restoreHP(amount) {
-        this.innerCard.curHP += amount;
+        this.curHP += amount;
     }
 
     // increases the card's attack stat by the specified amount
@@ -343,6 +307,9 @@ class SpellCard extends Card {
         this._longdesc = cardProto.longdesc;
     }
 
+    get callbackName() { return this._callbackName; }
+    get longdesc() { return this._longdesc; }
+    
     // wrapper for the spell effect's callback
     spellCallback(target) {
         spellCallbacks[this._callbackName](target);
@@ -365,7 +332,7 @@ class CardDOMEvent {
     get isHand() { return this._spaceObj.isHand; }
     get isFrontNatial() { return this._spaceObj.isFrontRow; }
     get isBackNatial() { return this._spaceObj.isBackRow; }
-    get isSpell() { return (this._hasCard
+    get isSpell() { return (this.hasCard
                             && this._spaceObj.innerCard.type === "spell");}
     get owner() { return this._spaceObj.owner; }
 
@@ -443,7 +410,6 @@ class NatialZone {
         return (row === ROW_FRONT ? this._front : this._back)
     }
     
-
     validateRowIndex(row, index) {
         if (row !== ROW_FRONT && row !== ROW_BACK) {
             throw "invalid row argument!";
@@ -470,6 +436,15 @@ class NatialZone {
         targetSpace._cardToSpace(card);
     }
 
+    // performs the indicated callback with each NON-EMPTY space in the
+    // indicated row.
+    forAllSpacesInRow(row, callback) {
+        if (row === ROW_FRONT) {
+            this._front.filter(sp => sp.hasCard).forEach((space, i) => callback(space, i));
+        } else if (row === ROW_BACK) {
+            this._back.filter(sp => sp.hasCard).forEach((space, i) => callback(space, i));
+        }
+    }
     // performs the indicated callback with each NON-EMPTY natial space.
     forAllSpaces(callback) {
         const nonEmpty = this.nonEmpty;
@@ -485,6 +460,30 @@ class NatialZone {
     render() {
         this._front.forEach(space => space.render());
         this._back.forEach(space => space.render());
+    }
+
+    // returns true if the card in moverSpace can move to targetSpace, and
+    // false otherwise.
+    validateMovement(moverSpace, targetSpace) {
+        // fail if targetSpace is occupied
+        if (targetSpace.hasCard) { return false; }
+        // fail if the two spaces aren't owned by the same player
+        if (moverSpace.owner !== targetSpace.owner) { return false;}
+        // fail if mover doesn't have an available move
+        if (!moverSpace.innerCard.canMove) { return false; }
+
+        return true;
+    }
+
+    // transfers the card instance in moverSpace to targetSpace
+    moveNatial(moverSpace, targetSpace) {
+        const mover = moverSpace.innerCard;
+
+        this.cardToZone(targetSpace, mover);
+        mover.canMove = false;
+        moverSpace._clear();
+
+        game.renderAll();
     }
 }
 
@@ -598,6 +597,7 @@ class Player {
     get natialZone() { return this._natialZone; }
     get hand() { return this._hand; }
     get deck() { return this._deck; }
+    get master() { return this._master; }
     get currentMana() { return this._currentMana; }
     get maxMana() { return this._maxMana; }
     set currentMana(newMana) { this._currentMana = newMana; }
@@ -632,6 +632,10 @@ class Player {
     // checks whether a natial can be summoned to the desired space. does not
     // actually summon the natial.
     validateSummon(toSummonSpace, targetSpace) {
+        // fail if the two spaces aren't owned by the same player
+        if (toSummonSpace.owner !== targetSpace.owner) { return false; }
+        // fail if the card to summon is a spell
+        if (toSummonSpace.innerCard.type === "spell") { return false; }
         // fail if target space is occupied
         if (targetSpace.hasCard) { return false; }
         // fail if insufficient mana
@@ -644,7 +648,7 @@ class Player {
     summonNatial(toSummonSpace, targetSpace) {
         // deduct mana and transfer the card to the board
         const summonedNatial = toSummonSpace.innerCard;
-        this.mana -= summonedNatial.cost;
+        this.currentMana -= summonedNatial.cost;
         this.natialZone.cardToZone(targetSpace, summonedNatial);
         toSummonSpace._clear();
         
@@ -666,7 +670,7 @@ class Player {
     // currently just renders the player's mana display, but may be expanded
     // in the future
     render() {
-        const playerStr = (this.playerID === PLAYER_FRIENDLY ? "friendly" : "enemy");
+        const playerStr = (this === friendlyPlayer ? "friendly" : "enemy");
         const manaDOM = document.getElementById(`${playerStr}-portrait`);
 
         manaDOM.innerText = `${this.currentMana}/${this.maxMana}`;
@@ -691,10 +695,8 @@ class GameBoard {
     // game ends and false if it does not. the game-ending code right now is VERY
     // rudimentary, but will work for a MVP. it will be significantly expanded on.
     checkVictory() {
-        return false; // ###
-
-        let friendlyHP = friendlyPlayer.master.currentHP;
-        let enemyHP = enemyPlayer.master.currentHP;
+        let friendlyHP = friendlyPlayer.master.curHP;
+        let enemyHP = enemyPlayer.master.curHP;
 
         if (friendlyHP <= 0 && enemyHP <= 0) {
             console.log("it's a draw!");
@@ -725,20 +727,14 @@ class GameBoard {
     // returns true if the card in moverSpace can move to targetSpace, and
     // false otherwise.
     validateMovement(moverSpace, targetSpace) {
-        // fail if targetSpace is occupied
-        if (targetSpace.hasCard) { return false; }
-        // fail if mover doesn't have an available move
-        if (!moverSpace.innerCard.canMove) { return false; }
-
-        return true;
+        const player = getPlayer(moverSpace.owner);
+        return player.natialZone.validateMovement(moverSpace, targetSpace);
     }
 
     // transfers the card instance in moverSpace to targetspace
     moveNatial(moverSpace, targetSpace) {
-        const mover = moverSpace.innerCard;
-        cardToZone(targetSpace, mover);
-        mover.canMove = false;
-        moverSpace._clear();
+        const player = getPlayer(moverSpace.owner);
+        player.natialZone.moveNatial(moverSpace, targetSpace);
     }
 
     // calculates the damage that would be dealt if the card in attackerSpace
@@ -747,7 +743,7 @@ class GameBoard {
     calculateDamage(attackerSpace, targetSpace) {
         const attacker = attackerSpace.innerCard;
         const target = targetSpace.innerCard;
-        const targetOwner = getPlayer(target.owner);
+        const targetOwner = getPlayer(targetSpace.owner);
 
         const myAtk = attacker.attack;
         const myElement = attacker.element;
@@ -799,9 +795,12 @@ class GameBoard {
 
         // fail if either attacker or target does not exist
         if (!attacker || !target) { return false; }
+        // fail if attacker and target aren't opposed
+        if (attackerSpace.owner === targetSpace.owner) { return false; }
         // fail if the card can't act
         if (!attacker.currentActions) { return false; }
-        if (target.sealed) { return false; }
+        // fail if the attacker is sealed
+        if (attacker.sealed) { return false; }
         // fail if the attacker is not ranged and targeting occluded back row
         if (!attacker.isRanged
             && targetSpace.isBackRow
@@ -827,8 +826,8 @@ class GameBoard {
 
         // deduct an action and perform attack and counterattack
         attacker.expendAction();
-        target.takeDamage(thisAttack[0]);
-        attacker.takeDamage(thisAttack[1]);
+        targetSpace.dealDamage(thisAttack[0]);
+        attackerSpace.dealDamage(thisAttack[1]);
 
         this.renderAll();
         this.checkVictory();
@@ -836,9 +835,8 @@ class GameBoard {
 
     // wrapper for validating a natial summon
     validateSummon(toSummonSpace, targetSpace) {
-        const owner = toSummonSpace.owner;
-        if (owner !== targetSpace.owner) { return false; }
-        return getPlayer(owner).validateSummon(toSummonSpace, targetSpace);
+        const player = toSummonSpace.owner;
+        return getPlayer(player).validateSummon(toSummonSpace, targetSpace);
     }
 
     // wrapper for summoning a natial

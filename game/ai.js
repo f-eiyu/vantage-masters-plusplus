@@ -55,13 +55,13 @@ const aiAttack = () => {
 
         // perform an attack if possible
         if (!game.validateAttack(attackerSpace, targetSpace)) { continue; }
-        game.attackNatial(attackerSpace, targetSpace);
         if (aiVerbose) {
             console.log("AI: Attacking", targetSpace.innerCard.name, "with", attackerSpace.innerCard.name);
             const calcedDmg = game.calculateDamage(attackerSpace, targetSpace);
             console.log("    Damage done:", calcedDmg[0]);
             console.log("    Damage countered:", calcedDmg[1]);
         }
+        game.attackNatial(attackerSpace, targetSpace);
         // remove target from attackTargets if destroyed
         if (!targetSpace.hasCard) { 
             if (aiVerbose) { console.log("Target destroyed."); }
