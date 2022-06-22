@@ -1,12 +1,6 @@
 // as the CardDOMEvent object is updated, this code will need additional
 // refactoring in order to prevent its interactions from being a convoluted mess
 
-const setDraggable = (thisCardDOM) => {
-    thisCardDOM.setAttribute("draggable", "true");
-    thisCardDOM.addEventListener("dragstart", dragStart)
-    thisCardDOM.addEventListener("dragend", (event) => event.target.classList.remove("dragging"));
-}
-
 const dragStart = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
@@ -143,6 +137,7 @@ const cardDragLeave = (event) => {
     clearDragVisuals(event);
 }
 
+// ### all of this code needs significant cleanup
 const cardDragDrop = (event) => {
     if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
 
@@ -157,6 +152,8 @@ const cardDragDrop = (event) => {
 
     const isToFriendlyNatial = (thisDragTo.owner === PLAYER_FRIENDLY && thisDragTo.isNatial);
     const isToEnemyNatial = (thisDragTo.owner === PLAYER_ENEMY && thisDragTo.isNatial);
+
+    const player = getPlayer(thisDragFrom.owner);
 
     // decide what to do based on what was dragged into what
     // spells have special validation and should be handled case-by-case
@@ -179,8 +176,8 @@ const cardDragDrop = (event) => {
     // check for summoning: card dragged from hand onto friendly space
     else if (thisDragFrom.isHandCard
         && isToFriendlyNatial
-        && thisDragFromSpace.checkSummonPossible(thisDragToSpace)) {
-        thisDragFromSpace.summonNatial(thisDragToSpace);
+        && player.validateSummon(thisDragFromSpace, thisDragToSpace)) {
+        player.summonNatial(thisDragFromSpace, thisDragToSpace);
     }
 
     return;

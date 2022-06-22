@@ -10,7 +10,6 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 ## todo
 - give Wall visual feedback
 - implement sealed cards being unable to attack
-- refactor all the event listeners in the latter part of game.js
 - refactor the board, hand, and deck into classes with coherent methods
 - rework the extremely useful but VERY clunky CardDOMEvent class
 

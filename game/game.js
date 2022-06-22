@@ -25,26 +25,7 @@ const cardToBoardDirect = (player, card, row, position, render = true) => {
     const thisSpace = natials[player][row][position];
     if (!thisSpace.hasCard) { thisSpace.innerCard = card; }
 
-    if (render) { renderAll(); }
-}
-
-const replenishMana = (player) => {
-    if (maxMana[player] < 10) { maxMana[player]++; }
-    currentMana[player] = maxMana[player];
-    renderMana(player);
-}
-
-// sets all natials' actions to their maximum and enables them to move
-// please refactor this i am begging you
-const refreshNatials = (player) => {
-    natials[player].forEach(row => {
-        row.forEach(natialSpace => {
-            if (natialSpace.hasCard) {
-                natialSpace.innerCard.currentActions = natialSpace.innerCard.maxActions;
-                natialSpace.innerCard.canMove = true;
-            }
-        });
-    });
+    if (render) { game.renderAll(); }
 }
 
 const incrementTurnCounter = () => {
@@ -57,9 +38,9 @@ const friendlyStartTurn = () => {
     incrementTurnCounter();
     renderTurnCounter();
 
-    replenishMana(PLAYER_FRIENDLY);
-    refreshNatials(PLAYER_FRIENDLY);
-    drawCard(PLAYER_FRIENDLY);
+    friendlyPlayer.refreshNatials();
+    friendlyPlayer.refreshMana();
+    friendlyPlayer.drawCard();
 
     playerCanInteract = true;
 }
@@ -75,9 +56,9 @@ const enemyStartTurn = () => {
     incrementTurnCounter();
     renderTurnCounter();
 
-    replenishMana(PLAYER_ENEMY);
-    refreshNatials(PLAYER_ENEMY);
-    drawCard(PLAYER_ENEMY);
+    enemyPlayer.refreshNatials();
+    enemyPlayer.refreshMana();
+    enemyPlayer.drawCard();
 
     aiTurn();
 }
@@ -148,15 +129,16 @@ const initializeGameBoard = () => {
         _playerDeckTemplate.push(createCard(getFromDB("Sister")));
         _enemyDeckTemplate.push(createCard(getFromDB("Beast")));
     }
-    players[PLAYER_FRIENDLY] = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
-    players[PLAYER_ENEMY] = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
+    friendlyPlayer =  new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
+    enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
+    game = new GameEngine();
 
     // both players start with three cards in hand.
     // a mulligan feature will be added... later.
-    players[PLAYER_FRIENDLY].drawCard(3, false);
-    players[PLAYER_ENEMY].drawCard(3, false);
+    friendlyPlayer.drawCard(3, false);
+    enemyPlayer.drawCard(3, false);
 
-    renderAll();
+    game.renderAll();
 
     // choose a random player to start
     (Math.random() > 0.5) ? friendlyStartTurn() : enemyStartTurn();

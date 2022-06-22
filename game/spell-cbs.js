@@ -82,7 +82,7 @@ const spellCallbacks = {
         // are a very good case for REFACTORING MY DAMN CODE TO USE BOARD AND
         // HAND OBJECTS instead of coding one-offs like a caveman.
         // this is also not DRY with games.js > drawCard > getFirstEmpty!
-        const freeIndex = hands[oppOwner].reduce((firstEmpty, handSpace) => {
+        const freeIndex = getPlayer(oppOwner).hand.reduce((firstEmpty, handSpace) => {
             return (!handSpace.innerCard && handSpace._index < firstEmpty ? handSpace._index : firstEmpty);
         }, Infinity);
 
@@ -92,6 +92,7 @@ const spellCallbacks = {
         }
         // otherwise, return the card to the hand
         else {
+            // refactor this! should be a Player method
             hands[oppOwner][freeIndex].innerCard = targetSpace.innerCard;
         }
 

@@ -43,7 +43,7 @@ const aiSummonNatials = () => {
     if (!emptyNatialSpaces.length) { return false; }
 
     // ignore empty hand spaces and play everything that we can
-    hands[PLAYER_ENEMY].filter(sp => sp.innerCard).forEach((thisHandSpace, i) => {
+    enemyPlayer.hand.filter(sp => sp.innerCard).forEach((thisHandSpace, i) => {
         // halt if card is a spell (we're not smart enough for that yet)
         if (thisHandSpace.innerCard.type === "spell") { return false; }
 

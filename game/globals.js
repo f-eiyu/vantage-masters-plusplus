@@ -4,14 +4,6 @@ const ELEMENT_HEAVEN = 2;
 const ELEMENT_EARTH = 3;
 const ELEMENT_WATER = 4;
 
-const TYPE_CHART = [ // row = attacker, col = defender
-    [0, 0, 0, 0, 0], // ELEMENT_NONE attacker
-    [0, 0, 2, 0, -2], // ELEMENT_FIRE attacker
-    [0, -2, 0, 2, 0], // ELEMENT_HEAVEN attacker
-    [0, 0, -2, 0, 2], // ELEMENT_EARTH attacker
-    [0, 2, 0, -2, 0] // ELEMENT_WATER attacker
-];
-
 const PLAYER_FRIENDLY = 0;
 const PLAYER_ENEMY = 1;
 
@@ -33,3 +25,7 @@ let gameEnd = false;
 
 let thisDragFrom = null;
 let thisDragTo = null;
+
+let friendlyPlayer = null;
+let enemyPlayer = null;
+let game = null;
