@@ -1,5 +1,4 @@
 // ========== Classes ==========
-
 /*
     general hierarchy of organization:
       - each player contains a deck, hand, and natial zone.
@@ -48,8 +47,7 @@ class BoardSpace {
 
     // removes the reference to the card contained in the current BoardSpace
     // instance, without any additional action. not intended to be used to clear
-    // spaces by itself -- for regular gameplay use, destroyCard() is the
-    // method to use!
+    // spaces by itself -- for regular gameplay, use destroyCard()!
     _clear() {
         this.innerCard = null;
     }
@@ -617,27 +615,7 @@ class Player {
 
 // ========== Non-class structures ==========
 
-const decks = [[], []]; // friendly, enemy
-const hands = [
-    Array(6).fill(null).map((el, i) => new HandSpace(PLAYER_FRIENDLY, i)), // friendly
-    Array(6).fill(null).map((el, i) => new HandSpace(PLAYER_ENEMY, i)) // enemy
-];
-const natials = [
-    [ // friendly
-        Array(4).fill(null).map((el, i) => new NatialSpace(PLAYER_FRIENDLY, i, true)), // front
-        Array(3).fill(null).map((el, i) => new NatialSpace(PLAYER_FRIENDLY, i, false)), // back
-    ],
-    [ // enemy
-        Array(4).fill(null).map((el, i) => new NatialSpace(PLAYER_ENEMY, i, true)), // front
-        Array(3).fill(null).map((el, i) => new NatialSpace(PLAYER_ENEMY, i, false)) // back
-    ]
-];
 const destroyedCards = [[], []]; // friendly, enemy
-
-let masters = [null, null]; // friendly, enemy
-
-let maxMana = [null, null]; // friendly, enemy
-let currentMana = [null, null] // friendly, enemy
 
 let skillUsage = new NatialSkillEvent(null, false);
 

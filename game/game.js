@@ -156,9 +156,10 @@ const initializeGameBoard = () => {
     players[PLAYER_FRIENDLY].drawCard(3, false);
     players[PLAYER_ENEMY].drawCard(3, false);
 
+    renderAll();
+
     // choose a random player to start
     (Math.random() > 0.5) ? friendlyStartTurn() : enemyStartTurn();
-    renderAll();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
