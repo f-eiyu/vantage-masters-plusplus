@@ -7,32 +7,11 @@
 const aiVerbose = true;
 
 const aiFindEmptySpaces = () => {
-    const emptySpaces = [];
-
-    natials[PLAYER_ENEMY].forEach((rowArray, rowIndex) => {
-        rowArray.forEach((space, spaceIndex) => {
-            if (!space.hasCard) { emptySpaces.push([rowIndex, spaceIndex]); }
-        });
-    });
-
-    if (emptySpaces.length) { return emptySpaces; }
-    else { return false; }
+    return enemyPlayer.natialZone.empty;
 }
 
-// looks for all natials for a specified player, returning an array of
-// [row, index] pairs. note that at least one natial for each player -- the
-// deck master -- has to exist at all times.
 const aiFindNatials = (player) => {
-    const foundNatials = [];
-
-    natials[player].forEach((rowArray, rowIndex) => {
-        rowArray.forEach((space, spaceIndex) => {
-            if (space.hasCard) { foundNatials.push([rowIndex, spaceIndex]); }
-        });
-    });
-
-    if (!foundNatials.length && aiVerbose) { alert("Logic error reached in ai.js/findNatials -- no natials found on the board"); }
-    return foundNatials;
+    return player.natialZone.nonEmpty;
 }
 
 // summons as many natials from the hand as possible
@@ -42,60 +21,54 @@ const aiSummonNatials = () => {
     // halt if no space to summon
     if (!emptyNatialSpaces.length) { return false; }
 
-    // ignore empty hand spaces and play everything that we can
-    enemyPlayer.hand.filter(sp => sp.innerCard).forEach((thisHandSpace, i) => {
-        // halt if card is a spell (we're not smart enough for that yet)
-        if (thisHandSpace.innerCard.type === "spell") { return false; }
+    // play as many natials from the hand as possible
+    // (we're not smart enough to handle spells yet)
+    const toSummon = enemyPlayer.hand.nonEmpty.filter(sp => sp.innerCard.type !== "spell");
+    toSummon.forEach((toSummonSpace, i) => {
+        // halt if no empty spaces on board
+        if (!emptyNatialSpaces.length) { return; }
 
         const thisEmptySpace = emptyNatialSpaces[0];
-        const emptyRow = thisEmptySpace[0];
-        const emptyIndex = thisEmptySpace[1];
+        if (!game.validateSummon(toSummonSpace, thisEmptySpace)) { return false; }
 
-        const targetSpace = natials[PLAYER_ENEMY][emptyRow][emptyIndex];
-
-        if (emptyNatialSpaces.length && thisHandSpace.checkSummonPossible(targetSpace)) {
-            thisHandSpace.summonNatial(targetSpace);
-            emptyNatialSpaces.shift();
-            if (aiVerbose) {
-                console.log("Hand card", i, "summoned to", thisEmptySpace);
-            }
+        game.summonNatial(toSummonSpace, thisEmptySpace);
+        emptyNatialSpaces.shift();
+        if (aiVerbose) {
+            console.log("AI: Hand card", i, "summoned to", thisEmptySpace.row, thisEmptySpace.index);
         }
     });
 }
 
 // attacks with as many natials as possible
 const aiAttack = () => {
-    const attackers = aiFindNatials(PLAYER_ENEMY).map(pos => {
-        return natials[PLAYER_ENEMY][pos[0]][pos[1]];
-    });
-    const attackTargets = aiFindNatials(PLAYER_FRIENDLY).map(pos => {
-        return natials[PLAYER_FRIENDLY][pos[0]][pos[1]];
-    });
+    const attackers = aiFindNatials(enemyPlayer);
+    const attackTargets = aiFindNatials(friendlyPlayer);
 
-    while(attackers.length && attackTargets.length && !gameEnd) {
-        // each natial can only attack once...
+    console.log(attackers);
+    console.log(attackTargets);
+
+    while (attackers.length && attackTargets.length && !gameEnd) {
+        // each natial attacks once
         const attackerSpace = attackers.pop();
-        // .. but each natial can BE attacked more than once, so this can't pop
-        const attackTargetSpace = attackTargets[0];
+        // each target can be attacked more than once, so don't pop here
+        const targetSpace = attackTargets[0];
 
-        // perform an attack, if possible
-        if (attackerSpace.checkAttackPossible(attackTargetSpace)) {
-            if (aiVerbose) {
-                console.log("Attacking", attackTargetSpace.innerCard.name, "with", attackerSpace.innerCard.name);
-                const calcedDmg = attackerSpace.calculateDamage(attackTargetSpace);
-                console.log("Expected damage done:", calcedDmg[0]);
-                console.log("Expected damage countered:", calcedDmg[1]);
-            }
-            attackerSpace.attackNatial(attackTargetSpace);
-            if (aiVerbose) { console.log("Attack resolved."); }
-            if (!attackTargetSpace.hasCard) { 
-                if (aiVerbose) { console.log("Target destroyed."); }
-                attackTargets.shift();
-            }
+        // perform an attack if possible
+        if (!game.validateAttack(attackerSpace, targetSpace)) { continue; }
+        game.attackNatial(attackerSpace, targetSpace);
+        if (aiVerbose) {
+            console.log("AI: Attacking", targetSpace.innerCard.name, "with", attackerSpace.innerCard.name);
+            const calcedDmg = game.calculateDamage(attackerSpace, targetSpace);
+            console.log("    Damage done:", calcedDmg[0]);
+            console.log("    Damage countered:", calcedDmg[1]);
+        }
+        // remove target from attackTargets if destroyed
+        if (!targetSpace.hasCard) { 
+            if (aiVerbose) { console.log("Target destroyed."); }
+            attackTargets.shift();
         }
     }
-
-    console.log("Finished attacking!");
+    if (aiVerbose) { console.log("Finished attacking."); }
 }
 
 // lets the AI take its turn

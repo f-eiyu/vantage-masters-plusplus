@@ -30,6 +30,8 @@ class BoardSpace {
         this._index = index;
     }
 
+    get owner() { return this._owner; }
+    get index() { return this._index; }
     get hasCard() { return (this._containedCard !== null); }
     get innerCard() { return this._containedCard; }
 
@@ -49,7 +51,7 @@ class BoardSpace {
     // instance, without any additional action. not intended to be used for
     // normal destruction of a card; use destroyCard() for that!
     _clear() {
-        this.innerCard = null;
+        this._containedCard = null;
     }
 
     // removes a card from the board or hand and adds it to the discard list
@@ -80,36 +82,44 @@ class BoardSpace {
             `
         }
 
-        // if (this._owner !== PLAYER_ENEMY && this.hasCard) { setDraggable(this.DOM); }
+        if (this.owner !== PLAYER_ENEMY && this.hasCard) {
+            this.setDraggable();
+        } else {
+            this.clearDraggable();
+        }
+
         this.DOM.innerText = cardStr;
         return cardStr;
     }
 
     setDraggable() {
-        thisCardDOM.setAttribute("draggable", "true");
-        thisCardDOM.addEventListener("dragstart", dragStart)
-        thisCardDOM.addEventListener("dragend", (event) => event.target.classList.remove("dragging"));
+        this.DOM.setAttribute("draggable", "true");
+        this.DOM.addEventListener("dragstart", dragStart)
+        this.DOM.addEventListener("dragend", (event) => event.target.classList.remove("dragging"));
     }
 
     clearDraggable() {
-        
+        this.DOM.setAttribute("draggable", "false");
+        this.DOM.removeEventListener("dragstart", dragStart);
     }
 }
 
 class NatialSpace extends BoardSpace {
-    constructor (owner, index, isFrontRow) {
+    constructor (owner, index, row) {
         super(owner, index);
-        this._isFrontRow = isFrontRow;
-        this._isBackRow = !isFrontRow;
-        this._isNatialSpace = true;
-        this._isHandSpace = false;
+        this._row = row;
 
-        const playerStr = (this._owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
-        const rowStr = (this._isFrontRow ? "front" : "back");
+        const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
+        const rowStr = (this.isFrontRow ? "front" : "back");
         this._DOMId = `${playerStr}-${rowStr}-${this._index}`
         this._DOM = document.getElementById(this._DOMId);
     }
 
+    get isNatial() { return true; }
+    get isHand() { return false; }
+    get row() { return this._row; }
+    get isFrontRow() { return this._row === ROW_FRONT; }
+    get isBackRow() { return this._row === ROW_BACK; }
     get DOM() { return this._DOM; }
 
     // activates the skill on the currently selected card, on the target at
@@ -339,29 +349,41 @@ class SpellCard extends Card {
     }
 }
 
-// to be honest, this is mostly a wrapper for the actual javascript object that
-// corresponds to the specified event.target DOM. however, it ended up being
-// useful for the wrapper to have a bit of self-awareness, so here we are!
+// mostly contains wrappers for the BoardSpace instance corresponding to the
+// DOM that was clicked on. serves to seamlessly bridge the DOM with the actual
+// objects on the board when needed, and the wrappers inside serve as shortcuts 
+// to give event listeners more convenient access to logic and validation.
 class CardDOMEvent {
     constructor(draggedDOM) {
-        this.isFrontNatial = draggedDOM.classList.contains("front-natial");
-        this.isBackNatial = draggedDOM.classList.contains("back-natial");
-        this.isNatial = this.isFrontNatial || this.isBackNatial;
-        this.isHandCard = !this.isNatial;
+        this._spaceObj = this.domIDToSpaceObj(draggedDOM.id);
+    }
 
-        this.inRow = this.isFrontNatial ? ROW_FRONT : ROW_BACK;
-        this.index = parseInt(draggedDOM.id.slice(-1));
-        this.owner = draggedDOM.classList.contains("friendly") ? PLAYER_FRIENDLY : PLAYER_ENEMY;
+    // all of the following getters are read-only wrappers
+    get spaceObj() { return this._spaceObj; }
+    get hasCard() { return this._spaceObj.hasCard; }
+    get isNatial() { return this._spaceObj.isNatial; }
+    get isHand() { return this._spaceObj.isHand; }
+    get isFrontNatial() { return this._spaceObj.isFrontRow; }
+    get isBackNatial() { return this._spaceObj.isBackRow; }
+    get isSpell() { return (this._hasCard
+                            && this._spaceObj.innerCard.type === "spell");}
+    get owner() { return this._spaceObj.owner; }
 
-        this.spaceObj = (this.isNatial ? 
-            natials[this.owner][this.inRow][this.index] :
-            getPlayer(this.owner).hand.getSpaceAt(this.index));
+    // fetches the BoardSpace instance corresponding to the desired DOM ID
+    domIDToSpaceObj(domID) {
+        const domIDParts = domID.split("-");
+        const owner = (domIDParts[0] === "friendly" ? friendlyPlayer : enemyPlayer);
+        const zone = domIDParts[1];
+        const index = parseInt(domIDParts[2]);
 
-        if (this.spaceObj.innerCard
-            && this.spaceObj.innerCard.type === "spell") {
-            this.isSpell = true;
-        } else {
-            this.isSpell = false;
+        if (zone === "hand") {
+            return owner.hand.getSpaceAt(index);
+        }
+        else if (zone === "front") {
+            return owner.natialZone.getSpaceAt(ROW_FRONT, index);
+        }
+        else { // (zone === "back")
+            return owner.natialZone.getSpaceAt(ROW_BACK, index);
         }
     }
 }
@@ -380,8 +402,8 @@ class NatialSkillEvent {
 
 class NatialZone {
     constructor(player) {
-        this._front = Array(4).fill(null).map((el, i) => new NatialSpace(player, i, true));
-        this._back = Array(3).fill(null).map((el, i) => new NatialSpace(player, i, false));
+        this._front = Array(4).fill(null).map((el, i) => new NatialSpace(player, i, ROW_FRONT));
+        this._back = Array(3).fill(null).map((el, i) => new NatialSpace(player, i, ROW_BACK));
     }
 
     // returns all non-empty NatialSpace instances
@@ -389,20 +411,32 @@ class NatialZone {
         const nonEmpty = [];
         nonEmpty.push(...this._front.filter(sp => sp.hasCard));
         nonEmpty.push(...this._back.filter(sp => sp.hasCard));
+
+        // at least one natial (the master) should always be in the natial zone
+        if (!nonEmpty.length) { throw "error: no natials found on the board!"; }
         return nonEmpty;
     }
 
-    // returns true if the target space is in the back row and any cards exist
-    // in the front row, and false otherwise
-    isOccluded = () => {
+    // returns all empty NatialSpace instances
+    get empty() {
+        const empty = []
+        empty.push(...this._front.filter(sp => !sp.hasCard));
+        empty.push(...this._back.filter(sp => ~sp.hasCard));
+        return empty;
+    }
+
+    // returns true if the specified natial is occluded and false otherwise. a
+    // natial is occluded if it is in the back row and there is at least one
+    // other natial in the front row.
+    isOccluded = (space) => {
+        if (!space.isBackRow) { return false; }
+
+        const frontRow = this.getRow(ROW_FRONT);
+        for (let space of frontRow) {
+            if (space.hasCard) { return true; }
+        }
+
         return false;
-        // if (!this._isBackRow) { return false; }
-
-        // const inFront = natials[this._owner][ROW_FRONT].reduce((front, space) => {
-        //     return (front || Boolean(space.innerCard));
-        // }, false);
-
-        // return inFront;
     }
 
     getRow(row) {
@@ -595,11 +629,38 @@ class Player {
         this.natialZone.forAllCards(card => card.refresh());
     }
 
+    // checks whether a natial can be summoned to the desired space. does not
+    // actually summon the natial.
+    validateSummon(toSummonSpace, targetSpace) {
+        // fail if target space is occupied
+        if (targetSpace.hasCard) { return false; }
+        // fail if insufficient mana
+        if (this.mana < toSummonSpace.innerCard.cost) { return false; }
 
+        return true;
+    }
 
-    // activates a spell from the hand, deducting the necessary mana
-    playSpell() {
+    // moves a natial from the hand to the board, deducting the necessary mana
+    summonNatial(toSummonSpace, targetSpace) {
+        // deduct mana and transfer the card to the board
+        const summonedNatial = toSummonSpace.innerCard;
+        this.mana -= summonedNatial.cost;
+        this.natialZone.cardToZone(targetSpace, summonedNatial);
+        toSummonSpace._clear();
+        
+        // give the natial actions if it's quick
+        if (summonedNatial.isQuick) {
+            summonedNatial.currentActions = summonedNatial.maxActions;
+            summonedNatial.canMove = true;
+        } else {
+            summonedNatial.currentActions = 0;
+            summonedNatial.canMove = false;
+        }
 
+        // summoning will always require a re-render
+        game.renderAll();
+
+        return true;
     }
 
     // currently just renders the player's mana display, but may be expanded
@@ -612,7 +673,7 @@ class Player {
     }
 }
 
-class GameEngine {
+class GameBoard {
     constructor() {}
 
     renderAll() {
@@ -630,6 +691,8 @@ class GameEngine {
     // game ends and false if it does not. the game-ending code right now is VERY
     // rudimentary, but will work for a MVP. it will be significantly expanded on.
     checkVictory() {
+        return false; // ###
+
         let friendlyHP = friendlyPlayer.master.currentHP;
         let enemyHP = enemyPlayer.master.currentHP;
 
@@ -684,10 +747,11 @@ class GameEngine {
     calculateDamage(attackerSpace, targetSpace) {
         const attacker = attackerSpace.innerCard;
         const target = targetSpace.innerCard;
+        const targetOwner = getPlayer(target.owner);
 
         const myAtk = attacker.attack;
-        const myElement = target.element;
-        const oppAtk = attacker.attack;
+        const myElement = attacker.element;
+        const oppAtk = target.attack;
         const oppElement = target.element;
 
         const TYPE_CHART = [ // row = attacker, col = target
@@ -708,7 +772,7 @@ class GameEngine {
 
         // there's some nuance as to whether counterattacking is possible:
         // a ranged card attacking from the back will never be counterattacked.
-        if (attacker.isRanged && attackerSpace._isBackRow) {
+        if (attacker.isRanged && attackerSpace.isBackRow) {
             counterDmg = 0;
         }
         // a ranged card attacking from the front might not be counterattacked.
@@ -716,7 +780,9 @@ class GameEngine {
         // the attacker will not be counterattacked (even if the target is
         // ranged). counterattacks will trigger as normal if the attacker hits
         // the front row or if the front row is empty.
-        else if (attacker.isRanged && targetSpace.isBackRow && targetSpace.hasCardInFront()) {
+        else if (attacker.isRanged
+            && targetSpace.isBackRow
+            && targetOwner.natialZone.isOccluded(targetSpace)) {
             counterDmg = 0;
         }
 
@@ -727,17 +793,27 @@ class GameEngine {
     // calculateDamage() above if the attack is allowable, and false otherwise.
     validateAttack(attackerSpace, targetSpace) {
         const attacker = attackerSpace.innerCard;
+        const attackerOwner = getPlayer(attackerSpace.owner);
         const target = targetSpace.innerCard;
+        const targetOwner = getPlayer(targetSpace.owner);
 
         // fail if either attacker or target does not exist
         if (!attacker || !target) { return false; }
         // fail if the card can't act
         if (!attacker.currentActions) { return false; }
         if (target.sealed) { return false; }
-        // fail if the attacker is not ranged and targeting a blocked back row
-        if (!attacker.isRanged && targetSpace.isBackRow && targetSpace.hasCardInFront()) { return false; }
-        // fail if attacker is not ranged, in the back, and blocked
-        if (!attacker.isRanged && attackerSpace.isBackRow && attackerSpace.hasCardInFront()) { return false; }
+        // fail if the attacker is not ranged and targeting occluded back row
+        if (!attacker.isRanged
+            && targetSpace.isBackRow
+            && targetOwner.natialZone.isOccluded(targetSpace)) {
+            return false;
+        }
+        // fail if attacker is not ranged and is occluded
+        if (!attacker.isRanged
+            && attackerSpace.isBackRow
+            && attackerOwner.natialZone.isOccluded(attackerSpace)) {
+            return false;
+        }
 
         return this.calculateDamage(attackerSpace, targetSpace);
     }
@@ -758,40 +834,17 @@ class GameEngine {
         this.checkVictory();
     }
 
-    // checks whether a natial can be summoned to the desired space. does not
-    // actually summon the natial.
+    // wrapper for validating a natial summon
     validateSummon(toSummonSpace, targetSpace) {
-        // fail if target space is occupied
-        if (targetSpace.hasCard) { return false; }
-        // fail if card and target have different owners
-        // ###
-        // fail if insufficient mana
-        if (this.mana < toSummonSpace.innerCard.cost) { return false; }
-
-        return true;
+        const owner = toSummonSpace.owner;
+        if (owner !== targetSpace.owner) { return false; }
+        return getPlayer(owner).validateSummon(toSummonSpace, targetSpace);
     }
 
-    // moves a natial from the hand to the board, deducting the necessary mana
+    // wrapper for summoning a natial
     summonNatial(toSummonSpace, targetSpace) {
-        // deduct mana and transfer the card to the board
-        const summonedNatial = toSummonSpace.innerCard;
-        this.mana -= summonedNatial.cost;
-        this.natialZone.cardToZone(targetSpace, summonedNatial);
-        toSummonSpace._clear();
-        
-        // give the natial actions if it's quick
-        if (summonedNatial.isQuick) {
-            summonedNatial.currentActions = summonedNatial.maxActions;
-            summonedNatial.canMove = true;
-        } else {
-            summonedNatial.currentActions = 0;
-            summonedNatial.canMove = false;
-        }
-
-        // summoning will always require a re-render
-        this.renderAll();
-
-        return true;
+        const player = getPlayer(toSummonSpace.owner);
+        player.summonNatial(toSummonSpace, targetSpace);
     }
 }
 
