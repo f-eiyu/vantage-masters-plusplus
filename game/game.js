@@ -1,46 +1,5 @@
 'use strict';
 
-const loadDeck = (cardList, player) => {
-    // cardList will be used later on, when deck building is implemented!
-    // for now, decks will simply be five copies of each debug card.
-    const thisDeckRaw = [];
-    for (let i = 0; i < 4; i++) { // 20 cards in each deck
-        // generate each card in a wrapping object, with a random sorting seed
-        thisDeckRaw.push({card: createCard(getFromDB("Debug Fire")), seed: Math.random()});
-        thisDeckRaw.push({card: createCard(getFromDB("Debug Water")), seed: Math.random()});
-        thisDeckRaw.push({card: createCard(getFromDB("Debug Earth")), seed: Math.random()});
-        thisDeckRaw.push({card: createCard(getFromDB("Debug Heaven")), seed: Math.random()});
-        thisDeckRaw.push({card: createCard(getFromDB("Reduce")), seed: Math.random()});
-    }
-    // using the random seeds, shuffle the deck
-    thisDeckRaw.sort((cardOne, cardTwo) => { return cardOne.seed - cardTwo.seed; });
-    // extract the cards from their object wrappers
-    const thisDeck = thisDeckRaw.map(cardWrapper => cardWrapper.innerCard);
-
-    // put the cards in the correct player's deck
-    return decks[player] = thisDeck;
-}
-
-const drawCard = (player, render = true) => {/*
-    // fail if there are no cards to draw
-    if (decks[player].length === 0) { return false; }
-
-    // retrieve the index of the first empty handSpace
-    const getFirstEmpty = hands[player].reduce((firstEmpty, toCheck) => {
-        return (!toCheck.innerCard && toCheck._index < firstEmpty ? toCheck._index : firstEmpty);
-    }, Infinity);
-
-    // fail if there are no empty spaces
-    if (getFirstEmpty > HAND_SIZE_LIMIT - 1) { return false; }
-
-    // if the draw is possible, pop last card in the deck to the player's hand
-    hands[player][getFirstEmpty].innerCard = decks[player].pop();
-
-    if (render) { renderAll(); }
-    return true;*/
-    throw "drawCard call -- replace with class method!"
-}
-
 const boardCardMouseover = (event) => {
     const boardSpace = (new CardDOMEvent(event.target)).spaceObj;
     if (!boardSpace.hasCard) { return; }
@@ -127,53 +86,55 @@ const enemyEndTurn = () => {
 }
 
 const initializeGameBoard = () => {
-    const addHoverMagnifyEventListener = (domObj) => {
-        domObj.addEventListener("mouseover", boardCardMouseover);
-        domObj.addEventListener("mouseleave", boardCardMouseleave);
+    // attach events to DOMs
+    const addListenerToAll = (listenerName, callback, className) => {
+        const classList = document.querySelectorAll("." + className);
+        classList.forEach(dom => {
+            dom.addEventListener(listenerName, callback);
+        });
     }
 
-    const addHoverMagnifyListenerToAll = (className) => {
-        const thisClassList = document.querySelectorAll("." + className);
-        thisClassList.forEach(element => addHoverMagnifyEventListener(element))
+    addListenerToAll("mouseover", boardCardMouseover, "enemy-natial-space");
+    addListenerToAll("mouseover", boardCardMouseover, "friendly-natial-space");
+    addListenerToAll("mouseover", boardCardMouseover, "friendly-hand-space");
+    addListenerToAll("mouseleave", boardCardMouseleave, "friendly-natial-space");
+    addListenerToAll("mouseleave", boardCardMouseleave, "enemy-natial-space");
+    addListenerToAll("mouseleave", boardCardMouseleave, "friendly-hand-space");
+
+    addListenerToAll("contextmenu", natialRightClick, "friendly-natial-space");
+
+    // addListenerToAll("click", natialLeftClick, "enemy-hand-space");
+    addListenerToAll("click", natialLeftClick, "enemy-natial-space");
+    addListenerToAll("click", natialLeftClick, "friendly-natial-space");
+    // addListenerToAll("click", natialLeftClick, "friendly-hand-space");
+    
+    // instantiate players
+    const _playerDeckTemplate = [];
+    const _enemyDeckTemplate = [];
+    { // all of this is for debugging until the deck builder goes in
+        for (let i = 0; i < 4; i++) {
+            _playerDeckTemplate.push(createCard(getFromDB("Debug Fire")));
+            _playerDeckTemplate.push(createCard(getFromDB("Debug Water")));
+            _playerDeckTemplate.push(createCard(getFromDB("Debug Earth")));
+            _playerDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
+            _playerDeckTemplate.push(createCard(getFromDB("Uptide")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Debug Fire")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Debug Water")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Debug Earth")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Uptide")));
+        }
+        _playerDeckTemplate.push(createCard(getFromDB("Sister")));
+        _enemyDeckTemplate.push(createCard(getFromDB("Beast")));
     }
+    players[PLAYER_FRIENDLY] = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
+    players[PLAYER_ENEMY] = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
 
-    addHoverMagnifyListenerToAll("enemy-natial-space");
-    addHoverMagnifyListenerToAll("friendly-natial-space");
-    addHoverMagnifyListenerToAll("friendly-hand-card");
-
-    const addRightClickListener = (domObj) => {
-        domObj.addEventListener("contextmenu", natialRightClick);
-    }
-
-    const addRightClickListenerToAll = (className) => {
-        const thisClassList = document.querySelectorAll("." + className);
-        thisClassList.forEach(element => addRightClickListener(element));
-    }
-
-    addRightClickListenerToAll("friendly-natial-space");
-
-    const addLeftClickListener = (domObj) => {
-        domObj.addEventListener("click", natialLeftClick);
-    }
-
-    const addLeftClickListenerToAll = (className) => {
-        const thisClassList = document.querySelectorAll("." + className);
-        thisClassList.forEach(element => addLeftClickListener(element));
-    }
-
-    // addLeftClickListenerToAll("enemy-hand-card");
-    addLeftClickListenerToAll("enemy-natial-space");
-    addLeftClickListenerToAll("friendly-natial-space");
-    // addLeftClickListenerToAll("enemy-hand-card");
-
-    loadDeck(null, PLAYER_FRIENDLY);
-    loadDeck(null, PLAYER_ENEMY);
-
-    // both players start with four cards in hand
+    // both players start with three cards in hand
     // a mulligan feature will be added... later
-    for (let i = 0; i < 4; i++) {
-        drawCard(PLAYER_FRIENDLY, false);
-        drawCard(PLAYER_ENEMY, false);
+    for (let i = 0; i < 3; i++) {
+        players[PLAYER_FRIENDLY].drawCard();
+        players[PLAYER_ENEMY].drawCard();
     }
 
     // both players start with their respective masters on back-1

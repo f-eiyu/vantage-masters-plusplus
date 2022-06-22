@@ -44,7 +44,7 @@ body {
     font-size: 20pt;
 }
 
-.container, .enemy-hand-card, .enemy-natial-space, .friendly-hand-card, .friendly-natial-space {
+.container, .enemy-hand-space, .enemy-natial-space, .friendly-hand-space, .friendly-natial-space {
     border: solid black 1px;
 
     display: flex;
@@ -62,7 +62,7 @@ body {
     padding: 0 20%;
 }
 
-.enemy-hand-card, .friendly-hand-card {
+.enemy-hand-space, .friendly-hand-space {
     height: 95%;
     width: 12.6%;
 

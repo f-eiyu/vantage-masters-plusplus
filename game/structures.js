@@ -485,12 +485,15 @@ class NatialSkillEvent {
 }
 
 class NatialZone {
-
+    constructor(player) {
+        this._front = Array(4).fill(null).map((el, i) => new NatialSpace(player, i, true));
+        this._back = Array(3).fill(null).map((el, i) => new NatialSpace(player, i, false));
+    }
 }
 
-class Hand extends Array {
-    constructor() {
-
+class Hand {
+    constructor(player) {
+        this._handCards = Array(6).fill(null).map((el, i) => new HandSpace(player, i));
     }
 
     // returns the HandSpace instance at the specified index
@@ -499,7 +502,7 @@ class Hand extends Array {
             throw "Hand index out of bounds!";
         }
 
-        return this[index];
+        return this._handCards[index];
     }
     // returns the index of the first empty handSpace in Hand. if there are 
     // no empty handSpaces, returns HAND_SIZE_LIMIT.
@@ -512,10 +515,10 @@ class Hand extends Array {
 
         return firstEmpty;
     }
-    get isFull() { return (this.firstEmpty() === HAND_SIZE_LIMIT); }
-    get isEmpty() { return (this.firstEmpty() === 0); }
+    get isFull() { return (this.firstEmpty === HAND_SIZE_LIMIT); }
+    get isEmpty() { return (this.firstEmpty === 0); }
     get cardCount() {
-        return this.reduce((cardTotal, nextSpace) => {
+        return this._handCards.reduce((cardTotal, nextSpace) => {
             return cardTotal + (nextSpace.hasCard ? 1 : 0);
         }, 0);
     }
@@ -529,31 +532,57 @@ class Hand extends Array {
     }
 }
 
-class Deck extends Array {
+class Deck {
+    constructor(player, deckCards) {
+        this._deckCards = deckCards.slice();
+        this.shuffle();
+    }
 
+    get length() { return this._deckCards.length; }
+    
+    pop() { return this._deckCards.pop(); }
+
+    shuffle() {
+        // wrap each card in an object to associate it with a random seed
+        const toShuffle = this._deckCards.map((card) => {
+            return {"card": card, "seed": Math.random()};
+        });
+
+        // order the cards according to their random seed
+        toShuffle.sort((cardOne, cardTwo) => {
+            return cardOne.seed - cardTwo.seed;
+        });
+
+        // extract the cards from their wrappers
+        const shuffled = toShuffle.map(wrapper => wrapper.card);
+
+        this._deckCards = shuffled;
+    }
 }
 
 class Player {
-    constructor() {
-        
-        this._natialZone = new NatialZone();
-        this._hand = new Hand();
-        this._deck = new Deck();
+    constructor(player, deckCards) {
+        this._master = deckCards.pop();
+
+        this._natialZone = new NatialZone(player);
+        this._hand = new Hand(player);
+        this._deck = new Deck(player, deckCards);
     }
 
     get hand() { return this._hand; }
     get deck() { return this._deck; }
 
     drawCard(n = 1, render = true) {
-        if (!this.deck.length) { return false; }
-        if (this.hand.isFull) { return false; }
+        if (!this._deck.length) { return false; }
+        if (this._hand.isFull) { return false; }
 
-        const firstEmpty = this._hand.firstEmpty;
-        const drawnCard = this._deck.pop();
+        const firstEmpty = this.hand.firstEmpty;
+        const drawnCard = this.deck.pop();
 
         this.hand.cardToHand(firstEmpty, drawnCard);
 
         if (render) { renderAll(); }
+        return true;
     }
 }
 
@@ -583,3 +612,5 @@ let maxMana = [null, null]; // friendly, enemy
 let currentMana = [null, null] // friendly, enemy
 
 let skillUsage = new NatialSkillEvent(null, false);
+
+const players = [];
