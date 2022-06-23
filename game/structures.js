@@ -275,11 +275,35 @@ class NatialSpace extends BoardSpace {
     get DOM() { return this._DOM; }
 
     // wrapper for dealing damage to the contained card instance
-    dealDamage(dmg, dmgSource = null) {
-        this.innerCard.takeDamage(dmg);
-        if (this.innerCard.curHP <= 0) {
+    dealDamage(dmg, attackerSpace = null) {
+        const target = this.innerCard;
+        const attacker = (attackerSpace ? attackerSpace.innerCard : null);
+
+        target.takeDamage(dmg);
+
+        // onDamageTaken hook
+        if (target.hasPassive
+            && natialPassiveCallbacks.onDamageTaken[target.passiveCbName]) {
+            natialPassiveCallbacks.onDamageTaken[target.passiveCbName](this, dmg);
+        }
+
+        // destroy and run relevant callbacks if target dies
+        if (target.curHP <= 0) {
+            // onDeath hook
+            if (target.hasPassive
+                && natialPassiveCallbacks.onDeath[target.passiveCbName]) {
+                natialPassiveCallbacks.onDeath[target.passiveCbName](this);
+            }
+            // onKill hook
+            // specifically structured to NOT run if a counterattacker both got
+            // a kill and died simultaneously.
+            if (attacker
+                && attacker.hasPassive
+                && natialPassiveCallbacks.onKill[attacker.passiveCbName]) {
+                natialPassiveCallbacks.onKill[attacker.passiveCbName](attackerSpace);
+            }
+
             this.destroyCard();
-            // ### dmgSource hook/callbacks here
         }
     }
 
@@ -787,12 +811,11 @@ class GameBoard {
     attackNatial(attackerSpace, targetSpace) {
         const thisAttack = this.calculateDamage(attackerSpace, targetSpace);
         const attacker = attackerSpace.innerCard;
-        const target = targetSpace.innerCard;
 
         // deduct an action and perform attack and counterattack
         attacker.expendAction();
-        targetSpace.dealDamage(thisAttack[0]);
-        attackerSpace.dealDamage(thisAttack[1]);
+        targetSpace.dealDamage(thisAttack[0], attackerSpace);
+        attackerSpace.dealDamage(thisAttack[1], targetSpace);
 
         this.renderAll();
         this.checkVictory();

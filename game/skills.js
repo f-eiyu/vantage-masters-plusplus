@@ -197,7 +197,7 @@ const calculateSkillDamage = (userSpace, targetSpace, dmg) => {
 }
 
 const natialActiveCallbacks = {
-    // Generic effects
+    // ========== Generic effects ==========
     genericHealTarget: function(userSpace, targetSpace, hp) {
         targetSpace.innerCard.restoreHP(hp);
     },
@@ -209,7 +209,7 @@ const natialActiveCallbacks = {
         // into dealDamage(). all natial skills that do damage should be
         // passed through this method before actually resolving.
         const finalDmg = calculateSkillDamage(userSpace, targetSpace, dmg);
-        targetSpace.dealDamage(finalDmg);
+        targetSpace.dealDamage(finalDmg, userSpace);
     },
     genericDamageRow: function(userSpace, targetSpace, dmg) {
         const natialZone = getPlayer(targetSpace.owner).natialZone;
@@ -365,69 +365,65 @@ const natialActiveCallbacks = {
 const natialPassiveCallbacks= {
     // callback when the card dies
     onDeath: {
+        genericDrawCard: function(deathSpace) {
+            getPlayer(deathSpace.owner).drawCard();
+        },
+
         cbPassivePaRancell: function() {
             // remove protection from adjacent spaces
         },
         cbPassiveDaColm: function() {
             // undo buff of HP +1 to cards in the same row
         },
-        cbPassiveRequ: function() {
-            // draw a card
+        cbPassiveRequ: function(deathSpace) {
+            this.genericDrawCard(deathSpace);
         },
-        cbPassiveTarbyss: function() {
-            // draw a card
+        cbPassiveTarbyss: function(deathSpace) {
+            this.genericDrawCard(deathSpace);
         },
         cbPassiveNeptjuno: function() {
             // remove protection from adjacent spaces
         },
-        cbPassiveFifenall: function() {
-            // draw a card
+        cbPassiveFifenall: function(deathSpace) {
+            this.genericDrawCard(deathSpace);
         },
         cbPassiveRegnaCroix: function () {
             // ATK +1 for all Heaven
         }
     },
-    // callback when the card gets a kill
+    // callback when the card destroys an opposing natial
     onKill: {
-        cbPassiveSwordsman: function() {
-            // ATK +1
+        genericBuffAtk: function(attackerSpace, buff) {
+            attackerSpace.innerCard.buffAtk(buff);
         },
-        cbPassiveMaGorb: function() {
-            // ATK +1
+
+        cbPassiveSwordsman: function(attackerSpace) {
+            // +1 to Attack when it gets a kill
+            this.genericBuffAtk(attackerSpace, 1);
         },
-        cbPassiveDullmdalla: function() {
-            // ATK +1
+        cbPassiveMaGorb: function(attackerSpace) {
+            // +1 to Attack when it gets a kill
+            this.genericBuffAtk(attackerSpace, 1);
         },
-        cbPassiveOonvievle: function() {
-            // ATK +1
+        cbPassiveDullmdalla: function(attackerSpace) {
+            // +1 to Attack when it gets a kill
+            this.genericBuffAtk(attackerSpace, 1);
         },
-        cbPassiveXenofiend: function() {
-            // ATK +2
+        cbPassiveOonvievle: function(attackerSpace) {
+            // +1 to Attack when it gets a kill
+            this.genericBuffAtk(attackerSpace, 1);
         },
-        cbPassivePelitt: function() {
-            // ATK +2
-        }
-    },
-    // callback when the card moves, before the movement has happened
-    onPreMove: {
-        cbPassiveTyrant: function() {
-            // remove +2 HP/ATK from adjacent spaces
+        cbPassiveXenofiend: function(attackerSpace) {
+            // +2 to Attack when it gets a kill
+            this.genericBuffAtk(attackerSpace, 2);
         },
-        cbPassivePaRancell: function() {
-            // remove protection from adjacent spaces
-        },
-        cbPassiveDaColm: function() {
-            // remove +1 HP bonus from spaces in the same row
-        },
-        cbPassiveNeptjuno: function() {
-            // remove protection from adjacent spaces
-        },
-        cbPassiveAmoltamis: function() {
-            // remove +2 attack 
+        cbPassivePelitt: function(attackerSpace) {
+            // +2 to Attack when it gets a kill
+            this.genericBuffAtk(attackerSpace, 2);
         }
     },
     // callback when the card moves, after the movement has happened
-    onPostMoveOrSummon: {
+    onMove: {
         cbPassiveTyrant: function() {
             // grant +2 HP/ATK to adjacent spaces
         },
@@ -444,23 +440,61 @@ const natialPassiveCallbacks= {
             // +2 attack if moved to front row
         }
     },
-    // 
+    // callback when a card is summoned or moved into a space that another
+    // natial is buffing
     onSpaceEffect: {
-
+        cbPassiveTyrant: function() {
+            // grant +2 HP/ATK to the inner card
+        },
+        cbPassivePaRancell: function() {
+            // grant protection to the inner card
+        },
+        cbPassiveDaColm: function() {
+            // grant +1 HP to the inner card
+        },
+        cbPassiveNeptjuno: function() {
+            // grant protection to the inner card
+        }
     },
+    // callback when a card is moved out of a space that another natial is
+    // buffing (reverses the effects of the above)
     onSpaceEffectReverse: {
-
+        cbPassiveTyrant: function() {
+            // remove +2 HP/ATK from the inner card
+        },
+        cbPassivePaRancell: function() {
+            // remove protection from the inner card
+        },
+        cbPassiveDaColm: function() {
+            // remove +1 HP from the inner card
+        },
+        cbPassiveNeptjuno: function() {
+            // remove protection from the inner card
+        }
     },
     // callback when the card takes damage
     onDamageTaken: {
-        cbPassiveSpirit: function() {
-            // HP/ATK +1 to all friendlies when below 10 HP
+        cbPassiveSpirit: function(damagedSpace, dmg) {
+            // permanent +1 HP/ATK to all allies when falling below 10 HP. 
+            // this effect can trigger repeatedly if Spirit falls below 10 HP
+            // repeatedly.
+            const curHP = damagedSpace.innerCard.curHP;
+            const prevHP = curHP + dmg;
+
+            if (prevHP >= 10 && curHP < 10) {
+                const player = getPlayer(damagedSpace.owner);
+                player.natialZone.forAllCards(card => {
+                    card.restoreHP(1);
+                    card.buffAtk(1);
+                });
+            }
         }
     },
     // callback when the card owner's turn ends
     onTurnEnd: {
-        cbPassivePaladin: function() {
-            // restores 1 HP
+        cbPassivePaladin: function(paladinSpace) {
+            // restores 1 HP for the Paladin
+            paladinSpace.innerCard.restoreHP(1);
         }
     }
 }

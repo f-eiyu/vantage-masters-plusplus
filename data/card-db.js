@@ -108,7 +108,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillDullmdalla",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveDullmdalla"
     },
     {
         "name": "Blyx",
@@ -144,7 +144,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveOonvievle"
     },
     {
         "name": "Greon",
@@ -180,7 +180,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillXenofiend",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveXenofiend"
     },
     // Heaven Natials
     {
@@ -199,7 +199,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillPelitt",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassivePelitt"
     },
     {
         "name": "Guene-Foss",
@@ -253,7 +253,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillFifenall",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveFifenall"
     },
     {
         "name": "Amoltamis",
@@ -271,7 +271,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveAmoltamis"
     },
     {
         "name": "Regna-Croix",
@@ -289,7 +289,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillRegnaCroix",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveRegnaCroix"
     },
     // Earth Natials
     {
@@ -308,7 +308,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassivePaRancell"
     },
     {
         "name": "D-Arma",
@@ -380,7 +380,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveDaColm"
     },
     {
         "name": "Ma-Gorb",
@@ -398,7 +398,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillMaGorb",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveMaGorb"
     },
     // Water Natials
     {
@@ -417,7 +417,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveRequ"
     },
     {
         "name": "Marme",
@@ -471,7 +471,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveTarbyss"
     },
     {
         "name": "Neptjuno",
@@ -489,7 +489,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillNeptjuno",
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveNeptjuno"
     },
     {
         "name": "Tentarch",
@@ -662,7 +662,7 @@ const cardDB = [
 
         "skillCallbackName": "cbSkillPaladin",
         "skillCost": 4,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassivePaladin"
     },
     {
         "name": "Beast",
@@ -700,7 +700,7 @@ const cardDB = [
 
         "skillCallbackName": "cbSkillSwordsman",
         "skillCost": 2,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveSwordsman"
     },
     {
         "name": "Sorcerer",
@@ -758,7 +758,7 @@ const cardDB = [
 
         "skillCallbackName": "cbSkillSpirit",
         "skillCost": 3,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveSpirit"
     },
     {
         "name": "Bard",
@@ -796,7 +796,7 @@ const cardDB = [
 
         "skillCallbackName": "cbSkillTyrant",
         "skillCost": 7,
-        "passiveCallbackName": null
+        "passiveCallbackName": "cbPassiveTyrant"
     },
 
     // ========== Spells ==========

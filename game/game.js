@@ -47,8 +47,17 @@ const friendlyStartTurn = () => {
 
 const friendlyEndTurn = () => {
     playerCanInteract = false;
-    friendlyPlayer.natialZone.decrementSeal();
+    
+    // onTurnEnd hook
+    friendlyPlayer.natialZone.forAllSpaces(sp => {
+        const card = sp.innerCard;
+        if (card.hasPassive
+            && natialPassiveCallbacks.onTurnEnd[card.passiveCbName]) {
+            natialPassiveCallbacks.onTurnEnd[card.passiveCbName](sp);
+        }
+    });
 
+    friendlyPlayer.natialZone.decrementSeal();
     enemyStartTurn();
 }
 
@@ -66,6 +75,15 @@ const enemyStartTurn = () => {
 
 const enemyEndTurn = () => {
     if (!gameEnd) {
+        // onTurnEnd hook
+        enemyPlayer.natialZone.forAllSpaces(sp => {
+            const card = sp.innerCard;
+            if (card.hasPassive
+                && natialPassiveCallbacks.onTurnEnd[card.passiveCbName]) {
+                natialPassiveCallbacks.onTurnEnd[card.passiveCbName](sp);
+            }
+        });
+
         enemyPlayer.natialZone.decrementSeal();
         friendlyStartTurn();
     }
@@ -119,22 +137,22 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Marme")));
-            _playerDeckTemplate.push(createCard(getFromDB("Zamilpen")));
-            _playerDeckTemplate.push(createCard(getFromDB("Neptjuno")));
-            _playerDeckTemplate.push(createCard(getFromDB("Tentarch")));
-            _playerDeckTemplate.push(createCard(getFromDB("Regna-Croix")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Debug Fire")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Debug Water")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Debug Earth")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Uptide")));
+            _playerDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _playerDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _playerDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _playerDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _playerDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Tyrant")));
-        _enemyDeckTemplate.push(createCard(getFromDB("Ranger")));
+        _playerDeckTemplate.push(createCard(getFromDB("Paladin")));
+        _enemyDeckTemplate.push(createCard(getFromDB("Witch")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
-    friendlyPlayer._maxMana = 10;
+    friendlyPlayer._maxMana = 10; // ###
     enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
     skillUsage = new NatialSkillEvent(null, false);
     game = new GameBoard();
