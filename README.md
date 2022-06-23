@@ -10,6 +10,17 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 ## todo
 - give wall and seal visual feedback
 - remove ability to drag other cards while skill is selected
+- allow movement on an occupied space to swap the two natials
+
+### needed hooks
+- defend left and right: check for protected property on targeted spaces
+    - move protected property from card to space
+    - ondeath, for the card that's defending
+- card can act twice: no passive needed (that's just having 2 actions)
+- bonus stats to cards in the same row: onsummon, onmove, and ondeath
+- bonus stats when enemy defeated: check attacker ondeath
+- draws a card when defeated: ondeath
+- all matching cards gain stats: onsummon, ondeath
 
 ## User stories
 ### MVP goals

@@ -362,6 +362,105 @@ const natialActiveCallbacks = {
     }
 }
 
-const natialPassiveCallbacks = {
+const natialPassiveCallbacks= {
+    // callback when the card dies
+    onDeath: {
+        cbPassivePaRancell: function() {
+            // remove protection from adjacent spaces
+        },
+        cbPassiveDaColm: function() {
+            // undo buff of HP +1 to cards in the same row
+        },
+        cbPassiveRequ: function() {
+            // draw a card
+        },
+        cbPassiveTarbyss: function() {
+            // draw a card
+        },
+        cbPassiveNeptjuno: function() {
+            // remove protection from adjacent spaces
+        },
+        cbPassiveFifenall: function() {
+            // draw a card
+        },
+        cbPassiveRegnaCroix: function () {
+            // ATK +1 for all Heaven
+        }
+    },
+    // callback when the card gets a kill
+    onKill: {
+        cbPassiveSwordsman: function() {
+            // ATK +1
+        },
+        cbPassiveMaGorb: function() {
+            // ATK +1
+        },
+        cbPassiveDullmdalla: function() {
+            // ATK +1
+        },
+        cbPassiveOonvievle: function() {
+            // ATK +1
+        },
+        cbPassiveXenofiend: function() {
+            // ATK +2
+        },
+        cbPassivePelitt: function() {
+            // ATK +2
+        }
+    },
+    // callback when the card moves, before the movement has happened
+    onPreMove: {
+        cbPassiveTyrant: function() {
+            // remove +2 HP/ATK from adjacent spaces
+        },
+        cbPassivePaRancell: function() {
+            // remove protection from adjacent spaces
+        },
+        cbPassiveDaColm: function() {
+            // remove +1 HP bonus from spaces in the same row
+        },
+        cbPassiveNeptjuno: function() {
+            // remove protection from adjacent spaces
+        },
+        cbPassiveAmoltamis: function() {
+            // remove +2 attack 
+        }
+    },
+    // callback when the card moves, after the movement has happened
+    onPostMoveOrSummon: {
+        cbPassiveTyrant: function() {
+            // grant +2 HP/ATK to adjacent spaces
+        },
+        cbPassivePaRancell: function() {
+            // grant protection to adjacent spaces
+        },
+        cbPassiveDaColm: function() {
+            // grant +1 HP to spaces in the same row
+        },
+        cbPassiveNeptjuno: function() {
+            // grant protection to adjacent spaces
+        },
+        cbPassiveAmoltamis: function() {
+            // +2 attack if moved to front row
+        }
+    },
+    // 
+    onSpaceEffect: {
 
+    },
+    onSpaceEffectReverse: {
+
+    },
+    // callback when the card takes damage
+    onDamageTaken: {
+        cbPassiveSpirit: function() {
+            // HP/ATK +1 to all friendlies when below 10 HP
+        }
+    },
+    // callback when the card owner's turn ends
+    onTurnEnd: {
+        cbPassivePaladin: function() {
+            // restores 1 HP
+        }
+    }
 }
