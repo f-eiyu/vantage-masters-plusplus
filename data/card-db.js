@@ -1,5 +1,5 @@
 const cardDB = [
-    // ========== Natials ==========
+    // ========== Debug ==========
     {
         "name": "Debug Fire",
         "portrait": null,
@@ -15,9 +15,7 @@ const cardDB = [
         "isQuick": false,
         "isMaster": false,
 
-        "hasSkill": false,
         "skillCallbackName": null,
-        "hasPassive": false,
         "passiveCallbackName": null
     },
     {
@@ -35,9 +33,7 @@ const cardDB = [
         "isQuick": true,
         "isMaster": false,
 
-        "hasSkill": false,
         "skillCallbackName": null,
-        "hasPassive": false,
         "passiveCallbackName": null
     },
     {
@@ -55,9 +51,7 @@ const cardDB = [
         "isQuick": false,
         "isMaster": false,
 
-        "hasSkill": false,
         "skillCallbackName": null,
-        "hasPassive": false,
         "passiveCallbackName": null
     },
     {
@@ -75,11 +69,122 @@ const cardDB = [
         "isQuick": false,
         "isMaster": false,
 
-        "hasSkill": false,
         "skillCallbackName": null,
-        "hasPassive": false,
         "passiveCallbackName": null
     },
+    // ========== Natials ==========
+    // Fire Natials
+    {
+        "name": "Hepetus",
+        "portrait": null,
+        "cost": 2,
+        "type": "natial",
+
+        "element": "ELEMENT_FIRE",
+        "maxHP": 2,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Dullmdalla",
+        "portrait": null,
+        "cost": 3,
+        "type": "natial",
+
+        "element": "ELEMENT_FIRE",
+        "maxHP": 1,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillDullmdalla",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Blyx",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_FIRE",
+        "maxHP": 3,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Oonvievle",
+        "portrait": null,
+        "cost": 6,
+        "type": "natial",
+
+        "element": "ELEMENT_FIRE",
+        "maxHP": 5,
+        "attack": 6,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Greon",
+        "portrait": null,
+        "cost": 7,
+        "type": "natial",
+
+        "element": "ELEMENT_FIRE",
+        "maxHP": 5,
+        "attack": 5,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Xenofiend",
+        "portrait": null,
+        "cost": 7,
+        "type": "natial",
+
+        "element": "ELEMENT_FIRE",
+        "maxHP": 7,
+        "attack": 4,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillXenofiend",
+        "passiveCallbackName": null
+    },
+    // Heaven Natials
+    // Earth Natials
+    // Water Natials
 
     // ========== Masters ==========
     {
@@ -97,10 +202,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": false,
+        "skillCallbackName": null,
         "skillCost": null,
-        "skill": null,
-        "hasPassive": false,
         "passive": null
     },
     {
@@ -118,10 +221,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": false,
-        "skillCost": null,
         "skillCallbackName": null,
-        "hasPassive": true,
+        "skillCost": null,
         "passiveCallbackName": null
     },
     {
@@ -139,10 +240,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": false,
-        "skillCost": null,
         "skillCallbackName": null,
-        "hasPassive": false,
+        "skillCost": null,
         "passiveCallbackName": null
     },
     {
@@ -160,10 +259,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 2,
         "skillCallbackName": "cbSkillSister",
-        "hasPassive": false,
+        "skillCost": 2,
         "passiveCallbackName": null
     },
     {
@@ -181,10 +278,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 3,
         "skillCallbackName": "cbSkillKnight",
-        "hasPassive": false,
+        "skillCost": 3,
         "passiveCallbackName": null
     },
     {
@@ -202,10 +297,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 2,
         "skillCallbackName": "cbSkillThief",
-        "hasPassive": true,
+        "skillCost": 2,
         "passiveCallbackName": null
     },
     {
@@ -223,10 +316,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 3,
         "skillCallbackName": "cbSkillWitch",
-        "hasPassive": false,
+        "skillCost": 3,
         "passiveCallbackName": null
     },
     {
@@ -244,10 +335,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 4,
         "skillCallbackName": "cbSkillPaladin",
-        "hasPassive": true,
+        "skillCost": 4,
         "passiveCallbackName": null
     },
     {
@@ -265,10 +354,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 1,
         "skillCallbackName": "cbSkillBeast",
-        "hasPassive": true,
+        "skillCost": 1,
         "passiveCallbackName": null
     },
     {
@@ -286,10 +373,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 2,
         "skillCallbackName": "cbSkillSwordsman",
-        "hasPassive": true,
+        "skillCost": 2,
         "passiveCallbackName": null
     },
     {
@@ -307,9 +392,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 3,
         "skillCallbackName": "cbSkillSorcerer",
+        "skillCost": 3,
         "hasPassive": false,
         "passiveCallbackName": null
     },
@@ -328,10 +412,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 4,
         "skillCallbackName": "cbSkillShadow",
-        "hasPassive": true,
+        "skillCost": 4,
         "passiveCallbackName": null
     },
     {
@@ -349,10 +431,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 3,
         "skillCallbackName": "cbSkillSpirit",
-        "hasPassive": true,
+        "skillCost": 3,
         "passiveCallbackName": null
     },
     {
@@ -370,10 +450,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 3,
         "skillCallbackName": "cbSkillBard",
-        "hasPassive": false,
+        "skillCost": 3,
         "passiveCallbackName": null
     },
     {
@@ -391,10 +469,8 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": true,
-        "skillCost": 7,
         "skillCallbackName": "cbSkillTyrant",
-        "hasPassive": true,
+        "skillCost": 7,
         "passiveCallbackName": null
     },
 

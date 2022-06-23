@@ -88,6 +88,12 @@ const skillValidators = {
     },
 
     // ========== Regular natial skill validators ==========
+    cbSkillDullmdalla: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    cbSkillXenofiend: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    }
 }
 
 const skillUseValidation = (userSpace, targetSpace) => {
@@ -112,6 +118,8 @@ const natialRightClick = (event) => {
     const userCard = userSpace.innerCard;
     const player = getPlayer(userSpace.owner);
 
+    console.log(userCard.skillReady);
+
     if (!userSpace.hasCard) { return; }
     if (!userCard.skillReady) { return; }
     if (!userCard.currentActions) { return; }
@@ -119,7 +127,7 @@ const natialRightClick = (event) => {
     if (skillUsage.selected) {
         skillUsage.purge();
         event.target.classList.remove("skill-selected");
-    } else if (player.currentMana >= userCard.skillCost) {
+    } else if (!userCard.isMaster || player.currentMana >= userCard.skillCost) {
         skillUsage = new NatialSkillEvent(userSpace);
         event.target.classList.add("skill-selected");
     }
@@ -142,6 +150,20 @@ const natialLeftClick = (event) => {
 }
 
 const natialActiveCallbacks = {
+    // Generic effects
+    genericDrawCard: function(targetSpace, n = 1) {
+        getPlayer(targetSpace.owner).drawCard(n);
+    },
+    genericDamageTarget: function(targetSpace, dmg) {
+        targetSpace.dealDamage(dmg);
+    },
+    genericDamageRow: function(targetSpace, dmg) {
+        const natialZone = getPlayer(targetSpace.owner).natialZone;
+
+        natialZone.forAllSpacesInRow(targetSpace.row, sp => sp.dealDamage(dmg));
+    },
+
+    // ========== Master active skills ==========
     cbSkillSister: function(targetSpace) {
         // heals the target for 2 HP
         const targetCard = targetSpace.innerCard;
@@ -156,12 +178,11 @@ const natialActiveCallbacks = {
     },
     cbSkillThief: function(targetSpace) {
         // draws a card
-        const player = getPlayer(targetSpace.owner);
-        player.drawCard();
+        this.genericDrawCard(targetSpace);
     },
     cbSkillWitch: function(targetSpace) {
         // deals 4 damage to the target
-        targetSpace.dealDamage(4);
+        this.genericDamageTarget(targetSpace, 4);
     },
     cbSkillPaladin: function(targetSpace) {
         // revives a random destroyed natial
@@ -187,15 +208,11 @@ const natialActiveCallbacks = {
     },
     cbSkillBeast: function(targetSpace) {
         // draws a card
-        this.cbSkillThief(targetSpace);
+        this.genericDrawCard(targetSpaec);
     },
     cbSkillSwordsman: function(targetSpace) {
         // deals 1 damage to the row containing the target
-        const player = getPlayer(targetSpace.owner);
-
-        player.natialZone.forAllSpacesInRow(targetSpace.row, (sp) => {
-            sp.dealDamage(1);
-        });
+        this.genericDamageRow(targetSpace, 1);
     },
     cbSkillSorcerer: function(targetSpace) {
         // adds a Magic Crystal spell to the hand
@@ -221,6 +238,15 @@ const natialActiveCallbacks = {
         // deals 3 damage to all enemies
         const natialZone = getPlayer(targetSpace.owner).natialZone;
         natialZone.forAllSpaces(sp => sp.dealDamage(3));
+    },
+    // ========== Regular natial active skills ==========
+    cbSkillDullmdalla: function (targetSpace) {
+        // deals 1 damage to the row containing the target
+        this.genericDamageRow(targetSpace, 1);
+    },
+    cbSkillXenofiend: function(targetSpace) {
+        // deals 5 damage to the target
+        this.genericDamageTarget(targetSpace, 5);
     }
 }
 

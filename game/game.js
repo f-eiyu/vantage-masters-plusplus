@@ -119,8 +119,8 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Debug Fire")));
-            _playerDeckTemplate.push(createCard(getFromDB("Debug Water")));
+            _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
+            _playerDeckTemplate.push(createCard(getFromDB("Xenofiend")));
             _playerDeckTemplate.push(createCard(getFromDB("Debug Earth")));
             _playerDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
             _playerDeckTemplate.push(createCard(getFromDB("Blaze")));

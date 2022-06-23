@@ -275,9 +275,12 @@ class NatialSpace extends BoardSpace {
     get DOM() { return this._DOM; }
 
     // wrapper for dealing damage to the contained card instance
-    dealDamage(dmg) {
+    dealDamage(dmg, dmgSource = null) {
         this.innerCard.takeDamage(dmg);
-        if (this.innerCard.curHP <= 0) { this.destroyCard(); }
+        if (this.innerCard.curHP <= 0) {
+            this.destroyCard();
+            // ### dmgSource hook/callbacks here
+        }
     }
 
     // activates the skill on the currently selected card, on the target at
