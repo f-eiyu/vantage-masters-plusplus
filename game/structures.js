@@ -154,7 +154,7 @@ class NatialCard extends Card {
 
     // wrapper for the skill effect's callback
     skillCallback(target) {
-        natialActiveCallbacks[this.innerCardSkillCallbackName](target);
+        natialActiveCallbacks[this.skillCbName](target);
     }
 }
 
@@ -208,7 +208,7 @@ class BoardSpace {
 
     // removes a card from the board or hand and adds it to the discard list
     destroyCard() {
-        destroyedCards[this._owner].push(this.innerCard);
+        destroyedCards.byPlayer(this.owner).push(this.innerCard);
         this._clear();
     }
 
@@ -282,10 +282,11 @@ class NatialSpace extends BoardSpace {
 
     // activates the skill on the currently selected card, on the target at
     // targetSpace, then flags the natial's skill as used.
-    activateSkill(targetSpace) { // belongs in Card class, wrapper and logic here
+    activateSkill(targetSpace) { // ### belongs in Card class, wrapper and logic here
+        const player = getPlayer(this.owner);
         this.innerCard.skillCallback(targetSpace);
         if (this.innerCard.isMaster) { // masters use mana for skills
-            currentMana[this._owner] -= this.innerCard.skillCost;
+            player.currentMana -= this.innerCard.skillCost;
         } else { // regular natials' skills are one time use
             this.innerCard.skillReady = false;
         }
@@ -337,7 +338,7 @@ class NatialZone {
     get empty() {
         const empty = []
         empty.push(...this._front.filter(sp => !sp.hasCard));
-        empty.push(...this._back.filter(sp => ~sp.hasCard));
+        empty.push(...this._back.filter(sp => !sp.hasCard));
         return empty;
     }
     // returns true if every NatialSpace instance has a card
@@ -354,6 +355,11 @@ class NatialZone {
 
         const thisRow = this.getRow(row);
         return thisRow[index];
+    }
+    // returns a random empty NatialSpace instance
+    getRandomEmpty() {
+        const empty = this.empty;
+        return empty[Math.floor(Math.random() * empty.length)];
     }
     // returns true if the specified natial is occluded and false otherwise. a
     // natial is occluded if it is in the back row and there is at least one
@@ -433,6 +439,11 @@ class NatialZone {
         nonEmpty.forEach((natialSpace, i) => callback(natialSpace.innerCard, i));
     }
 
+    // removes one turn of seal from every card
+    decrementSeal() {
+        this.forAllCards(card => card.sealed--);
+    }
+
     // re-draws each NatialSpace instance, including empty ones
     render() {
         this._front.forEach(space => space.render());
@@ -442,7 +453,7 @@ class NatialZone {
 
 class Hand {
     constructor(player) {
-        this._handCards = Array(6).fill(null).map((el, i) => new HandSpace(player, i));
+        this._handSpaces = Array(6).fill(null).map((el, i) => new HandSpace(player, i));
     }
 
     // returns the HandSpace instance at the specified index
@@ -451,7 +462,7 @@ class Hand {
             throw "Hand index out of bounds!";
         }
 
-        return this._handCards[index];
+        return this._handSpaces[index];
     }
     // returns the index of the first empty handSpace in Hand. if there are 
     // no empty handSpaces, returns HAND_SIZE_LIMIT.
@@ -467,13 +478,13 @@ class Hand {
     get isFull() { return (this.firstEmpty === HAND_SIZE_LIMIT); }
     get isEmpty() { return (this.firstEmpty === 0); }
     get cardCount() {
-        return this._handCards.reduce((cardTotal, nextSpace) => {
+        return this._handSpaces.reduce((cardTotal, nextSpace) => {
             return cardTotal + (nextSpace.hasCard ? 1 : 0);
         }, 0);
     }
     // returns all non-empty HandSpace instances
     get nonEmpty() {
-        return this._handCards.filter(sp => sp.hasCard);
+        return this._handSpaces.filter(sp => sp.hasCard);
     }
 
     // places the specified card in the indicated HandSpace instance if it
@@ -499,7 +510,7 @@ class Hand {
 
     // re-draws each HandSpace, including empty ones
     render() {
-        this._handCards.forEach(space => space.render());
+        this._handSpaces.forEach(space => space.render());
     }
 }
 
@@ -585,7 +596,7 @@ class Player {
         // fail if target space is occupied
         if (targetSpace.hasCard) { return false; }
         // fail if insufficient mana
-        if (this.mana < toSummonSpace.innerCard.cost) { return false; }
+        if (this.currentMana < toSummonSpace.innerCard.cost) { return false; }
 
         return true;
     }

@@ -37,7 +37,7 @@ const incrementTurnCounter = () => {
 const friendlyStartTurn = () => {
     incrementTurnCounter();
     renderTurnCounter();
-
+    
     friendlyPlayer.refreshNatials();
     friendlyPlayer.refreshMana();
     friendlyPlayer.drawCard();
@@ -47,6 +47,7 @@ const friendlyStartTurn = () => {
 
 const friendlyEndTurn = () => {
     playerCanInteract = false;
+    friendlyPlayer.natialZone.decrementSeal();
 
     enemyStartTurn();
 }
@@ -64,7 +65,10 @@ const enemyStartTurn = () => {
 }
 
 const enemyEndTurn = () => {
-    if (!gameEnd) { friendlyStartTurn(); }
+    if (!gameEnd) {
+        enemyPlayer.natialZone.decrementSeal();
+        friendlyStartTurn();
+    }
 }
 
 // adds the specified listener and cb to every DOM element with className
@@ -85,7 +89,7 @@ const attachEventListeners = () => {
 
     addListenerToAll("contextmenu", natialRightClick, "friendly-natial-space");
 
-    // addListenerToAll("click", natialLeftClick, "enemy-hand-space");
+    addListenerToAll("click", natialLeftClick, "enemy-hand-space");
     addListenerToAll("click", natialLeftClick, "enemy-natial-space");
     addListenerToAll("click", natialLeftClick, "friendly-natial-space");
     // addListenerToAll("click", natialLeftClick, "friendly-hand-space");
@@ -119,18 +123,19 @@ const initializeGameBoard = () => {
             _playerDeckTemplate.push(createCard(getFromDB("Debug Water")));
             _playerDeckTemplate.push(createCard(getFromDB("Debug Earth")));
             _playerDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
-            _playerDeckTemplate.push(createCard(getFromDB("Disaster")));
+            _playerDeckTemplate.push(createCard(getFromDB("Blaze")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Fire")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Water")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Earth")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
             _enemyDeckTemplate.push(createCard(getFromDB("Uptide")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Sister")));
+        _playerDeckTemplate.push(createCard(getFromDB("Tyrant")));
         _enemyDeckTemplate.push(createCard(getFromDB("Ranger")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
     enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
+    skillUsage = new NatialSkillEvent(null, false);
     game = new GameBoard();
     destroyedCards = new DestroyedCards();
 

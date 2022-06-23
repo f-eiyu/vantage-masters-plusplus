@@ -181,9 +181,9 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": false,
-        "skillCost": null,
-        "skillCallbackName": null,
+        "hasSkill": true,
+        "skillCost": 3,
+        "skillCallbackName": "cbSkillKnight",
         "hasPassive": false,
         "passiveCallbackName": null
     },
@@ -223,9 +223,9 @@ const cardDB = [
         "isQuick": false,
         "isMaster": true,
 
-        "hasSkill": "cbSkillWitch",
+        "hasSkill": true,
         "skillCost": 3,
-        "skillCallbackName": null,
+        "skillCallbackName": "cbSkillWitch",
         "hasPassive": false,
         "passiveCallbackName": null
     },
@@ -293,7 +293,7 @@ const cardDB = [
         "passiveCallbackName": null
     },
     {
-        "name": "Sorceror",
+        "name": "Sorcerer",
         "portrait": null,
         "cost": 5,
         "type": "natial",
@@ -309,7 +309,7 @@ const cardDB = [
 
         "hasSkill": true,
         "skillCost": 3,
-        "skillCallbackName": "cbSkillSorceror",
+        "skillCallbackName": "cbSkillSorcerer",
         "hasPassive": false,
         "passiveCallbackName": null
     },

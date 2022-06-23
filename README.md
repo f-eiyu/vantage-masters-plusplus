@@ -9,6 +9,7 @@ re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 
 ## todo
 - give wall and seal visual feedback
+- remove ability to drag other cards while skill is selected
 
 ## User stories
 ### MVP goals

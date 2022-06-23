@@ -54,7 +54,6 @@ const skillValidators = {
         if (!destroyedCards.listNatials(owner).length) { return false; }
 
         return true;
-
     },
     cbSkillBeast: function(skillSpace, targetSpace) {
         return (this.validateTargetless(skillSpace, targetSpace)
@@ -77,7 +76,9 @@ const skillValidators = {
         return true;
     },
     cbSkillSpirit: function(skillSpace, targetSpace) {
-        return this.validateBuffGeneric(skillSpace, targetSpace);
+        // fail if targeting self (mostly because it's useless)
+        return (this.validateBuffGeneric(skillSpace, targetSpace)
+                && skillSpace !== targetSpace);
     },
     cbSkillBard: function(skillSpace, targetSpace) {
         return this.validateOffensiveGeneric(skillSpace, targetSpace);
@@ -86,42 +87,21 @@ const skillValidators = {
         return this.validateOffensiveGeneric(skillSpace, targetSpace);
     },
 
-    // ========== Other natial skill validators ==========
+    // ========== Regular natial skill validators ==========
 }
 
 const skillUseValidation = (userSpace, targetSpace) => {
     const player = getPlayer(userSpace.owner);
     const userCard = userSpace.innerCard;
 
-    // always fail if natial skill and insufficient mana
+    // always fail if master skill and insufficient mana
     if (userCard.isMaster && userCard.skillCost > player.currentMana) {
         return false;
     }
 
     // validate the skill's usage based on the skill
-    const cbName = userSpace.innerCard.skillCallbackName;
+    const cbName = userSpace.innerCard.skillCbName;
     return skillValidators[cbName](userSpace, targetSpace);
-
-
-
-    // const userSpace = skillUsage.userSpace;
-
-   
-
-
-
-    switch(cbName) {
-
-        // shadow: must check if enemy has a card in hand - after hand refactor
-        case "cbSkillShadow":
-
-        // paladin: must check if the player has dead cards and if board is full - after board refactor
-        case "cbSkillPaladin":
-
-
-
-        default: return false;
-    }
 }
 
 const natialRightClick = (event) => {
@@ -150,12 +130,100 @@ const natialLeftClick = (event) => {
     // if no skill is being used, left clicking should never succeed.
     if (!skillUsage.selected) { return; }
 
+    const skillUser = skillUsage.userSpace;
     const thisLeftClick = new CardDOMEvent(event.target);
     const thisLeftClickSpace = thisLeftClick.spaceObj;
 
-    if (skillUseValidation(thisLeftClickSpace)) {
-        skillUsage.userSpace.DOM.classList.remove("skill-selected");
-        skillUsage.userSpace.activateSkill(thisLeftClickSpace);
+    if (skillUseValidation(skillUser, thisLeftClickSpace)) {
+        skillUser.DOM.classList.remove("skill-selected");
+        skillUser.activateSkill(thisLeftClickSpace);
         skillUsage.purge();
     }
+}
+
+const natialActiveCallbacks = {
+    cbSkillSister: function(targetSpace) {
+        // heals the target for 2 HP
+        const targetCard = targetSpace.innerCard;
+
+        restoreHP(targetCard, 2);
+    },
+    cbSkillKnight: function(targetSpace) {
+        // all allied natials gain 1 ATK
+        const player = getPlayer(targetSpace.owner);
+
+        player.natialZone.forAllCards(card => card.buffAtk(1));
+    },
+    cbSkillThief: function(targetSpace) {
+        // draws a card
+        const player = getPlayer(targetSpace.owner);
+        player.drawCard();
+    },
+    cbSkillWitch: function(targetSpace) {
+        // deals 4 damage to the target
+        targetSpace.dealDamage(4);
+    },
+    cbSkillPaladin: function(targetSpace) {
+        // revives a random destroyed natial
+        // ### probably refactor this along with DestroyedCards in the future
+        const owner = targetSpace.owner;
+        const natialZone = getPlayer(owner).natialZone;
+
+        const deadNatials = destroyedCards.listNatials(owner);
+        const cardToRevive = deadNatials[Math.floor(Math.random() * deadNatials.length)];
+
+        // bring the selected natial back to the board with restored HP, no
+        // actions, and no seal; carry over its other pre-death stats
+        cardToRevive.curHP = cardToRevive.maxHP;
+        cardToRevive.currentActions = 0;
+        cardToRevive.canMove = false;
+        cardToRevive.sealed = 0;
+        const destSpace = natialZone.getRandomEmpty();
+        natialZone.cardToZone(destSpace, cardToRevive);
+
+        // remove the revived natial from destroyedCards
+        const revivedIndex = destroyedCards.byPlayer(owner).indexOf(cardToRevive);
+        destroyedCards.byPlayer(owner).splice(revivedIndex, 1);
+    },
+    cbSkillBeast: function(targetSpace) {
+        // draws a card
+        this.cbSkillThief(targetSpace);
+    },
+    cbSkillSwordsman: function(targetSpace) {
+        // deals 1 damage to the row containing the target
+        const player = getPlayer(targetSpace.owner);
+
+        player.natialZone.forAllSpacesInRow(targetSpace.row, (sp) => {
+            sp.dealDamage(1);
+        });
+    },
+    cbSkillSorcerer: function(targetSpace) {
+        // adds a Magic Crystal spell to the hand
+        const player = getPlayer(targetSpace.owner);
+        const firstEmpty = player.hand.firstEmpty;
+        const magicCrystal = createCard(getFromDB("Magic Crystal"));
+        
+        player.hand.cardToHand(firstEmpty, magicCrystal);
+    },
+    cbSkillShadow: function(targetSpace) {
+        // destroys the target card (in the opponent's hand)
+        targetSpace.destroyCard();
+    },
+    cbSkillSpirit: function(targetSpace) {
+        // gives the target an extra action (but not an extra move)
+        targetSpace.innerCard.currentActions += 1;
+    },
+    cbSkillBard: function(targetSpace) {
+        // seals the target for 1 (additional) turn
+        targetSpace.innerCard.sealed++;
+    },
+    cbSkillTyrant: function(targetSpace) {
+        // deals 3 damage to all enemies
+        const natialZone = getPlayer(targetSpace.owner).natialZone;
+        natialZone.forAllSpaces(sp => sp.dealDamage(3));
+    }
+}
+
+const natialPassiveCallbacks = {
+
 }
