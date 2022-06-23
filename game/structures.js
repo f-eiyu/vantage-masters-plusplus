@@ -153,8 +153,8 @@ class NatialCard extends Card {
     }
 
     // wrapper for the skill effect's callback
-    skillCallback(target) {
-        natialActiveCallbacks[this.skillCbName](target);
+    skillCallback(userSpace, targetSpace) {
+        natialActiveCallbacks[this.skillCbName](userSpace, targetSpace);
     }
 }
 
@@ -287,7 +287,7 @@ class NatialSpace extends BoardSpace {
     // targetSpace, then flags the natial's skill as used.
     activateSkill(targetSpace) { // ### belongs in Card class, wrapper and logic here
         const player = getPlayer(this.owner);
-        this.innerCard.skillCallback(targetSpace);
+        this.innerCard.skillCallback(this, targetSpace);
         if (this.innerCard.isMaster) { // masters use mana for skills
             player.currentMana -= this.innerCard.skillCost;
         } else { // regular natials' skills are one time use
@@ -722,14 +722,6 @@ class GameBoard {
         const myElement = attacker.element;
         const oppAtk = target.attack;
         const oppElement = target.element;
-
-        const TYPE_CHART = [ // row = attacker, col = target
-            [0, 0, 0, 0, 0], // ELEMENT_NONE attack
-            [0, 0, 2, 0, -2], // ELEMENT_FIRE attack
-            [0, -2, 0, 2, 0], // ELEMENT_HEAVEN attack
-            [0, 0, -2, 0, 2], // ELEMENT_EARTH attack
-            [0, 2, 0, -2, 0] // ELEMENT_WATER attack
-        ];
 
         // all damage is floored at zero, and counterattacks do 1 less damage
         // than a directed attack

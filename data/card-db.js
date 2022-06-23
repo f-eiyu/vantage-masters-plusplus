@@ -183,8 +183,333 @@ const cardDB = [
         "passiveCallbackName": null
     },
     // Heaven Natials
+    {
+        "name": "Pelitt",
+        "portrait": null,
+        "cost": 1,
+        "type": "natial",
+
+        "element": "ELEMENT_HEAVEN",
+        "maxHP": 1,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillPelitt",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Guene-Foss",
+        "portrait": null,
+        "cost": 3,
+        "type": "natial",
+
+        "element": "ELEMENT_HEAVEN",
+        "maxHP": 3,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillGueneFoss",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Kyrier-Bell",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_HEAVEN",
+        "maxHP": 3,
+        "attack": 5,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillKyrierBell",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Fifenall",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_HEAVEN",
+        "maxHP": 6,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillFifenall",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Amoltamis",
+        "portrait": null,
+        "cost": 6,
+        "type": "natial",
+
+        "element": "ELEMENT_HEAVEN",
+        "maxHP": 6,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Regna-Croix",
+        "portrait": null,
+        "cost": 8,
+        "type": "natial",
+
+        "element": "ELEMENT_HEAVEN",
+        "maxHP": 7,
+        "attack": 5,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillRegnaCroix",
+        "passiveCallbackName": null
+    },
     // Earth Natials
+    {
+        "name": "Pa-Rancell",
+        "portrait": null,
+        "cost": 1,
+        "type": "natial",
+
+        "element": "ELEMENT_EARTH",
+        "maxHP": 1,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "D-Arma",
+        "portrait": null,
+        "cost": 2,
+        "type": "natial",
+
+        "element": "ELEMENT_EARTH",
+        "maxHP": 3,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillDArma",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Ae-Ferrion",
+        "portrait": null,
+        "cost": 3,
+        "type": "natial",
+
+        "element": "ELEMENT_EARTH",
+        "maxHP": 2,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Gia-Bro",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_EARTH",
+        "maxHP": 5,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillGiaBro",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Da-Colm",
+        "portrait": null,
+        "cost": 6,
+        "type": "natial",
+
+        "element": "ELEMENT_EARTH",
+        "maxHP": 8,
+        "attack": 6,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Ma-Gorb",
+        "portrait": null,
+        "cost": 7,
+        "type": "natial",
+
+        "element": "ELEMENT_EARTH",
+        "maxHP": 5,
+        "attack": 5,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": true,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillMaGorb",
+        "passiveCallbackName": null
+    },
     // Water Natials
+    {
+        "name": "Requ",
+        "portrait": null,
+        "cost": 1,
+        "type": "natial",
+
+        "element": "ELEMENT_WATER",
+        "maxHP": 1,
+        "attack": 1,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Marme",
+        "portrait": null,
+        "cost": 3,
+        "type": "natial",
+
+        "element": "ELEMENT_WATER",
+        "maxHP": 3,
+        "attack": 2,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillMarme",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Zamilpen",
+        "portrait": null,
+        "cost": 4,
+        "type": "natial",
+
+        "element": "ELEMENT_WATER",
+        "maxHP": 3,
+        "attack": 4,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillZamilpen",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Tarbyss",
+        "portrait": null,
+        "cost": 5,
+        "type": "natial",
+
+        "element": "ELEMENT_WATER",
+        "maxHP": 3,
+        "attack": 3,
+        "maxActions": 1,
+
+        "isRanged": true,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": null,
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Neptjuno",
+        "portrait": null,
+        "cost": 7,
+        "type": "natial",
+
+        "element": "ELEMENT_WATER",
+        "maxHP": 7,
+        "attack": 5,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillNeptjuno",
+        "passiveCallbackName": null
+    },
+    {
+        "name": "Tentarch",
+        "portrait": null,
+        "cost": 8,
+        "type": "natial",
+
+        "element": "ELEMENT_WATER",
+        "maxHP": 9,
+        "attack": 6,
+        "maxActions": 1,
+
+        "isRanged": false,
+        "isQuick": false,
+        "isMaster": false,
+
+        "skillCallbackName": "cbSkillTentarch",
+        "passiveCallbackName": null
+    },
+    
 
     // ========== Masters ==========
     {

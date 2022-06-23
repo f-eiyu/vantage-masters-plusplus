@@ -88,10 +88,52 @@ const skillValidators = {
     },
 
     // ========== Regular natial skill validators ==========
+    // Fire natials
     cbSkillDullmdalla: function(skillSpace, targetSpace) {
         return this.validateOffensiveGeneric(skillSpace, targetSpace);
     },
     cbSkillXenofiend: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    // Heaven natials
+    cbSkillPelitt: function(skillSpace, targetSpace) {
+        // fail if target is not sealed
+        return (this.validateBuffGeneric(skillSpace, targetSpace)
+                && targetSpace.innerCard.sealed);
+    },
+    cbSkillGueneFoss: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    cbSkillKyrierBell: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    cbSkillFifenall: function(skillSpace, targetSpace) {
+        return this.validateBuffGeneric(skillSpace, targetSpace);
+    },
+    cbSkillRegnaCroix: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    // Earth natials
+    cbSkillDArma: function(skillSpace, targetSpace) {
+        return this.validateBuffGeneric(skillSpace, targetSpace);
+    },
+    cbSkillGiaBro: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    cbSkillMaGorb: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    // Water natials
+    cbSkillMarme: function(skillSpace, targetSpace) {
+        return this.validateBuffGeneric(skillSpace, targetSpace);
+    },
+    cbSkillZamilpen: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    cbSkillNeptjuno: function(skillSpace, targetSpace) {
+        return this.validateOffensiveGeneric(skillSpace, targetSpace);
+    },
+    cbSkillTentarch: function(skillSpace, targetSpace) {
         return this.validateOffensiveGeneric(skillSpace, targetSpace);
     }
 }
@@ -117,8 +159,6 @@ const natialRightClick = (event) => {
     const userSpace = thisRightClick.spaceObj;
     const userCard = userSpace.innerCard;
     const player = getPlayer(userSpace.owner);
-
-    console.log(userCard.skillReady);
 
     if (!userSpace.hasCard) { return; }
     if (!userCard.skillReady) { return; }
@@ -149,42 +189,65 @@ const natialLeftClick = (event) => {
     }
 }
 
+const calculateSkillDamage = (userSpace, targetSpace, dmg) => {
+    const userElement = userSpace.innerCard.element;
+    const targetElement = targetSpace.innerCard.element;
+
+    return dmg + TYPE_CHART[userElement][targetElement];
+}
+
 const natialActiveCallbacks = {
     // Generic effects
-    genericDrawCard: function(targetSpace, n = 1) {
+    genericHealTarget: function(userSpace, targetSpace, hp) {
+        targetSpace.innerCard.restoreHP(hp);
+    },
+    genericDrawCard: function(userSpace, targetSpace, n = 1) {
         getPlayer(targetSpace.owner).drawCard(n);
     },
-    genericDamageTarget: function(targetSpace, dmg) {
-        targetSpace.dealDamage(dmg);
+    genericDamageTarget: function(userSpace, targetSpace, dmg) {
+        // this method checks for type advantage before passing the final damage
+        // into dealDamage(). all natial skills that do damage should be
+        // passed through this method before actually resolving.
+        const finalDmg = calculateSkillDamage(userSpace, targetSpace, dmg);
+        targetSpace.dealDamage(finalDmg);
     },
-    genericDamageRow: function(targetSpace, dmg) {
+    genericDamageRow: function(userSpace, targetSpace, dmg) {
         const natialZone = getPlayer(targetSpace.owner).natialZone;
-
-        natialZone.forAllSpacesInRow(targetSpace.row, sp => sp.dealDamage(dmg));
+        natialZone.forAllSpacesInRow(targetSpace.row, sp => {
+            this.genericDamageTarget(userSpace, sp, dmg);
+        });
+    },
+    genericDamageAll: function(userSpace, targetSpace, dmg) {
+        // deals 3 damage to all enemies
+        const natialZone = getPlayer(targetSpace.owner).natialZone;
+        natialZone.forAllSpaces(sp => {
+            this.genericDamageTarget(userSpace, sp, dmg);
+        });
+    },
+    genericSealTarget: function(userSpace, targetSpace, turns = 1) {
+        targetSpace.innerCard.sealed += turns;
     },
 
     // ========== Master active skills ==========
-    cbSkillSister: function(targetSpace) {
+    cbSkillSister: function(userSpace, targetSpace) {
         // heals the target for 2 HP
-        const targetCard = targetSpace.innerCard;
-
-        restoreHP(targetCard, 2);
+        this.genericHealTarget(userSpace, targetSpace, 2);
     },
-    cbSkillKnight: function(targetSpace) {
+    cbSkillKnight: function(userSpace, targetSpace) {
         // all allied natials gain 1 ATK
         const player = getPlayer(targetSpace.owner);
 
         player.natialZone.forAllCards(card => card.buffAtk(1));
     },
-    cbSkillThief: function(targetSpace) {
+    cbSkillThief: function(userSpace, targetSpace) {
         // draws a card
-        this.genericDrawCard(targetSpace);
+        this.genericDrawCard(userSpace, targetSpace);
     },
-    cbSkillWitch: function(targetSpace) {
+    cbSkillWitch: function(userSpace, targetSpace) {
         // deals 4 damage to the target
-        this.genericDamageTarget(targetSpace, 4);
+        this.genericDamageTarget(userSpace, targetSpace, 4);
     },
-    cbSkillPaladin: function(targetSpace) {
+    cbSkillPaladin: function(userSpace, targetSpace) {
         // revives a random destroyed natial
         // ### probably refactor this along with DestroyedCards in the future
         const owner = targetSpace.owner;
@@ -206,15 +269,15 @@ const natialActiveCallbacks = {
         const revivedIndex = destroyedCards.byPlayer(owner).indexOf(cardToRevive);
         destroyedCards.byPlayer(owner).splice(revivedIndex, 1);
     },
-    cbSkillBeast: function(targetSpace) {
+    cbSkillBeast: function(userSpace, targetSpace) {
         // draws a card
-        this.genericDrawCard(targetSpaec);
+        this.genericDrawCard(userSpace, targetSpace);
     },
-    cbSkillSwordsman: function(targetSpace) {
+    cbSkillSwordsman: function(userSpace, targetSpace) {
         // deals 1 damage to the row containing the target
-        this.genericDamageRow(targetSpace, 1);
+        this.genericDamageRow(userSpace, targetSpace, 1);
     },
-    cbSkillSorcerer: function(targetSpace) {
+    cbSkillSorcerer: function(userSpace, targetSpace) {
         // adds a Magic Crystal spell to the hand
         const player = getPlayer(targetSpace.owner);
         const firstEmpty = player.hand.firstEmpty;
@@ -222,31 +285,80 @@ const natialActiveCallbacks = {
         
         player.hand.cardToHand(firstEmpty, magicCrystal);
     },
-    cbSkillShadow: function(targetSpace) {
+    cbSkillShadow: function(userSpace, targetSpace) {
         // destroys the target card (in the opponent's hand)
         targetSpace.destroyCard();
     },
-    cbSkillSpirit: function(targetSpace) {
+    cbSkillSpirit: function(userSpace, targetSpace) {
         // gives the target an extra action (but not an extra move)
         targetSpace.innerCard.currentActions += 1;
     },
-    cbSkillBard: function(targetSpace) {
+    cbSkillBard: function(userSpace, targetSpace) {
         // seals the target for 1 (additional) turn
-        targetSpace.innerCard.sealed++;
+        this.genericSealTarget(userSpace, targetSpace, 1);
     },
-    cbSkillTyrant: function(targetSpace) {
-        // deals 3 damage to all enemies
-        const natialZone = getPlayer(targetSpace.owner).natialZone;
-        natialZone.forAllSpaces(sp => sp.dealDamage(3));
+    cbSkillTyrant: function(userSpace, targetSpace) {
+        this.genericDamageAll(userSpace, targetSpace, 3);
     },
     // ========== Regular natial active skills ==========
+    // Fire natials
     cbSkillDullmdalla: function (targetSpace) {
         // deals 1 damage to the row containing the target
-        this.genericDamageRow(targetSpace, 1);
+        this.genericDamageRow(userSpace, targetSpace, 1);
     },
-    cbSkillXenofiend: function(targetSpace) {
+    cbSkillXenofiend: function(userSpace, targetSpace) {
         // deals 5 damage to the target
-        this.genericDamageTarget(targetSpace, 5);
+        this.genericDamageTarget(userSpace, targetSpace, 5);
+    },
+    // Heaven natials
+    cbSkillPelitt: function(userSpace, targetSpace) {
+        // removes seal from the target
+        targetSpace.innerCard.sealed = 0;
+    },
+    cbSkillGueneFoss: function(userSpace, targetSpace) {
+        // deals 2 damage to the target
+        this.genericDamageTarget(userSpace, targetSpace, 2);
+    },
+    cbSkillKyrierBell: function(userSpace, targetSpace) {
+        // deals 2 damage to the row containing the target
+        this.genericDamageRow(userSpace, targetSpace, 2);
+    },
+    cbSkillFifenall: function(userSpace, targetSpace) {
+        // restores 6 HP to the target
+        this.genericHealTarget(userSpace, targetSpace, 6);
+    },
+    cbSkillRegnaCroix: function(userSpace, targetSpace) {
+        // deals 3 damage to thet row containing the target
+        this.genericDamageRow(userSpace, targetSpace, 3);
+    },
+    // Earth natials
+    cbSkillDArma: function(userSpace, targetSpace) {
+        // restores 2 HP to target
+        this.genericHealTarget(userSpace, targetSpace, 2);
+    },
+    cbSkillGiaBro: function(userSpace, targetSpace) {
+        // deals 1 damage to the row containing the target
+        this.genericDamageRow(userSpace, targetSpace, 1);
+    },
+    cbSkillMaGorb: function(userSpace, targetSpace) {
+        this.genericSealTarget(userSpace, targetSpace, 2);
+    },
+    // Water natials
+    cbSkillMarme: function(userSpace, targetSpace) {
+        // restores 3 HP to the target
+        this.genericHealTarget(userSpace, targetSpace, 3);
+    },
+    cbSkillZamilpen: function(userSpace, targetSpace) {
+        // seals the target for 1 (additional) turn
+        this.genericSealTarget(userSpace, targetSpace);
+    },
+    cbSkillNeptjuno: function(userSpace, targetSpace) {
+        // deals 2 damage to the target
+        this.genericDamageTarget(userSpace, targetSpace, 2);
+    },
+    cbSkillTentarch: function(userSpace, targetSpace) {
+        // deals 4 damage to all enemies
+        this.genericDamageAll(userSpace, targetSpace, 4);
     }
 }
 

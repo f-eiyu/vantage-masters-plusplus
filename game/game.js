@@ -119,11 +119,11 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
-            _playerDeckTemplate.push(createCard(getFromDB("Xenofiend")));
-            _playerDeckTemplate.push(createCard(getFromDB("Debug Earth")));
-            _playerDeckTemplate.push(createCard(getFromDB("Debug Heaven")));
-            _playerDeckTemplate.push(createCard(getFromDB("Blaze")));
+            _playerDeckTemplate.push(createCard(getFromDB("Marme")));
+            _playerDeckTemplate.push(createCard(getFromDB("Zamilpen")));
+            _playerDeckTemplate.push(createCard(getFromDB("Neptjuno")));
+            _playerDeckTemplate.push(createCard(getFromDB("Tentarch")));
+            _playerDeckTemplate.push(createCard(getFromDB("Regna-Croix")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Fire")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Water")));
             _enemyDeckTemplate.push(createCard(getFromDB("Debug Earth")));
@@ -134,6 +134,7 @@ const initializeGameBoard = () => {
         _enemyDeckTemplate.push(createCard(getFromDB("Ranger")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
+    friendlyPlayer._maxMana = 10;
     enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
     skillUsage = new NatialSkillEvent(null, false);
     game = new GameBoard();
