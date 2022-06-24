@@ -212,14 +212,14 @@ const natialActiveCallbacks = {
         targetSpace.dealDamage(finalDmg, userSpace);
     },
     genericDamageRow: function(userSpace, targetSpace, dmg) {
-        const natialZone = getPlayer(targetSpace.owner).natialZone;
+        const natialZone = targetSpace.container;
         natialZone.forAllSpacesInRow(targetSpace.row, sp => {
             this.genericDamageTarget(userSpace, sp, dmg);
         });
     },
     genericDamageAll: function(userSpace, targetSpace, dmg) {
         // deals 3 damage to all enemies
-        const natialZone = getPlayer(targetSpace.owner).natialZone;
+        const natialZone = targetSpace.container;
         natialZone.forAllSpaces(sp => {
             this.genericDamageTarget(userSpace, sp, dmg);
         });
@@ -251,7 +251,7 @@ const natialActiveCallbacks = {
         // revives a random destroyed natial
         // ### probably refactor this along with DestroyedCards in the future
         const owner = targetSpace.owner;
-        const natialZone = getPlayer(owner).natialZone;
+        const natialZone = targetSpace.container;
 
         const deadNatials = destroyedCards.listNatials(owner);
         const cardToRevive = deadNatials[Math.floor(Math.random() * deadNatials.length)];
@@ -363,7 +363,7 @@ const natialActiveCallbacks = {
 }
 
 const recalculateAdjAuraPositions = (prevSpace, newSpace) => {
-    const natialZone = getPlayer(prevSpace.owner).natialZone;
+    const natialZone = prevSpace.container;
     const toRemove = natialZone.getAdjacents(prevSpace);
     const toAdd = natialZone.getAdjacents(newSpace);
 
@@ -389,7 +389,7 @@ const natialPassiveCallbacks = {
             getPlayer(deathSpace.owner).drawCard();
         },
         genericRemAuraAdj: function(deathSpace, cbName) {
-            const natialZone = getPlayer(deathSpace.owner).natialZone;
+            const natialZone = deathSpace.container;
             const adj = natialZone.getAdjacents(deathSpace);
             
             remAuraFor(adj, cbName);
@@ -399,7 +399,7 @@ const natialPassiveCallbacks = {
             this.genericRemAuraAdj(deathSpace, "cbPassivePaRancell");
         },
         cbPassiveDaColm: function(deathSpace) {
-            const natialZone = getPlayer(deathSpace.owner).natialZone;
+            const natialZone = deathSpace.container;
             natialZone.forAllSpacesInRow(deathSpace.row, sp => {
                 sp.remAura("cbPassiveDaColm");
             }, false);
@@ -417,7 +417,7 @@ const natialPassiveCallbacks = {
             this.genericDrawCard(deathSpace);
         },
         cbPassiveRegnaCroix: function (deathSpace) {
-            const natialZone = getPlayer(deathSpace.owner).natialZone;
+            const natialZone = deathSpace.container;
             natialZone.forAllSpaces(sp => sp.remAura("cbPassiveRegnaCroix"), false);
         }
     },
@@ -457,7 +457,6 @@ const natialPassiveCallbacks = {
     // here, but rather modify the aura lists of the spaces they affect and 
     // were affecting. the effects themselves are handled in the onAuraEnter 
     // and onAuraLeave hooks.
-    // ### could potentially refactor Amoltanis as a self-only aura?
     onMove: {
         genericSetAndRemAuras: function(prevSpace, nextSpace, cbName) {
             const toChange = recalculateAdjAuraPositions(prevSpace, nextSpace);
@@ -478,7 +477,7 @@ const natialPassiveCallbacks = {
             // grant +1 HP to spaces in the same row
             if (prevSpace.row === newSpace.row) { return; }
 
-            const natialZone = getPlayer(prevSpace.owner).natialZone;
+            const natialZone = prevSpace.container;
             remAuraFor(natialZone.getRow(prevSpace.row), "cbPassiveDaColm");
             setAuraFor(natialZone.getRow(newSpace.row), "cbPassiveDaColm");
 
@@ -515,7 +514,7 @@ const natialPassiveCallbacks = {
             this.genericSetAuraAdj(summonSpace, "cbPassivePaRancell");
         },
         cbPassiveDaColm: function(summonSpace) {
-            const natialZone = getPlayer(summonSpace.owner).natialZone;
+            const natialZone = summonSpace.container;
             natialZone.forAllSpacesInRow(summonSpace.row, sp => {
                 sp.setAura("cbPassiveDaColm");
             }, false);
@@ -524,7 +523,7 @@ const natialPassiveCallbacks = {
             this.genericSetAuraAdj(summonSpace, "cbPassiveNeptjuno");
         },
         cbPassiveRegnaCroix: function(summonSpace) {
-            const natialZone = getPlayer(summonSpace.owner).natialZone;
+            const natialZone = summonSpace.container;
             natialZone.forAllSpaces(sp => sp.setAura("cbPassiveRegnaCroix"), false);
         },
         cbPassiveTyrant: function(summonSpace) {

@@ -350,7 +350,7 @@ class NatialSpace extends BoardSpace {
 
     // activates the skill on the currently selected card, on the target at
     // targetSpace, then flags the natial's skill as used.
-    activateSkill(targetSpace) { // ### belongs in Card class, wrapper and logic here
+    activateSkill(targetSpace) {
         const player = getPlayer(this.owner);
         this.innerCard.skillCallback(this, targetSpace);
         if (this.innerCard.isMaster) { // masters use mana for skills
@@ -514,8 +514,6 @@ class NatialZone {
         }
 
         const postAuras = targetSpace.auras.slice();
-
-        console.log(preAuras, postAuras); // ###
 
         // remove previous aura effects and apply new aura effects to the card,
         // skipping any auras on both moverSpace and targetSpace
