@@ -930,9 +930,6 @@ class GameBoard {
     validateSummon(toSummonSpace, targetSpace) {
         const player = toSummonSpace.owner;
         return getPlayer(player).validateSummon(toSummonSpace, targetSpace);
-
-        // onMoveSummon hook
-
     }
 
     // wrapper for summoning a natial
