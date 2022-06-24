@@ -70,7 +70,7 @@ class NatialCard extends Card {
         // temporary status effects
         this._sealedTurns = 0;
         this._shieldedTurns = 0;
-        this._protectedStatus = false;
+        this._protected = 0;
 
         // passive callbacks - placeholder for now
         this._cardPassiveCbName = cardProto.passiveCallbackName;
@@ -93,7 +93,7 @@ class NatialCard extends Card {
     get isMaster() { return this._cardIsMaster; }
     get sealed() { return this._sealedTurns; }
     get shielded() { return this._shieldedTurns; }
-    get protected() { return this._protectedStatus; }
+    get protected() { return this._protected; }
     get hasPassive() { return Boolean(this._cardPassiveCbName); }
     get passiveCbName() { return this._cardPassiveCbName; }
     get hasSkill() { return Boolean(this._cardSkillCbName); }
@@ -119,7 +119,7 @@ class NatialCard extends Card {
     set canMove(newCanMove) { this._cardCanMove = newCanMove; }
     set sealed(newSealed) { this._sealedTurns = Math.max(newSealed, 0); }
     set shielded(newShield) { this._shieldedTurns = Math.max(newShield, 0); }
-    set protected(newProt) { this._protectedStatus = newProt; }
+    set protected(newProt) { this._protected = newProt; }
     set skillReady(newReady) { this._cardSkillReady = newReady; }
 
     // deals the specified amount of damage to this natial, if applicable
@@ -257,9 +257,12 @@ class BoardSpace {
 }
 
 class NatialSpace extends BoardSpace {
-    constructor (owner, index, row) {
+    constructor (owner, index, row, container) {
         super(owner, index);
         this._row = row;
+        this._container = container;
+
+        this._auraList = [];
 
         const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
         const rowStr = (this.isFrontRow ? "front" : "back");
@@ -270,9 +273,41 @@ class NatialSpace extends BoardSpace {
     get isNatial() { return true; }
     get isHand() { return false; }
     get row() { return this._row; }
+    get container() { return this._container; }
+    get auras() { return this._auraList; }
     get isFrontRow() { return this._row === ROW_FRONT; }
     get isBackRow() { return this._row === ROW_BACK; }
     get DOM() { return this._DOM; }
+
+    // applies the specific named aura to this space
+    applyAura(cbName) {
+        // do not apply Pa-Rancell auras to each other
+        if (this.innerCard.name === "Pa-Rancell"
+            && cbName === "cbPassivePaRancell") { return; }
+
+        natialPassiveCallbacks.onAuraEnter[cbName](this);
+    }
+    // apply every aura affecting this space to the card in this space
+    applyAllAuras() {
+        for (let aura of this.auras) { this.applyAura(aura); }
+    }
+    setAura(cbName) {
+        // adds the specified aura to auraList
+        this._auraList.push(cbName);
+
+        // apply the aura's effect
+        if (this.hasCard) { this.applyAura(cbName); }
+    }
+    remAura(cbName) {
+        // remove the specified aura from auraList
+        const index = this._auraList.indexOf(cbName);
+        this._auraList.splice(index, 1);
+
+        // remove the aura's effect
+        if (this.hasCard) {
+            natialPassiveCallbacks.onAuraLeave[cbName](this);
+        }
+    }
 
     // wrapper for dealing damage to the contained card instance
     dealDamage(dmg, attackerSpace = null) {
@@ -289,11 +324,19 @@ class NatialSpace extends BoardSpace {
 
         // destroy and run relevant callbacks if target dies
         if (target.curHP <= 0) {
+            // currently, no card cares about the properties of the card it
+            // killed, so it's fine to put this here to avoid a possible
+            // infinite recursion in the onDeath hook. if such a natial were
+            // to be added in the future, this block and associated code may
+            // have to be restructured or expanded.
+            this.destroyCard();
+
             // onDeath hook
             if (target.hasPassive
                 && natialPassiveCallbacks.onDeath[target.passiveCbName]) {
                 natialPassiveCallbacks.onDeath[target.passiveCbName](this);
             }
+
             // onKill hook
             // specifically structured to NOT run if a counterattacker both got
             // a kill and died simultaneously.
@@ -302,8 +345,6 @@ class NatialSpace extends BoardSpace {
                 && natialPassiveCallbacks.onKill[attacker.passiveCbName]) {
                 natialPassiveCallbacks.onKill[attacker.passiveCbName](attackerSpace);
             }
-
-            this.destroyCard();
         }
     }
 
@@ -347,10 +388,18 @@ class HandSpace extends BoardSpace {
 
 class NatialZone {
     constructor(player) {
-        this._front = Array(4).fill(null).map((el, i) => new NatialSpace(player, i, ROW_FRONT));
-        this._back = Array(3).fill(null).map((el, i) => new NatialSpace(player, i, ROW_BACK));
+        this._front = Array(4).fill(null).map((el, i) => new NatialSpace(player, i, ROW_FRONT, this));
+        this._back = Array(3).fill(null).map((el, i) => new NatialSpace(player, i, ROW_BACK, this));
     }
 
+    // returns all NatialSpace instances
+    get allSpaces() {
+        const allSpaces = [];
+        allSpaces.push(...this._front);
+        allSpaces.push(...this._back);
+
+        return allSpaces;
+    }
     // returns all non-empty NatialSpace instances
     get nonEmpty() {
         const nonEmpty = [];
@@ -383,6 +432,21 @@ class NatialZone {
         const thisRow = this.getRow(row);
         return thisRow[index];
     }
+    // return the space(s) adjacent to the specified natialSpace instance
+    getAdjacents(space) {
+        const row = space.row;
+        const index = space.index;
+        const adjacents = [];
+
+        if (index !== 0) {
+            adjacents.push(this.getSpaceAt(row, index - 1));
+        }
+        if (index !== this.getRow(row).length - 1) {
+            adjacents.push(this.getSpaceAt(row, index + 1));
+        }
+
+        return adjacents;
+    }
     // returns a random empty NatialSpace instance
     getRandomEmpty() {
         const empty = this.empty;
@@ -400,6 +464,15 @@ class NatialZone {
         }
 
         return false;
+    }
+
+    // places the specified card in targetSpace if targetSpace is empty
+    cardToZone(targetSpace, card) {
+        if (targetSpace.hasCard) {
+            throw "already occupied natial space in cardToZone!";
+        }
+
+        targetSpace._cardToSpace(card);
     }
     
     // returns true if row and index are both valid parameters
@@ -426,39 +499,48 @@ class NatialZone {
         return true;
     }
 
-    // places the specified card in targetSpace if targetSpace is empty
-    cardToZone(targetSpace, card) {
-        if (targetSpace.hasCard) {
-            throw "already occupied natial space in cardToZone!";
-        }
-
-        targetSpace._cardToSpace(card);
-    }
-
     // transfers the card instance in moverSpace to targetSpace
     moveNatial(moverSpace, targetSpace) {
         const mover = moverSpace.innerCard;
+        const preAuras = moverSpace.auras.slice();
 
         this.cardToZone(targetSpace, mover);
         mover.canMove = false;
         moverSpace._clear();
 
+        // onMove hook
+        if (natialPassiveCallbacks.onMove[mover.passiveCbName]) {
+            natialPassiveCallbacks.onMove[mover.passiveCbName](moverSpace, targetSpace);
+        }
+
+        const postAuras = targetSpace.auras.slice();
+
+        console.log(preAuras, postAuras); // ###
+
+        // remove previous aura effects and apply new aura effects to the card,
+        // skipping any auras on both moverSpace and targetSpace
+        const toRemove = preAuras.filter(cb => !postAuras.includes(cb));
+        const toAdd = postAuras.filter(cb => !preAuras.includes(cb));
+        for (let cb of toRemove) { // call on targetSpace, where the card is now
+            natialPassiveCallbacks.onAuraLeave[cb](targetSpace);
+        }
+        for (let cb of toAdd) {
+            natialPassiveCallbacks.onAuraEnter[cb](targetSpace);
+        }
+
         game.renderAll();
     }
 
-    // performs the indicated callback with each NON-EMPTY space in the
-    // indicated row.
-    forAllSpacesInRow(row, callback) {
-        if (row === ROW_FRONT) {
-            this._front.filter(sp => sp.hasCard).forEach((space, i) => callback(space, i));
-        } else if (row === ROW_BACK) {
-            this._back.filter(sp => sp.hasCard).forEach((space, i) => callback(space, i));
-        }
+    // performs the indicated callback with each space in the indicated row.
+    forAllSpacesInRow(row, callback, skipEmpty = true) {
+        const spaces = (skipEmpty ? this.getRow(row).filter(sp => sp.hasCard) : this.getRow(row));
+
+        spaces.forEach((space, i) => callback(space, i));
     }
-    // performs the indicated callback with each NON-EMPTY natial space.
-    forAllSpaces(callback) {
-        const nonEmpty = this.nonEmpty;
-        nonEmpty.forEach((natialSpace, i) => callback(natialSpace, i));
+    // performs the indicated callback with each natial space.
+    forAllSpaces(callback, skipEmpty = true) {
+        const spaces = (skipEmpty ? this.nonEmpty : this.allSpaces);
+        spaces.forEach((natialSpace, i) => callback(natialSpace, i));
     }
     // as above, but on the cards in the spaces.
     forAllCards(callback) {
@@ -475,6 +557,13 @@ class NatialZone {
     render() {
         this._front.forEach(space => space.render());
         this._back.forEach(space => space.render());
+    }
+
+    // debug
+    viewAuras() {
+        this.forAllSpaces((space) => {
+            console.log(space.row, space.index, space.auras);
+        }, false);
     }
 }
 
@@ -586,6 +675,10 @@ class Player {
         // players always start with their master on the middle of the back row
         const targetSpace = this._natialZone.getSpaceAt(ROW_BACK, 1);
         this._natialZone.cardToZone(targetSpace, this._master);
+        // force onSummon callbacks for each player's master, if applicable
+        if (natialPassiveCallbacks.onSummon[this._master.passiveCbName]) {
+            natialPassiveCallbacks.onSummon[this._master.passiveCbName](targetSpace);
+        }
     }
 
     get natialZone() { return this._natialZone; }
@@ -643,6 +736,20 @@ class Player {
         } else {
             summonedNatial.currentActions = 0;
             summonedNatial.canMove = false;
+        }
+
+        // onSummon hook
+        const cbName = summonedNatial.passiveCbName;
+        if (natialPassiveCallbacks.onSummon[cbName]) {
+            natialPassiveCallbacks.onSummon[cbName](targetSpace);
+        }
+        // onAuraEnter hook
+        targetSpace.applyAllAuras();
+        // if the summoned natial created an aura on its own space, it will
+        // now have applied that aura twice, which is incorrect. in this case,
+        // we remove one application of the aura.
+        if (targetSpace.auras.includes(cbName)) {
+            natialPassiveCallbacks.onAuraLeave[cbName](targetSpace);
         }
 
         // summoning will always require a re-render
@@ -716,19 +823,15 @@ class GameBoard {
         return true;
     }
 
-    // technically, the movement functions below could live in NatialZone and
-    // be just fine, since they don't require interaction with a different
-    // player or a different part of the board. they're here for consistency
-    // and ease of use more than anything else.
-
     // returns true if the card in moverSpace can move to targetSpace, and
-    // false otherwise.
+    // false otherwise. largely a wrapper.
     validateMovement(moverSpace, targetSpace) {
         const player = getPlayer(moverSpace.owner);
         return player.natialZone.validateMovement(moverSpace, targetSpace);
     }
 
-    // transfers the card instance in moverSpace to targetspace
+    // transfers the card instance in moverSpace to targetSpace. largely a
+    // wrapper.
     moveNatial(moverSpace, targetSpace) {
         const player = getPlayer(moverSpace.owner);
         player.natialZone.moveNatial(moverSpace, targetSpace);
@@ -784,6 +887,8 @@ class GameBoard {
 
         // fail if either attacker or target does not exist
         if (!attacker || !target) { return false; }
+        // fail if the target is protected
+        if (target.protected) { return false; }
         // fail if attacker and target aren't opposed
         if (attackerSpace.owner === targetSpace.owner) { return false; }
         // fail if the card can't act
@@ -825,6 +930,9 @@ class GameBoard {
     validateSummon(toSummonSpace, targetSpace) {
         const player = toSummonSpace.owner;
         return getPlayer(player).validateSummon(toSummonSpace, targetSpace);
+
+        // onMoveSummon hook
+
     }
 
     // wrapper for summoning a natial

@@ -137,22 +137,22 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Oonvievle")));
-            _playerDeckTemplate.push(createCard(getFromDB("Oonvievle")));
-            _playerDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _playerDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _playerDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Oonvievle")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Paladin")));
-        _enemyDeckTemplate.push(createCard(getFromDB("Witch")));
+        _playerDeckTemplate.push(createCard(getFromDB("Tyrant")));
+        _enemyDeckTemplate.push(createCard(getFromDB("Tyrant")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
-    friendlyPlayer._maxMana = 10; // ###
+    friendlyPlayer._maxMana = 10;
     enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
     skillUsage = new NatialSkillEvent(null, false);
     game = new GameBoard();

@@ -362,18 +362,47 @@ const natialActiveCallbacks = {
     }
 }
 
-const natialPassiveCallbacks= {
+const recalculateAdjAuraPositions = (prevSpace, newSpace) => {
+    const natialZone = getPlayer(prevSpace.owner).natialZone;
+    const toRemove = natialZone.getAdjacents(prevSpace);
+    const toAdd = natialZone.getAdjacents(newSpace);
+
+    // skip anything that's targeted for both removal and addition
+    const toRemoveFinal = toRemove.filter(sp => !toAdd.includes(sp));
+    const toAddFinal = toAdd.filter(sp => !toRemove.includes(sp));
+
+    return [toRemoveFinal, toAddFinal];
+}
+
+const setAuraFor = (spaces, cbName) => {
+    for (let space of spaces) { space.setAura(cbName); }
+}
+
+const remAuraFor = (spaces, cbName) => {
+    for (let space of spaces) { space.remAura(cbName); }
+}
+
+const natialPassiveCallbacks = {
     // callback when the card dies
     onDeath: {
         genericDrawCard: function(deathSpace) {
             getPlayer(deathSpace.owner).drawCard();
         },
-
-        cbPassivePaRancell: function() {
-            // remove protection from adjacent spaces
+        genericRemAuraAdj: function(deathSpace, cbName) {
+            const natialZone = getPlayer(deathSpace.owner).natialZone;
+            const adj = natialZone.getAdjacents(deathSpace);
+            
+            remAuraFor(adj, cbName);
         },
-        cbPassiveDaColm: function() {
-            // undo buff of HP +1 to cards in the same row
+
+        cbPassivePaRancell: function(deathSpace) {
+            this.genericRemAuraAdj(deathSpace, "cbPassivePaRancell");
+        },
+        cbPassiveDaColm: function(deathSpace) {
+            const natialZone = getPlayer(deathSpace.owner).natialZone;
+            natialZone.forAllSpacesInRow(deathSpace.row, sp => {
+                sp.remAura("cbPassiveDaColm");
+            }, false);
         },
         cbPassiveRequ: function(deathSpace) {
             this.genericDrawCard(deathSpace);
@@ -381,14 +410,15 @@ const natialPassiveCallbacks= {
         cbPassiveTarbyss: function(deathSpace) {
             this.genericDrawCard(deathSpace);
         },
-        cbPassiveNeptjuno: function() {
-            // remove protection from adjacent spaces
+        cbPassiveNeptjuno: function(deathSpace) {
+            this.genericRemAuraAdj(deathSpace, "cbPassiveNeptjuno");
         },
         cbPassiveFifenall: function(deathSpace) {
             this.genericDrawCard(deathSpace);
         },
-        cbPassiveRegnaCroix: function () {
-            // ATK +1 for all Heaven
+        cbPassiveRegnaCroix: function (deathSpace) {
+            const natialZone = getPlayer(deathSpace.owner).natialZone;
+            natialZone.forAllSpaces(sp => sp.remAura("cbPassiveRegnaCroix"), false);
         }
     },
     // callback when the card destroys an opposing natial
@@ -422,54 +452,147 @@ const natialPassiveCallbacks= {
             this.genericBuffAtk(attackerSpace, 2);
         }
     },
-    // callback when the card moves, after the movement has happened
+    // callback after the card moves. the cards here with position-based 
+    // effects (everything except Amoltamis) do not actually do their effects 
+    // here, but rather modify the aura lists of the spaces they affect and 
+    // were affecting. the effects themselves are handled in the onAuraEnter 
+    // and onAuraLeave hooks.
+    // ### could potentially refactor Amoltanis as a self-only aura?
     onMove: {
-        cbPassiveTyrant: function() {
+        genericSetAndRemAuras: function(prevSpace, nextSpace, cbName) {
+            const toChange = recalculateAdjAuraPositions(prevSpace, nextSpace);
+            remAuraFor(toChange[0], cbName);
+            setAuraFor(toChange[1], cbName);
+        },
+
+        // auras
+        cbPassiveTyrant: function(prevSpace, newSpace) {
             // grant +2 HP/ATK to adjacent spaces
+            this.genericSetAndRemAuras(prevSpace, newSpace, "cbPassiveTyrant");
         },
-        cbPassivePaRancell: function() {
+        cbPassivePaRancell: function(prevSpace, newSpace) {
             // grant protection to adjacent spaces
+            this.genericSetAndRemAuras(prevSpace, newSpace, "cbPassivePaRancell");
         },
-        cbPassiveDaColm: function() {
+        cbPassiveDaColm: function(prevSpace, newSpace) {
             // grant +1 HP to spaces in the same row
+            if (prevSpace.row === newSpace.row) { return; }
+
+            const natialZone = getPlayer(prevSpace.owner).natialZone;
+            remAuraFor(natialZone.getRow(prevSpace.row), "cbPassiveDaColm");
+            setAuraFor(natialZone.getRow(newSpace.row), "cbPassiveDaColm");
+
+            // here, Da-Colm has "double-dipped" in its own aura, keeping the
+            // aura from before it moved and applying the new one on its own
+            // space after it moves. the solution is to simply remove one
+            // instance of the aura.
+            natialPassiveCallbacks.onAuraLeave["cbPassiveDaColm"](newSpace);
         },
-        cbPassiveNeptjuno: function() {
+        cbPassiveNeptjuno: function(prevSpace, newSpace) {
             // grant protection to adjacent spaces
+            this.genericSetAndRemAuras(prevSpace, newSpace, "cbPassiveNeptjuno");
         },
-        cbPassiveAmoltamis: function() {
-            // +2 attack if moved to front row
+
+        // the only non-aura effect
+        cbPassiveAmoltamis: function(prevSpace, newSpace) {
+            // +2 to Attack if on the front row
+            if (prevSpace.row === newSpace.row) { return; }
+            if (newSpace.row === ROW_FRONT) { newSpace.innerCard.buffAtk(2); }
+            else { newSpace.innerCard.buffAtk(-2); }
         }
     },
-    // callback when a card is summoned or moved into a space that another
-    // natial is buffing
-    onSpaceEffect: {
-        cbPassiveTyrant: function() {
-            // grant +2 HP/ATK to the inner card
+    // callback when a natial is summoned
+    onSummon: {
+        genericSetAuraAdj: function(summonSpace, cbName) {
+            const natialZone = summonSpace.container;
+            const adj = natialZone.getAdjacents(summonSpace);
+            
+            setAuraFor(adj, cbName);
         },
-        cbPassivePaRancell: function() {
-            // grant protection to the inner card
+
+        // auras
+        cbPassivePaRancell: function(summonSpace) {
+            this.genericSetAuraAdj(summonSpace, "cbPassivePaRancell");
         },
-        cbPassiveDaColm: function() {
-            // grant +1 HP to the inner card
+        cbPassiveDaColm: function(summonSpace) {
+            const natialZone = getPlayer(summonSpace.owner).natialZone;
+            natialZone.forAllSpacesInRow(summonSpace.row, sp => {
+                sp.setAura("cbPassiveDaColm");
+            }, false);
         },
-        cbPassiveNeptjuno: function() {
-            // grant protection to the inner card
+        cbPassiveNeptjuno: function(summonSpace) {
+            this.genericSetAuraAdj(summonSpace, "cbPassiveNeptjuno");
+        },
+        cbPassiveRegnaCroix: function(summonSpace) {
+            const natialZone = getPlayer(summonSpace.owner).natialZone;
+            natialZone.forAllSpaces(sp => sp.setAura("cbPassiveRegnaCroix"), false);
+        },
+        cbPassiveTyrant: function(summonSpace) {
+            this.genericSetAuraAdj(summonSpace, "cbPassiveTyrant");
+        },
+
+        // the only non-aura effect
+        cbPassiveAmoltamis: function(summonSpace) {
+            // +2 to Attack if on the front row
+            if (summonSpace.row === ROW_FRONT) {
+                summonSpace.innerCard.buffAtk(2);
+            }
         }
     },
-    // callback when a card is moved out of a space that another natial is
-    // buffing (reverses the effects of the above)
-    onSpaceEffectReverse: {
-        cbPassiveTyrant: function() {
-            // remove +2 HP/ATK from the inner card
+    // callback when a card enters a space with an aura
+    onAuraEnter: {
+        cbPassiveTyrant: function(effectSpace) {
+            console.log(effectSpace);
+            // grant +2 HP/ATK to the effect space
+            const card = effectSpace.innerCard;
+            card.buffAtk(2);
+            card.restoreHP(2);
         },
-        cbPassivePaRancell: function() {
-            // remove protection from the inner card
+        cbPassivePaRancell: function(effectSpace) {
+            // grant protection to the effect space
+            effectSpace.innerCard.protected++;
         },
-        cbPassiveDaColm: function() {
-            // remove +1 HP from the inner card
+        cbPassiveDaColm: function(effectSpace) {
+            // grant +1 HP to spaces in the same row
+            effectSpace.innerCard.restoreHP(1);
         },
-        cbPassiveNeptjuno: function() {
-            // remove protection from the inner card
+        cbPassiveNeptjuno: function(effectSpace) {
+            // grant protection to the effect space
+            effectSpace.innerCard.protected++;
+        },
+        cbPassiveRegnaCroix: function(effectSpace) {
+            // grant +1 ATK to all Heaven elemental natials
+            if (effectSpace.innerCard.element === ELEMENT_HEAVEN) {
+                effectSpace.innerCard.buffAtk(1);
+            }
+        }
+    },
+    // callback when a card leaves a space with an aura, or when an aura is
+    // removed from a space
+    onAuraLeave: {
+        cbPassiveTyrant: function(effectSpace) {
+            // removes the +2 HP/ATK buff; this CAN kill a card
+            const card = effectSpace.innerCard;
+            card.buffAtk(-2);
+            effectSpace.dealDamage(2);
+        },
+        cbPassivePaRancell: function(effectSpace) {
+            // removes protection from the effect space
+            effectSpace.innerCard.protected--;
+        },
+        cbPassiveDaColm: function(effectSpace) {
+            // removes the +1 HP buff; this CAN kill a card
+            effectSpace.dealDamage(1);
+        },
+        cbPassiveNeptjuno: function(effectSpace) {
+            // remove protection from the effect space
+            effectSpace.innerCard.protected--;
+        },
+        cbPassiveRegnaCroix: function(effectSpace) {
+            // removes the +1 ATK buff from all Heaven elemental natials
+            if (effectSpace.innerCard.element === ELEMENT_HEAVEN) {
+                effectSpace.innerCard.buffAtk(-1);
+            }
         }
     },
     // callback when the card takes damage
@@ -498,3 +621,4 @@ const natialPassiveCallbacks= {
         }
     }
 }
+
