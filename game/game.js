@@ -137,11 +137,11 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Pa-Rancell")));
-            _playerDeckTemplate.push(createCard(getFromDB("Pa-Rancell")));
-            _playerDeckTemplate.push(createCard(getFromDB("Pa-Rancell")));
-            _playerDeckTemplate.push(createCard(getFromDB("Pa-Rancell")));
-            _playerDeckTemplate.push(createCard(getFromDB("Pa-Rancell")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));

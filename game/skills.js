@@ -362,24 +362,35 @@ const natialActiveCallbacks = {
     }
 }
 
-const recalculateAdjAuraPositions = (prevSpace, newSpace) => {
-    const natialZone = prevSpace.container;
-    const toRemove = natialZone.getAdjacents(prevSpace);
-    const toAdd = natialZone.getAdjacents(newSpace);
+const fetchSpacesByAuraShape = (space, auraShape) => {
+    const natialZone = space.container;
+    const fetched = [];
 
-    // skip anything that's targeted for both removal and addition
-    const toRemoveFinal = toRemove.filter(sp => !toAdd.includes(sp));
-    const toAddFinal = toAdd.filter(sp => !toRemove.includes(sp));
+    switch (auraShape) {
+        case "adjacent":
+            fetched.push(...natialZone.getAdjacents(space));
+            break;
+        case "row":
+            fetched.push(...natialZone.getRow(space.row));
+            break;
+        case "all":
+            fetched.push(...natialZone.allSpaces);
+            break;
+        default:
+            return false;
+    }
 
-    return [toRemoveFinal, toAddFinal];
+    return fetched;
 }
 
-const setAuraFor = (spaces, cbName) => {
-    for (let space of spaces) { space.setAura(cbName); }
+const genericAddAura = (space, cbName, auraShape) => {
+    const addTo = fetchSpacesByAuraShape(space, auraShape);
+    addTo.forEach(sp => sp.auraHandler.addAura(cbName));
 }
 
-const remAuraFor = (spaces, cbName) => {
-    for (let space of spaces) { space.remAura(cbName); }
+const genericRemoveAura = (space, cbName, auraShape) => {
+    const remFrom = fetchSpacesByAuraShape(space, auraShape);
+    remFrom.forEach(sp => sp.auraHandler.remAura(cbName));
 }
 
 const natialPassiveCallbacks = {
@@ -388,21 +399,12 @@ const natialPassiveCallbacks = {
         genericDrawCard: function(deathSpace) {
             getPlayer(deathSpace.owner).drawCard();
         },
-        genericRemAuraAdj: function(deathSpace, cbName) {
-            const natialZone = deathSpace.container;
-            const adj = natialZone.getAdjacents(deathSpace);
-            
-            remAuraFor(adj, cbName);
-        },
 
         cbPassivePaRancell: function(deathSpace) {
-            this.genericRemAuraAdj(deathSpace, "cbPassivePaRancell");
+            genericRemoveAura(deathSpace, "cbPassivePaRancell", "adjacent");
         },
         cbPassiveDaColm: function(deathSpace) {
-            const natialZone = deathSpace.container;
-            natialZone.forAllSpacesInRow(deathSpace.row, sp => {
-                sp.remAura("cbPassiveDaColm");
-            }, false);
+            genericRemoveAura(deathSpace, "cbPassiveDaColm", "row");
         },
         cbPassiveRequ: function(deathSpace) {
             this.genericDrawCard(deathSpace);
@@ -411,14 +413,13 @@ const natialPassiveCallbacks = {
             this.genericDrawCard(deathSpace);
         },
         cbPassiveNeptjuno: function(deathSpace) {
-            this.genericRemAuraAdj(deathSpace, "cbPassiveNeptjuno");
+            genericRemoveAura(deathSpace, "cbPassiveNeptjuno", "adjacent");
         },
         cbPassiveFifenall: function(deathSpace) {
             this.genericDrawCard(deathSpace);
         },
         cbPassiveRegnaCroix: function (deathSpace) {
-            const natialZone = deathSpace.container;
-            natialZone.forAllSpaces(sp => sp.remAura("cbPassiveRegnaCroix"), false);
+            genericRemoveAura(deathSpace, "cbPassiveRegnaCroix", "all");
         }
     },
     // callback when the card destroys an opposing natial
@@ -454,42 +455,26 @@ const natialPassiveCallbacks = {
     },
     // callback after the card moves. the cards here with position-based 
     // effects (everything except Amoltamis) do not actually do their effects 
-    // here, but rather modify the aura lists of the spaces they affect and 
-    // were affecting. the effects themselves are handled in the onAuraEnter 
-    // and onAuraLeave hooks.
+    // here, but rather tell AuraHandler instances that their corresponding
+    // spaces are about to gain/lose auras. actual effects are below, in the
+    // onAuraApply and onAuraUnapply hooks.
     onMove: {
-        genericSetAndRemAuras: function(prevSpace, nextSpace, cbName) {
-            const toChange = recalculateAdjAuraPositions(prevSpace, nextSpace);
-            remAuraFor(toChange[0], cbName);
-            setAuraFor(toChange[1], cbName);
-        },
-
         // auras
         cbPassiveTyrant: function(prevSpace, newSpace) {
-            // grant +2 HP/ATK to adjacent spaces
-            this.genericSetAndRemAuras(prevSpace, newSpace, "cbPassiveTyrant");
+            genericAddAura(newSpace, "cbPassiveTyrant", "adjacent");
+            genericRemoveAura(prevSpace, "cbPassiveTyrant", "adjacent");
         },
         cbPassivePaRancell: function(prevSpace, newSpace) {
-            // grant protection to adjacent spaces
-            this.genericSetAndRemAuras(prevSpace, newSpace, "cbPassivePaRancell");
+            genericAddAura(newSpace, "cbPassivePaRancell", "adjacent");
+            genericRemoveAura(prevSpace, "cbPassivePaRancell", "adjacent");
         },
         cbPassiveDaColm: function(prevSpace, newSpace) {
-            // grant +1 HP to spaces in the same row
-            if (prevSpace.row === newSpace.row) { return; }
-
-            const natialZone = prevSpace.container;
-            remAuraFor(natialZone.getRow(prevSpace.row), "cbPassiveDaColm");
-            setAuraFor(natialZone.getRow(newSpace.row), "cbPassiveDaColm");
-
-            // here, Da-Colm has "double-dipped" in its own aura, keeping the
-            // aura from before it moved and applying the new one on its own
-            // space after it moves. the solution is to simply remove one
-            // instance of the aura.
-            natialPassiveCallbacks.onAuraLeave["cbPassiveDaColm"](newSpace);
+            genericAddAura(newSpace, "cbPassiveDaColm", "row");
+            genericRemoveAura(prevSpace, "cbPassiveDaColm", "row");
         },
         cbPassiveNeptjuno: function(prevSpace, newSpace) {
-            // grant protection to adjacent spaces
-            this.genericSetAndRemAuras(prevSpace, newSpace, "cbPassiveNeptjuno");
+            genericAddAura(newSpace, "cbPassiveNeptjuno", "adjacent");
+            genericRemoveAura(prevSpace, "cbPassiveNeptjuno", "adjacent");
         },
 
         // the only non-aura effect
@@ -502,32 +487,21 @@ const natialPassiveCallbacks = {
     },
     // callback when a natial is summoned
     onSummon: {
-        genericSetAuraAdj: function(summonSpace, cbName) {
-            const natialZone = summonSpace.container;
-            const adj = natialZone.getAdjacents(summonSpace);
-            
-            setAuraFor(adj, cbName);
-        },
-
         // auras
+        cbPassiveTyrant: function(summonSpace) {
+            genericAddAura(summonSpace, "cbPassiveTyrant", "adjacent");
+        },
         cbPassivePaRancell: function(summonSpace) {
-            this.genericSetAuraAdj(summonSpace, "cbPassivePaRancell");
+            genericAddAura(summonSpace, "cbPassivePaRancell", "adjacent");
         },
         cbPassiveDaColm: function(summonSpace) {
-            const natialZone = summonSpace.container;
-            natialZone.forAllSpacesInRow(summonSpace.row, sp => {
-                sp.setAura("cbPassiveDaColm");
-            }, false);
+            genericAddAura(summonSpace, "cbPassiveDaColm", "row");
         },
         cbPassiveNeptjuno: function(summonSpace) {
-            this.genericSetAuraAdj(summonSpace, "cbPassiveNeptjuno");
+            genericAddAura(summonSpace, "cbPassiveNeptjuno", "adjacent");
         },
         cbPassiveRegnaCroix: function(summonSpace) {
-            const natialZone = summonSpace.container;
-            natialZone.forAllSpaces(sp => sp.setAura("cbPassiveRegnaCroix"), false);
-        },
-        cbPassiveTyrant: function(summonSpace) {
-            this.genericSetAuraAdj(summonSpace, "cbPassiveTyrant");
+            genericAddAura(summonSpace, "cbPassiveRegnaCroix", "all");
         },
 
         // the only non-aura effect
@@ -538,13 +512,13 @@ const natialPassiveCallbacks = {
             }
         }
     },
-    // callback when a card enters a space with an aura
-    onAuraEnter: {
+    // callback when an aura is applied to a card for any reason
+    onAuraApply: {
         cbPassiveTyrant: function(effectSpace) {
-            console.log(effectSpace);
             // grant +2 HP/ATK to the effect space
             const card = effectSpace.innerCard;
             card.buffAtk(2);
+            console.log(effectSpace.row, effectSpace.index);
             card.restoreHP(2);
         },
         cbPassivePaRancell: function(effectSpace) {
@@ -566,9 +540,8 @@ const natialPassiveCallbacks = {
             }
         }
     },
-    // callback when a card leaves a space with an aura, or when an aura is
-    // removed from a space
-    onAuraLeave: {
+    // callback when an aura effect is removed from a card for any reason
+    onAuraUnapply: {
         cbPassiveTyrant: function(effectSpace) {
             // removes the +2 HP/ATK buff; this CAN kill a card
             const card = effectSpace.innerCard;

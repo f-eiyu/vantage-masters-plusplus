@@ -256,13 +256,147 @@ class BoardSpace {
     }
 }
 
+class AuraHandler {
+    constructor(natialSpace) {
+        this._auraList = [];
+        this._addQueueRaw = [];
+        this._removeQueueRaw = [];
+        this._container = natialSpace;
+
+        this._addQueue = [];
+        this._removeQueue = [];
+    }
+
+    get list() { return this._auraList; }
+
+    addAura(cbName) {
+        this._addQueueRaw.push(cbName);
+    }
+
+    remAura(cbName) {
+        this._removeQueueRaw.push(cbName);
+    }
+
+    // returns [arrayOne, arrayTwo] after any elements that they both share
+    // have been removed
+    removeIntersection(arrayOne, arrayTwo) {
+        const arrayOneFiltered = [];
+        const arrayTwoFiltered = arrayTwo.slice();
+
+        while (arrayOne.length) {
+            const thisElement = arrayOne.pop();
+            const indexInArrayTwo = arrayTwoFiltered.indexOf(thisElement);
+
+            if (indexInArrayTwo === -1) { // element is not in arrayTwo
+                arrayOneFiltered.push(thisElement);
+            } else { // element is in arrayTwo
+                // discard the first matching element in arrayTwoFiltered
+                // don't push anything into arrayOneFiltered
+                arrayTwoFiltered.splice(indexInArrayTwo, 1);
+            }
+        }
+
+        return [arrayOneFiltered, arrayTwoFiltered];
+    }
+
+    applyAura(cbName) {
+        this._auraList.push(cbName);
+
+        const space = this._container;
+        const card = space.innerCard;
+        if (card
+            && natialPassiveCallbacks.onAuraApply[cbName]) {
+            natialPassiveCallbacks.onAuraApply[cbName](space);
+        }
+    }
+
+    unapplyAura(cbName) {
+        const index = this._auraList.indexOf(cbName);
+        if (index !== -1) {
+            // unapply aura effects here
+        }
+        this._auraList.splice(index, 1);
+
+        const space = this._container;
+        const card = space.innerCard;
+        if (card
+            && natialPassiveCallbacks.onAuraUnapply[cbName]) {
+            natialPassiveCallbacks.onAuraUnapply[cbName](space);
+        }
+    }
+
+    processRawQueues() {
+        // clear anything that's in both the add queue and remove queue
+        // (this helps prevent wonky behavior with eg. cards immediately dying
+        // when an aura is removed and instantly replaced)
+        const toApply = this.removeIntersection(this._addQueueRaw, this._removeQueueRaw);
+        console.log(toApply);
+        this._addQueue.push(...toApply[0]);
+        this._removeQueue.push(...toApply[1]);
+
+        // reset raw queues
+        this._addQueueRaw = [];
+        this._removeQueueRaw = [];
+    }
+
+    applyQueues() {
+        // doing aura addition before aura removal helps preserve natial lives
+        // in as many cases as possible. if a 2 HP natial is sitting in a +2
+        // HP aura and the aura becomes a +1 HP, it would die immediately if
+        // the +2 HP aura were removed first.
+        while (this._addQueue.length) {
+            const thisCb = this._addQueue.pop();
+            this.applyAura(thisCb);
+        }
+        while (this._removeQueue.length) {
+            const thisCb = this._removeQueue.pop();
+            this.unapplyAura(thisCb);
+        }
+    }
+
+    applyAurasMovement(originSpace) {
+        // we use similar logic to the aura queues above: ignore every aura
+        // that's present in both the origin and destination spaces, apply any
+        // auras exclusive to the destination space, and remove any auras
+        // exclusive to the origin space.
+        const originAuras = originSpace.isNatial ? originSpace.auraHandler.list.slice() : [];
+        const destAuras = this._auraList.slice();
+        const space = this._container;
+        const card = space.innerCard;
+
+        const [toApply, toUnapply] = this.removeIntersection(destAuras, originAuras);
+       
+        while (toApply.length) {
+            const thisCb = toApply.pop();
+
+            if (card
+                && natialPassiveCallbacks.onAuraApply[thisCb]) {
+                natialPassiveCallbacks.onAuraApply[thisCb](space);
+            }
+        }
+        while (toUnapply.length) {
+            const thisCb = toUnapply.pop();
+
+            if (card
+                && natialPassiveCallbacks.onAuraUnapply[thisCb]) {
+                natialPassiveCallbacks.onAuraUnapply[thisCb](space);
+            }
+        }
+
+    }
+
+    viewAuras() { // for debugging purposes
+        console.log(this._auraList);
+    }
+}
+
 class NatialSpace extends BoardSpace {
     constructor (owner, index, row, container) {
         super(owner, index);
         this._row = row;
         this._container = container;
 
-        this._auraList = [];
+        this._auraHandler = new AuraHandler(this);
 
         const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
         const rowStr = (this.isFrontRow ? "front" : "back");
@@ -274,7 +408,7 @@ class NatialSpace extends BoardSpace {
     get isHand() { return false; }
     get row() { return this._row; }
     get container() { return this._container; }
-    get auras() { return this._auraList; }
+    get auraHandler() { return this._auraHandler; }
     get isFrontRow() { return this._row === ROW_FRONT; }
     get isBackRow() { return this._row === ROW_BACK; }
     get DOM() { return this._DOM; }
@@ -286,27 +420,6 @@ class NatialSpace extends BoardSpace {
             && cbName === "cbPassivePaRancell") { return; }
 
         natialPassiveCallbacks.onAuraEnter[cbName](this);
-    }
-    // apply every aura affecting this space to the card in this space
-    applyAllAuras() {
-        for (let aura of this.auras) { this.applyAura(aura); }
-    }
-    setAura(cbName) {
-        // adds the specified aura to auraList
-        this._auraList.push(cbName);
-
-        // apply the aura's effect
-        if (this.hasCard) { this.applyAura(cbName); }
-    }
-    remAura(cbName) {
-        // remove the specified aura from auraList
-        const index = this._auraList.indexOf(cbName);
-        this._auraList.splice(index, 1);
-
-        // remove the aura's effect
-        if (this.hasCard) {
-            natialPassiveCallbacks.onAuraLeave[cbName](this);
-        }
     }
 
     // wrapper for dealing damage to the contained card instance
@@ -474,6 +587,26 @@ class NatialZone {
 
         targetSpace._cardToSpace(card);
     }
+
+    // swaps the cards contained in the specified natial spaces
+    swapCards(firstSpace, secondSpace) {
+        const firstCard = firstSpace.innerCard;
+        const secondCard = secondSpace.innerCard;
+
+        // clear both spaces and switch their contents
+        firstSpace._clear();
+        secondSpace._clear();
+        if (secondCard !== null) { this.cardToZone(firstSpace, secondCard); }
+        if (firstCard !== null) { this.cardToZone(secondSpace, firstCard); }
+    }
+
+    doAuraHandlerQueues() {
+        const allSpaces = this.allSpaces;
+        allSpaces.forEach(sp => {
+            sp.auraHandler.processRawQueues();
+            sp.auraHandler.applyQueues();
+        });
+    }
     
     // returns true if row and index are both valid parameters
     validateRowIndex(row, index) {
@@ -489,45 +622,52 @@ class NatialZone {
     // returns true if the card in moverSpace can move to targetSpace, and
     // false otherwise.
     validateMovement(moverSpace, targetSpace) {
-        // fail if targetSpace is occupied
-        if (targetSpace.hasCard) { return false; }
         // fail if the two spaces aren't owned by the same player
         if (moverSpace.owner !== targetSpace.owner) { return false;}
         // fail if mover doesn't have an available move
         if (!moverSpace.innerCard.canMove) { return false; }
+        // fail if mover is trying to move onto itself
+        if (moverSpace === targetSpace) { return false; }
 
         return true;
     }
 
     // transfers the card instance in moverSpace to targetSpace
-    moveNatial(moverSpace, targetSpace) {
-        const mover = moverSpace.innerCard;
-        const preAuras = moverSpace.auras.slice();
+    moveNatial(originSpace, destSpace) {
+        const originCard = originSpace.innerCard;
+        const destCard = destSpace.innerCard;
 
-        this.cardToZone(targetSpace, mover);
-        mover.canMove = false;
-        moverSpace._clear();
 
-        // onMove hook
-        if (natialPassiveCallbacks.onMove[mover.passiveCbName]) {
-            natialPassiveCallbacks.onMove[mover.passiveCbName](moverSpace, targetSpace);
+
+        // onMove hook: place the appropriate aura additions/removals into
+        // AuraHandler queues
+        // moving originCard to destSpace
+        if (natialPassiveCallbacks.onMove[originCard.passiveCbName]) {
+            natialPassiveCallbacks.onMove[originCard.passiveCbName](originSpace, destSpace);
         }
-
-        const postAuras = targetSpace.auras.slice();
-
-        // remove previous aura effects and apply new aura effects to the card,
-        // skipping any auras on both moverSpace and targetSpace
-        const toRemove = preAuras.filter(cb => !postAuras.includes(cb));
-        const toAdd = postAuras.filter(cb => !preAuras.includes(cb));
-        for (let cb of toRemove) { // call on targetSpace, where the card is now
-            natialPassiveCallbacks.onAuraLeave[cb](targetSpace);
+        // moving potential destCard to originSpace
+        if (destCard
+            && natialPassiveCallbacks.onMove[destCard.passiveCbName]) {
+            natialPassiveCallbacks.onMove[destCard.passiveCbName](destSpace, originSpace);
         }
-        for (let cb of toAdd) {
-            natialPassiveCallbacks.onAuraEnter[cb](targetSpace);
-        }
+        
+        // apply aura effects after all potential changes are in AuraHandlers.
+        // as with summonNatial, this is placed before the actual movement
+        // happens so that the moved card or cards do not benefit from the auras
+        // in their new position before their aura calculation is intended to
+        // take place.
+        this.doAuraHandlerQueues();
+
+        // swap origin and target cards
+        this.swapCards(originSpace, destSpace);
+        originCard.canMove = false;
+
+        // now, calculate and apply auras to the moved cards
+        destSpace.auraHandler.applyAurasMovement(originSpace);
+        originSpace.auraHandler.applyAurasMovement(destSpace);
 
         game.renderAll();
-    }
+    }   
 
     // performs the indicated callback with each space in the indicated row.
     forAllSpacesInRow(row, callback, skipEmpty = true) {
@@ -558,9 +698,9 @@ class NatialZone {
     }
 
     // debug
-    viewAuras() {
+    viewAllAuras() {
         this.forAllSpaces((space) => {
-            console.log(space.row, space.index, space.auras);
+            space.auraHandler.viewAuras();
         }, false);
     }
 }
@@ -677,6 +817,7 @@ class Player {
         if (natialPassiveCallbacks.onSummon[this._master.passiveCbName]) {
             natialPassiveCallbacks.onSummon[this._master.passiveCbName](targetSpace);
         }
+        this._natialZone.doAuraHandlerQueues();
     }
 
     get natialZone() { return this._natialZone; }
@@ -720,35 +861,36 @@ class Player {
     }
 
     // moves a natial from the hand to the board, deducting the necessary mana
-    summonNatial(toSummonSpace, targetSpace) {
-        // deduct mana and transfer the card to the board
-        const summonedNatial = toSummonSpace.innerCard;
-        this.currentMana -= summonedNatial.cost;
-        this.natialZone.cardToZone(targetSpace, summonedNatial);
-        toSummonSpace._clear();
-        
-        // give the natial actions if it's quick
-        if (summonedNatial.isQuick) {
-            summonedNatial.currentActions = summonedNatial.maxActions;
-            summonedNatial.canMove = true;
-        } else {
-            summonedNatial.currentActions = 0;
-            summonedNatial.canMove = false;
+    summonNatial(originHandSpace, destNatialSpace) {
+        const summonedCard = originHandSpace.innerCard;
+
+        // onSummon hook: tell AuraHandlers to prepare to parse potentially
+        // new auras
+        if (natialPassiveCallbacks.onSummon[summonedCard.passiveCbName]) {
+            natialPassiveCallbacks.onSummon[summonedCard.passiveCbName](destNatialSpace);
         }
 
-        // onSummon hook
-        const cbName = summonedNatial.passiveCbName;
-        if (natialPassiveCallbacks.onSummon[cbName]) {
-            natialPassiveCallbacks.onSummon[cbName](targetSpace);
+        // recalculate and apply prospective aura effects to the board. this is 
+        // specifically placed so that the summoned card does NOT benefit from 
+        // its own (or any other auras) too early; that's handled below.
+        this.natialZone.doAuraHandlerQueues();
+
+        // deduct mana and transfer the card to the board
+        this.currentMana -= summonedCard.cost;
+        this.natialZone.cardToZone(destNatialSpace, summonedCard);
+        originHandSpace._clear();
+        
+        // give the natial actions if it's quick
+        if (summonedCard.isQuick) {
+            summonedCard.currentActions = summonedCard.maxActions;
+            summonedCard.canMove = true;
+        } else {
+            summonedCard.currentActions = 0;
+            summonedCard.canMove = false;
         }
-        // onAuraEnter hook
-        targetSpace.applyAllAuras();
-        // if the summoned natial created an aura on its own space, it will
-        // now have applied that aura twice, which is incorrect. in this case,
-        // we remove one application of the aura.
-        if (targetSpace.auras.includes(cbName)) {
-            natialPassiveCallbacks.onAuraLeave[cbName](targetSpace);
-        }
+
+        // now, apply any aura effects to the summoned natial.
+        destNatialSpace.auraHandler.applyAurasMovement(originHandSpace);
 
         // summoning will always require a re-render
         game.renderAll();
