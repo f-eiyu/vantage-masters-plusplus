@@ -2,7 +2,7 @@ const cardDB = [
     // ========== Debug ==========
     {
         "name": "Debug Fire",
-        "portrait": null,
+        "portrait": "../data/img/misc/card-back.png",
         "cost": 1,
         "type": "natial",
 
@@ -20,7 +20,7 @@ const cardDB = [
     },
     {
         "name": "Debug Heaven",
-        "portrait": null,
+        "portrait": "../data/img/misc/card-back.png",
         "cost": 1,
         "type": "natial",
 
@@ -38,7 +38,7 @@ const cardDB = [
     },
     {
         "name": "Debug Earth",
-        "portrait": null,
+        "portrait": "../data/img/misc/card-back.png",
         "cost": 1,
         "type": "natial",
 
@@ -56,7 +56,7 @@ const cardDB = [
     },
     {
         "name": "Debug Water",
-        "portrait": null,
+        "portrait": "../data/img/misc/card-back.png",
         "cost": 1,
         "type": "natial",
 
@@ -76,7 +76,7 @@ const cardDB = [
     // Fire Natials
     {
         "name": "Hepetus",
-        "portrait": null,
+        "portrait": "../data/img/natials/f-hepetus.png",
         "cost": 2,
         "type": "natial",
 
@@ -94,7 +94,7 @@ const cardDB = [
     },
     {
         "name": "Dullmdalla",
-        "portrait": null,
+        "portrait": "../data/img/natials/f-dullmdalla.png",
         "cost": 3,
         "type": "natial",
 
@@ -112,7 +112,7 @@ const cardDB = [
     },
     {
         "name": "Blyx",
-        "portrait": null,
+        "portrait": "../data/img/natials/f-blyx.png",
         "cost": 4,
         "type": "natial",
 
@@ -130,7 +130,7 @@ const cardDB = [
     },
     {
         "name": "Oonvievle",
-        "portrait": null,
+        "portrait": "../data/img/natials/f-oonvievle.png",
         "cost": 6,
         "type": "natial",
 
@@ -148,7 +148,7 @@ const cardDB = [
     },
     {
         "name": "Greon",
-        "portrait": null,
+        "portrait": "../data/img/natials/f-greon.png",
         "cost": 7,
         "type": "natial",
 
@@ -166,7 +166,7 @@ const cardDB = [
     },
     {
         "name": "Xenofiend",
-        "portrait": null,
+        "portrait": "../data/img/natials/f-xenofiend.png",
         "cost": 7,
         "type": "natial",
 
@@ -185,7 +185,7 @@ const cardDB = [
     // Heaven Natials
     {
         "name": "Pelitt",
-        "portrait": null,
+        "portrait": "../data/img/natials/h-pelitt.png",
         "cost": 1,
         "type": "natial",
 
@@ -203,7 +203,7 @@ const cardDB = [
     },
     {
         "name": "Guene-Foss",
-        "portrait": null,
+        "portrait": "../data/img/natials/h-guene-foss.png",
         "cost": 3,
         "type": "natial",
 
@@ -221,7 +221,7 @@ const cardDB = [
     },
     {
         "name": "Kyrier-Bell",
-        "portrait": null,
+        "portrait": "../data/img/natials/h-kyrier-bell.png",
         "cost": 4,
         "type": "natial",
 
@@ -239,7 +239,7 @@ const cardDB = [
     },
     {
         "name": "Fifenall",
-        "portrait": null,
+        "portrait": "../data/img/natials/h-fifenall.png",
         "cost": 4,
         "type": "natial",
 
@@ -257,7 +257,7 @@ const cardDB = [
     },
     {
         "name": "Amoltamis",
-        "portrait": null,
+        "portrait": "../data/img/natials/h-amoltamis.png",
         "cost": 6,
         "type": "natial",
 
@@ -275,7 +275,7 @@ const cardDB = [
     },
     {
         "name": "Regna-Croix",
-        "portrait": null,
+        "portrait": "../data/img/natials/h-regna-croix.png",
         "cost": 8,
         "type": "natial",
 
@@ -294,7 +294,7 @@ const cardDB = [
     // Earth Natials
     {
         "name": "Pa-Rancell",
-        "portrait": null,
+        "portrait": "../data/img/natials/e-pa-rancell.png",
         "cost": 1,
         "type": "natial",
 
@@ -312,7 +312,7 @@ const cardDB = [
     },
     {
         "name": "D-Arma",
-        "portrait": null,
+        "portrait": "../data/img/natials/e-d-arma.png",
         "cost": 2,
         "type": "natial",
 
@@ -330,7 +330,7 @@ const cardDB = [
     },
     {
         "name": "Ae-Ferrion",
-        "portrait": null,
+        "portrait": "../data/img/natials/e-ae-ferrion.png",
         "cost": 3,
         "type": "natial",
 
@@ -348,7 +348,7 @@ const cardDB = [
     },
     {
         "name": "Gia-Bro",
-        "portrait": null,
+        "portrait": "../data/img/natials/e-gia-bro.png",
         "cost": 4,
         "type": "natial",
 
@@ -366,7 +366,7 @@ const cardDB = [
     },
     {
         "name": "Da-Colm",
-        "portrait": null,
+        "portrait": "../data/img/natials/e-da-colm.png",
         "cost": 6,
         "type": "natial",
 
@@ -384,7 +384,7 @@ const cardDB = [
     },
     {
         "name": "Ma-Gorb",
-        "portrait": null,
+        "portrait": "../data/img/natials/e-ma-gorb.png",
         "cost": 7,
         "type": "natial",
 
@@ -403,7 +403,7 @@ const cardDB = [
     // Water Natials
     {
         "name": "Requ",
-        "portrait": null,
+        "portrait": "../data/img/natials/w-requ.png",
         "cost": 1,
         "type": "natial",
 
@@ -421,7 +421,7 @@ const cardDB = [
     },
     {
         "name": "Marme",
-        "portrait": null,
+        "portrait": "../data/img/natials/w-marme.png",
         "cost": 3,
         "type": "natial",
 
@@ -439,7 +439,7 @@ const cardDB = [
     },
     {
         "name": "Zamilpen",
-        "portrait": null,
+        "portrait": "../data/img/natials/w-zamilpen.png",
         "cost": 4,
         "type": "natial",
 
@@ -457,7 +457,7 @@ const cardDB = [
     },
     {
         "name": "Tarbyss",
-        "portrait": null,
+        "portrait": "../data/img/natials/w-tarbyss.png",
         "cost": 5,
         "type": "natial",
 
@@ -475,7 +475,7 @@ const cardDB = [
     },
     {
         "name": "Neptjuno",
-        "portrait": null,
+        "portrait": "../data/img/natials/w-neptjuno.png",
         "cost": 7,
         "type": "natial",
 
@@ -493,7 +493,7 @@ const cardDB = [
     },
     {
         "name": "Tentarch",
-        "portrait": null,
+        "portrait": "../data/img/natials/w-tentarch.png",
         "cost": 8,
         "type": "natial",
 
@@ -514,7 +514,8 @@ const cardDB = [
     // ========== Masters ==========
     {
         "name": "Debug Master",
-        "portrait": null,
+        "portrait": "../data/img/misc/card-back.png",
+        "playerIcon": "../data/img/playericons/bard.png",
         "cost": 3,
         "type": "natial",
 
@@ -533,7 +534,8 @@ const cardDB = [
     },
     {
         "name": "Fighter",
-        "portrait": null,
+        "portrait": "../data/img/masters/fighter.png",
+        "playerIcon": "../data/img/playericons/fighter.png",
         "cost": 1,
         "type": "natial",
 
@@ -552,7 +554,8 @@ const cardDB = [
     },
     {
         "name": "Ranger",
-        "portrait": null,
+        "portrait": "../data/img/masters/ranger.png",
+        "playerIcon": "../data/img/playericons/ranger.png",
         "cost": 2,
         "type": "natial",
 
@@ -571,7 +574,8 @@ const cardDB = [
     },
     {
         "name": "Sister",
-        "portrait": null,
+        "portrait": "../data/img/masters/sister.png",
+        "playerIcon": "../data/img/playericons/sister.png",
         "cost": 3,
         "type": "natial",
 
@@ -590,7 +594,8 @@ const cardDB = [
     },
     {
         "name": "Knight",
-        "portrait": null,
+        "portrait": "../data/img/masters/knight.png",
+        "playerIcon": "../data/img/playericons/knight.png",
         "cost": 2,
         "type": "natial",
 
@@ -609,7 +614,8 @@ const cardDB = [
     },
     {
         "name": "Thief",
-        "portrait": null,
+        "portrait": "../data/img/masters/thief.png",
+        "playerIcon": "../data/img/playericons/thief.png",
         "cost": 2,
         "type": "natial",
 
@@ -628,7 +634,8 @@ const cardDB = [
     },
     {
         "name": "Witch",
-        "portrait": null,
+        "portrait": "../data/img/masters/witch.png",
+        "playerIcon": "../data/img/playericons/witch.png",
         "cost": 5,
         "type": "natial",
 
@@ -647,7 +654,8 @@ const cardDB = [
     },
     {
         "name": "Paladin",
-        "portrait": null,
+        "portrait": "../data/img/masters/paladin.png",
+        "playerIcon": "../data/img/playericons/paladin.png",
         "cost": 4,
         "type": "natial",
 
@@ -666,7 +674,8 @@ const cardDB = [
     },
     {
         "name": "Beast",
-        "portrait": null,
+        "portrait": "../data/img/masters/beast.png",
+        "playerIcon": "../data/img/playericons/beast.png",
         "cost": 4,
         "type": "natial",
 
@@ -685,7 +694,8 @@ const cardDB = [
     },
     {
         "name": "Swordsman",
-        "portrait": null,
+        "portrait": "../data/img/masters/swordsman.png",
+        "playerIcon": "../data/img/playericons/swordsman.png",
         "cost": 4,
         "type": "natial",
 
@@ -704,7 +714,8 @@ const cardDB = [
     },
     {
         "name": "Sorcerer",
-        "portrait": null,
+        "portrait": "../data/img/masters/sorcerer.png",
+        "playerIcon": "../data/img/playericons/sorcerer.png",
         "cost": 5,
         "type": "natial",
 
@@ -724,7 +735,8 @@ const cardDB = [
     },
     {
         "name": "Shadow",
-        "portrait": null,
+        "portrait": "../data/img/masters/shadow.png",
+        "playerIcon": "../data/img/playericons/shadow.png",
         "cost": 2,
         "type": "natial",
 
@@ -743,7 +755,8 @@ const cardDB = [
     },
     {
         "name": "Spirit",
-        "portrait": null,
+        "portrait": "../data/img/masters/spirit.png",
+        "playerIcon": "../data/img/playericons/spirit.png",
         "cost": 5,
         "type": "natial",
 
@@ -762,7 +775,8 @@ const cardDB = [
     },
     {
         "name": "Bard",
-        "portrait": null,
+        "portrait": "../data/img/masters/bard.png",
+        "playerIcon": "../data/img/playericons/bard.png",
         "cost": 3,
         "type": "natial",
 
@@ -781,7 +795,8 @@ const cardDB = [
     },
     {
         "name": "Tyrant",
-        "portrait": "https://static.wikia.nocookie.net/kiseki/images/1/12/Fighter_-_Vantage_Masters.png",
+        "portrait": "../data/img/masters/tyrant.png",
+        "playerIcon": "../data/img/playericons/tyrant.png",
         "cost": 4,
         "type": "natial",
 
@@ -802,7 +817,7 @@ const cardDB = [
     // ========== Spells ==========
     {
         "name": "Magic Crystal",
-        "portrait": null,
+        "portrait": "../data/img/spells/magic-crystal.png",
         "cost": 0,
         "type": "spell",
 
@@ -814,7 +829,7 @@ const cardDB = [
     },
     {
         "name": "Medic",
-        "portrait": null,
+        "portrait": "../data/img/spells/medic.png",
         "cost": 1,
         "type": "spell",
 
@@ -826,7 +841,7 @@ const cardDB = [
     },
     {
         "name": "Transmute",
-        "portrait": null,
+        "portrait": "../data/img/spells/transmute.png",
         "cost": 4,
         "type": "spell",
 
@@ -837,7 +852,7 @@ const cardDB = [
     },
     {
         "name": "Vanish",
-        "portrait": null,
+        "portrait": "../data/img/spells/vanish.png",
         "cost": 4,
         "type": "spell",
 
@@ -848,7 +863,7 @@ const cardDB = [
     },
     {
         "name": "Uptide",
-        "portrait": null,
+        "portrait": "../data/img/spells/uptide.png",
         "cost": 3,
         "type": "spell",
 
@@ -860,7 +875,7 @@ const cardDB = [
     },
     {
         "name": "Blaze",
-        "portrait": null,
+        "portrait": "../data/img/spells/blaze.png",
         "cost": 2,
         "type": "spell",
 
@@ -871,7 +886,7 @@ const cardDB = [
     },
     {
         "name": "Wall",
-        "portrait": null,
+        "portrait": "../data/img/spells/wall.png",
         "cost": 2,
         "type": "spell",
 
@@ -884,7 +899,7 @@ const cardDB = [
     },
     {
         "name": "Expel",
-        "portrait": null,
+        "portrait": "../data/img/spells/expel.png",
         "cost": 3,
         "type": "spell",
 
@@ -897,7 +912,7 @@ const cardDB = [
     },
     {
         "name": "Reduce",
-        "portrait": null,
+        "portrait": "../data/img/spells/reduce.png",
         "cost": 1,
         "type": "spell",
 
@@ -908,7 +923,7 @@ const cardDB = [
     },
     {
         "name": "Disaster",
-        "portrait": null,
+        "portrait": "../data/img/spells/disaster.png",
         "cost": 5,
         "type": "spell",
 

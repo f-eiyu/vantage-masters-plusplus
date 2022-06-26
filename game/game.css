@@ -2,46 +2,57 @@ body {
     text-align: center;
     margin: 0;
 
-    font-family: sans-serif;
+    font-family: serif;
 
-    background-color: #AAA;
+    background-color: #444;
 
     user-select: none;
 }
 
 #game-container {
     position: absolute;
-    margin: 0 10%;
-    height: 100%;
-    width: 80%;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    
+    height: 850px;
+    width: 1200px;
+
+    background-color: #35654d;
+    border: solid black 4px;
 
     display: grid;
     grid-template: 1fr / 2fr 5fr 2fr;
 }
 
 #left-container {
-    background-color: pink;
-
     display: grid;
-    grid-template: repeat(3, 1fr) / 1fr;
+    grid-template: 6fr 1fr 6fr 6fr 1fr / 1fr;
+}
+
+.mana {
+    background-image: url("../data/img/misc/mana-empty.png");
+    background-size: cover;
+    display: inline;
+    height: 33px;
+    width: 20px;
 }
 
 #center-container {
-    background-color: lightgreen;
-
     display: grid;
     grid-template: 1fr 2fr 2fr 1fr / 1fr;
 }
 
 #right-container {
-    background-color: lightblue;
-
     display: grid;
-    grid-template: 4fr 1fr / 1fr;
+    grid-template: 5fr 3fr 1fr 1fr / 1fr;
 }
 
-#card-detail-zone {
-    font-size: 20pt;
+#card-largepic-zone {
+    background-image: url("../data/img/misc/card-back.png");
+    background-size: cover;
 }
 
 .container, .enemy-hand-space, .enemy-natial-space, .friendly-hand-space, .friendly-natial-space {
@@ -62,18 +73,10 @@ body {
     padding: 0 20%;
 }
 
-.enemy-hand-space, .friendly-hand-space {
-    height: 95%;
-    width: 12.6%;
-
-    font-size: 9pt;
-}
-
-.enemy-natial-space, .friendly-natial-space {
-    height: 47.5%;
-    width: 21%;
-
-    font-size: 9pt;
+/* not the final layout size -- retweak later */
+.enemy-hand-space, .enemy-natial-space, .friendly-hand-space, .friendly-natial-space {
+    height: 136px;
+    width: 85px;
 }
 
 .friendly, .enemy {
@@ -82,26 +85,28 @@ body {
 
 .name-banner {
     position: absolute;
-    top: 0px;
+    bottom: 2px;
 
     display: none;
     text-align: center;
+    font-family: "Satisfy";
+    font-weight: bold;
+    font-size: 1em;
 
-    width: 100%;
-    background-color: rgba(180 , 180, 180, 0.7);
+    width: 98%;
+    opacity: 0.8;
 }
 
-.hp-orb, .atk-orb {
+.hp-orb, .atk-orb, .mana-orb, .icons {
     position: absolute;
-    bottom: 0;
 
     display: none;
     justify-content: center;
     align-items: center;
 
-    height: 2em;
-    width: 2em;
-    margin: 2px;
+    height: 1.5em;
+    width: 1.5em;
+    margin: 3px;
     border: solid black 1px;
     border-radius: 100%;
 
@@ -109,19 +114,40 @@ body {
 }
 
 .hp-orb {
-    bottom: 0;
+    bottom: 24px;
     right: 0;
 
     background-color: rgba(0, 255, 0, 0.8);
 }
 
 .atk-orb {
+    bottom: 24px;
     left: 0;
 
     background-color: rgba(255, 0, 0, 0.8);
 }
 
+.mana-orb {
+    top: 2px;
+    right: 0;
 
+    background-color: steelblue;
+}
+
+.icons {
+    left: 0;
+    top: 2px;
+    border: none;
+    border-radius: 0;
+    width: 1.5em;
+    flex-wrap: wrap;
+}
+
+.icon {
+    height: 1.5em;
+    width: 1.5em;
+    display: block;
+}
 
 
 

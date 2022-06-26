@@ -1,23 +1,28 @@
 'use strict';
 
 const boardCardMouseover = (event) => {
+    console.log(event);
     const boardSpace = (new CardDOMEvent(event.target)).spaceObj;
     if (!boardSpace.hasCard) { return; }
 
-    const detailZone = document.querySelector("#card-detail-zone");
+    const detailZone = document.querySelector("#card-largepic-zone");
 
     detailZone.innerText = boardSpace._DOM.innerText;
     if (boardSpace.innerCard.type === "spell") {
         detailZone.innerText += boardSpace.innerCard.longdesc;
     }
+    detailZone.style.backgroundImage = `url('${boardSpace.innerCard.portraitURL}')`;
+    detailZone.style.backgroundSize = "cover";
     boardSpace._DOM.classList.add("hovered");
 }
 
 const boardCardMouseleave = (event) => {
     const boardSpace = event.target;
-    const detailZone = document.querySelector("#card-detail-zone");
+    const largeCardZone = document.querySelector("#card-largepic-zone");
 
-    detailZone.innerText = "";
+    largeCardZone.innerText = "";
+    largeCardZone.style.backgroundImage = `url('../data/img/misc/card-back.png')`;
+    largeCardZone.style.backgroundSize = "cover";
     boardSpace.classList.remove("hovered");
 }
 
@@ -94,7 +99,7 @@ const addListenerToAll = (listenerName, callback, className) => {
     const classList = document.querySelectorAll("." + className);
     classList.forEach(dom => {
         dom.addEventListener(listenerName, callback);
-    });
+    }, true);
 }
 
 const attachEventListeners = () => {
@@ -137,18 +142,18 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
-            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
-            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
-            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
-            _playerDeckTemplate.push(createCard(getFromDB("Da-Colm")));
+            _playerDeckTemplate.push(createCard(getFromDB("Requ")));
+            _playerDeckTemplate.push(createCard(getFromDB("Requ")));
+            _playerDeckTemplate.push(createCard(getFromDB("Amoltamis")));
+            _playerDeckTemplate.push(createCard(getFromDB("Amoltamis")));
+            _playerDeckTemplate.push(createCard(getFromDB("Amoltamis")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Tyrant")));
+        _playerDeckTemplate.push(createCard(getFromDB("Ranger")));
         _enemyDeckTemplate.push(createCard(getFromDB("Tyrant")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
@@ -157,6 +162,8 @@ const initializeGameBoard = () => {
     skillUsage = new NatialSkillEvent(null, false);
     game = new GameBoard();
     destroyedCards = new DestroyedCards();
+    friendlyPlayer.loadIcon();
+    enemyPlayer.loadIcon();
 
     // both players start with three cards in hand.
     // a mulligan feature will be added... later.

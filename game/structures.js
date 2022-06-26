@@ -79,6 +79,9 @@ class NatialCard extends Card {
         this._cardSkillCbName = cardProto.skillCallbackName;
         this._cardSkillReady = Boolean(this._cardSkillCbName);
         this._cardSkillCost = cardProto.skillCost;
+
+        // cosmetic
+        this._playerIcon = cardProto.playerIcon;
     }
 
     get element() { return this._cardElement; }
@@ -100,6 +103,7 @@ class NatialCard extends Card {
     get skillCbName() { return this._cardSkillCbName; }
     get skillReady() { return this._cardSkillReady; }
     get skillCost() { return this._cardSkillCost; }
+    get playerIcon() { return this._playerIcon; }
 
     set element(newElement) {
         if (newElement >= ELEMENT_NONE && newElement <= ELEMENT_WATER) {
@@ -244,6 +248,7 @@ class BoardSpace {
         return cardStr;
     }
 
+    // this function is pretty ugly but what can you do
     render() {
         const getDomIdName = () => {
             // returns the id name of the DOM element associated with this space
@@ -263,32 +268,48 @@ class BoardSpace {
 
         const card = this.innerCard;
         const domID = getDomIdName();
+        console.log(domID);
         const nameBanner = document.getElementById(`name-${domID}`);
         const hpOrb = document.getElementById(`hp-${domID}`);
         const atkOrb = document.getElementById(`atk-${domID}`);
-
-        // always display blanks if no card is present
-        if (!this.hasCard) {
-            return;
-        }
+        const manaOrb = document.getElementById(`mana-${domID}`);
+        const icons = document.getElementById(`icons-${domID}`);
 
         // enemy hand cards are the only ones the player can't view
-        if (this.owner === PLAYER_ENEMY && this.isHand) {
-            if (this.hasCard) { this.DOM.innerText = "???"; }
+        if (this.owner === PLAYER_ENEMY && this.isHand && this.hasCard) {
+            this.DOM.style.backgroundImage = "url('../data/img/misc/card-back.png')";
+            this.DOM.style.backgroundSize = "cover";
         }
 
-        if (!(this.owner === PLAYER_ENEMY && this.isHand)) {
+        // always display blanks if the card has no content
+        else if (!this.hasCard) {
+            nameBanner.style.display = "none";
+            hpOrb.style.display = "none";
+            atkOrb.style.display = "none";
+            manaOrb.style.display = "none";
+            icons.style.display = "none";
+
+            this.DOM.style.backgroundImage = "none";
+            this.DOM.style.backgroundColor = "rgba(0, 0, 0, 0)"
+        }
+
+        // render the card background and various properties
+        else {
             nameBanner.style.display = "block";
             hpOrb.style.display = "flex";
             atkOrb.style.display = "flex";
+            manaOrb.style.display = "flex";
+            icons.style.display = "flex";
 
             nameBanner.innerText = card.name;
             hpOrb.innerText = card.curHP;
             atkOrb.innerText = card.attack;
+            manaOrb.innerText = card.cost;
+            icons.innerHTML = "";
+            if (card.isRanged) { icons.innerHTML += "<img src='../data/img/misc/icon-ranged.png' class='icon' />"; }
+            if (card.isQuick) { icons.innerHTML += "<img src='../data/img/misc/icon-quick.png' class='icon' />"; }
+            console.log(icons.innerHTML);
 
-            this.DOM.style.backgroundImage = `url('${card.portraitURL}')`;
-            this.DOM.style.backgroundSize = "cover";
-            
             let bgColor = "";
             if (card.type === "spell") { bgColor = "green"; }
             else {
@@ -309,7 +330,10 @@ class BoardSpace {
                         bgColor = "purple";
                 }
             }
-            this.DOM.style.backgroundColor = bgColor;
+            nameBanner.style.backgroundColor = bgColor;
+
+            this.DOM.style.backgroundImage = `url('${card.portraitURL}')`;
+            this.DOM.style.backgroundSize = "cover";
         }
 
         if (this.owner === PLAYER_FRIENDLY && this.hasCard) {
@@ -981,13 +1005,31 @@ class Player {
         this.natialZone.forAllCards(card => card.refresh());
     }
 
+    loadIcon() {
+        const playerStr = (this._playerID === PLAYER_FRIENDLY ? "friendly" : "enemy");
+        const iconDOM = document.getElementById(`${playerStr}-portrait`);
+
+        iconDOM.style.backgroundImage = `url(${this.master.playerIcon})`
+        iconDOM.style.backgroundSize = "250px";
+        iconDOM.style.backgroundRepeat = "no-repeat";
+        iconDOM.style.backgroundPosition = "center";
+        console.log("loadicon", iconDOM)
+    }
+
     // currently just renders the player's mana display, but may be expanded
     // in the future
     render() {
         const playerStr = (this === friendlyPlayer ? "friendly" : "enemy");
-        const manaDOM = document.getElementById(`${playerStr}-portrait`);
+        const manaDOM = document.getElementById(`${playerStr}-mana`);
+        const manaList = manaDOM.querySelectorAll(".mana");
 
-        manaDOM.innerText = `${this.currentMana}/${this.maxMana}`;
+        manaList.forEach((mana, i) => {
+            if (i + 1 <= this.currentMana) {
+                mana.style.backgroundImage = `url("../data/img/misc/mana-full.png")`;
+            } else {
+                mana.style.backgroundImage = `url("../data/img/misc/mana-empty.png")`;
+            }
+        });
     }
 }
 
@@ -1170,8 +1212,8 @@ class DestroyedCards {
 // objects on the board when needed, and the wrappers inside serve as shortcuts 
 // to give event listeners more convenient access to logic and validation.
 class CardDOMEvent {
-    constructor(draggedDOM) {
-        this._spaceObj = this.domIDToSpaceObj(draggedDOM.id);
+    constructor(cardDOM) {
+        this._spaceObj = this.domIDToSpaceObj(cardDOM.id);
     }
 
     // all of the following getters are read-only wrappers
@@ -1188,6 +1230,9 @@ class CardDOMEvent {
     // fetches the BoardSpace instance corresponding to the desired DOM ID
     domIDToSpaceObj(domID) {
         const domIDParts = domID.split("-");
+        if (domIDParts[0] !== "friendly" && domIDParts[0] !== "enemy") {
+            domIDParts.shift();
+        }
         const owner = (domIDParts[0] === "friendly" ? friendlyPlayer : enemyPlayer);
         const zone = domIDParts[1];
         const index = parseInt(domIDParts[2]);

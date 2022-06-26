@@ -4,61 +4,138 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        <title>Vantage Masters</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
+        </style>
         <link rel="stylesheet" href="game.css">
     </head>
     <body>
         <div id="game-container">
             <div id="left-container">
-                <div id="enemy-portrait" class="container">enemy portrait</div>
+                <div id="enemy-portrait" class="container"></div>
+                <div id="enemy-mana" class="container">
+                    <div class="mana" id="enemy-mana-1"></div>
+                    <div class="mana" id="enemy-mana-2"></div>
+                    <div class="mana" id="enemy-mana-3"></div>
+                    <div class="mana" id="enemy-mana-4"></div>
+                    <div class="mana" id="enemy-mana-5"></div>
+                    <div class="mana" id="enemy-mana-6"></div>
+                    <div class="mana" id="enemy-mana-7"></div>
+                    <div class="mana" id="enemy-mana-8"></div>
+                    <div class="mana" id="enemy-mana-9"></div>
+                    <div class="mana" id="enemy-mana-10"></div>
+                </div>
                 <div id="misc-container" class="container">misc container</div>
-                <div id="friendly-portrait" class="container">friendly portrait</div>
+                <div id="friendly-portrait" class="container"></div>
+                <div id="friendly-mana" class="container">
+                    <div class="mana" id="friendly-mana-1"></div>
+                    <div class="mana" id="friendly-mana-2"></div>
+                    <div class="mana" id="friendly-mana-3"></div>
+                    <div class="mana" id="friendly-mana-4"></div>
+                    <div class="mana" id="friendly-mana-5"></div>
+                    <div class="mana" id="friendly-mana-6"></div>
+                    <div class="mana" id="friendly-mana-7"></div>
+                    <div class="mana" id="friendly-mana-8"></div>
+                    <div class="mana" id="friendly-mana-9"></div>
+                    <div class="mana" id="friendly-mana-10"></div>
+                </div>
             </div>
             <div id="center-container">
                 <div id="enemy-hand-zone" class="container">
                     <div id="enemy-deck">deck</div>
-                    <div class="enemy enemy-hand-space" id="enemy-hand-0"></div>
-                    <div class="enemy enemy-hand-space" id="enemy-hand-1"></div>
-                    <div class="enemy enemy-hand-space" id="enemy-hand-2"></div>
-                    <div class="enemy enemy-hand-space" id="enemy-hand-3"></div>
-                    <div class="enemy enemy-hand-space" id="enemy-hand-4"></div>
-                    <div class="enemy enemy-hand-space" id="enemy-hand-5"></div>
+                    <div class="enemy enemy-hand-space" id="enemy-hand-0">
+                        <div class="name-banner" id="name-enemy-hand-0"></div>
+                        <div class="icons" id="icons-enemy-hand-0"></div>
+                        <div class="mana-orb" id="mana-enemy-hand-0"></div>
+                        <div class="atk-orb" id="atk-enemy-hand-0"></div>
+                        <div class="hp-orb" id="hp-enemy-hand-0"></div>
+                    </div>
+                    <div class="enemy enemy-hand-space" id="enemy-hand-1">
+                        <div class="name-banner" id="name-enemy-hand-1"></div>
+                        <div class="icons" id="icons-enemy-hand-1"></div>
+                        <div class="mana-orb" id="mana-enemy-hand-1"></div>
+                        <div class="atk-orb" id="atk-enemy-hand-1"></div>
+                        <div class="hp-orb" id="hp-enemy-hand-1"></div>
+                    </div>
+                    <div class="enemy enemy-hand-space" id="enemy-hand-2">
+                        <div class="name-banner" id="name-enemy-hand-2"></div>
+                        <div class="icons" id="icons-enemy-hand-2"></div>
+                        <div class="mana-orb" id="mana-enemy-hand-2"></div>
+                        <div class="atk-orb" id="atk-enemy-hand-2"></div>
+                        <div class="hp-orb" id="hp-enemy-hand-2"></div>
+                    </div>
+                    <div class="enemy enemy-hand-space" id="enemy-hand-3">
+                        <div class="name-banner" id="name-enemy-hand-3"></div>
+                        <div class="icons" id="icons-enemy-hand-3"></div>
+                        <div class="mana-orb" id="mana-enemy-hand-3"></div>
+                        <div class="atk-orb" id="atk-enemy-hand-3"></div>
+                        <div class="hp-orb" id="hp-enemy-hand-3"></div>
+                    </div>
+                    <div class="enemy enemy-hand-space" id="enemy-hand-4">
+                        <div class="name-banner" id="name-enemy-hand-4"></div>
+                        <div class="icons" id="icons-enemy-hand-4"></div>
+                        <div class="mana-orb" id="mana-enemy-hand-4"></div>
+                        <div class="atk-orb" id="atk-enemy-hand-4"></div>
+                        <div class="hp-orb" id="hp-enemy-hand-4"></div>
+                    </div>
+                    <div class="enemy enemy-hand-space" id="enemy-hand-5">
+                        <div class="name-banner" id="name-enemy-hand-5"></div>
+                        <div class="icons" id="icons-enemy-hand-5"></div>
+                        <div class="mana-orb" id="mana-enemy-hand-5"></div>
+                        <div class="atk-orb" id="atk-enemy-hand-5"></div>
+                        <div class="hp-orb" id="hp-enemy-hand-5"></div>
+                    </div>
                 </div>
                 <div id="enemy-natial-zone" class="container">
                     <div class="enemy enemy-natial-space front-natial" id="enemy-front-0">
                         <div class="name-banner" id="name-enemy-front-0"></div>
+                        <div class="icons" id="icons-enemy-front-0"></div>
+                        <div class="mana-orb" id="mana-enemy-front-0"></div>
                         <div class="atk-orb" id="atk-enemy-front-0"></div>
                         <div class="hp-orb" id="hp-enemy-front-0"></div>
                     </div>
                     <div class="enemy enemy-natial-space front-natial" id="enemy-front-1">
                         <div class="name-banner" id="name-enemy-front-1"></div>
+                        <div class="icons" id="icons-enemy-front-1"></div>
+                        <div class="mana-orb" id="mana-enemy-front-1"></div>
                         <div class="atk-orb" id="atk-enemy-front-1"></div>
                         <div class="hp-orb" id="hp-enemy-front-1"></div>
                     </div>
                     <div class="enemy enemy-natial-space front-natial" id="enemy-front-2">
                         <div class="name-banner" id="name-enemy-front-2"></div>
+                        <div class="icons" id="icons-enemy-front-2"></div>
+                        <div class="mana-orb" id="mana-enemy-front-2"></div>
                         <div class="atk-orb" id="atk-enemy-front-2"></div>
                         <div class="hp-orb" id="hp-enemy-front-2"></div>
                     </div>
                     <div class="enemy enemy-natial-space front-natial" id="enemy-front-3">
                         <div class="name-banner" id="name-enemy-front-3"></div>
+                        <div class="icons" id="icons-enemy-front-3"></div>
+                        <div class="mana-orb" id="mana-enemy-front-3"></div>
                         <div class="atk-orb" id="atk-enemy-front-3"></div>
                         <div class="hp-orb" id="hp-enemy-front-3"></div>
                     </div>
                     <div class="enemy enemy-natial-space back-natial" id="enemy-back-0">
                         <div class="name-banner" id="name-enemy-back-0"></div>
+                        <div class="icons" id="icons-enemy-back-0"></div>
+                        <div class="mana-orb" id="mana-enemy-back-0"></div>
                         <div class="atk-orb" id="atk-enemy-back-0"></div>
                         <div class="hp-orb" id="hp-enemy-back-0"></div>
                     </div>
                     <div class="enemy enemy-natial-space back-natial" id="enemy-back-1">
                         <div class="name-banner" id="name-enemy-back-1"></div>
+                        <div class="icons" id="icons-enemy-back-1"></div>
+                        <div class="mana-orb" id="mana-enemy-back-1"></div>
                         <div class="atk-orb" id="atk-enemy-back-1"></div>
                         <div class="hp-orb" id="hp-enemy-back-1"></div>
                     </div>
                     <div class="enemy enemy-natial-space back-natial" id="enemy-back-2">
                         <div class="name-banner" id="name-enemy-back-2"></div>
+                        <div class="icons" id="icons-enemy-back-2"></div>
+                        <div class="mana-orb" id="mana-enemy-back-2"></div>
                         <div class="atk-orb" id="atk-enemy-back-2"></div>
                         <div class="hp-orb" id="hp-enemy-back-2"></div>
                     </div>
@@ -66,36 +143,50 @@
                 <div id="friendly-natial-zone" class="container">
                     <div class="friendly friendly-natial-space front-natial" id="friendly-front-0">
                         <div class="name-banner" id="name-friendly-front-0"></div>
+                        <div class="icons" id="icons-friendly-front-0"></div>
+                        <div class="mana-orb" id="mana-friendly-front-0"></div>
                         <div class="atk-orb" id="atk-friendly-front-0"></div>
                         <div class="hp-orb" id="hp-friendly-front-0"></div>
                     </div>
                     <div class="friendly friendly-natial-space front-natial" id="friendly-front-1">
                         <div class="name-banner" id="name-friendly-front-1"></div>
+                        <div class="icons" id="icons-friendly-front-1"></div>
+                        <div class="mana-orb" id="mana-friendly-front-1"></div>
                         <div class="atk-orb" id="atk-friendly-front-1"></div>
                         <div class="hp-orb" id="hp-friendly-front-1"></div>
                     </div>
                     <div class="friendly friendly-natial-space front-natial" id="friendly-front-2">
                         <div class="name-banner" id="name-friendly-front-2"></div>
+                        <div class="icons" id="icons-friendly-front-2"></div>
+                        <div class="mana-orb" id="mana-friendly-front-2"></div>
                         <div class="atk-orb" id="atk-friendly-front-2"></div>
                         <div class="hp-orb" id="hp-friendly-front-2"></div>
                     </div>
                     <div class="friendly friendly-natial-space front-natial" id="friendly-front-3">
                         <div class="name-banner" id="name-friendly-front-3"></div>
+                        <div class="icons" id="icons-friendly-front-3"></div>
+                        <div class="mana-orb" id="mana-friendly-front-3"></div>
                         <div class="atk-orb" id="atk-friendly-front-3"></div>
                         <div class="hp-orb" id="hp-friendly-front-3"></div>
                     </div>
                     <div class="friendly friendly-natial-space back-natial" id="friendly-back-0">
                         <div class="name-banner" id="name-friendly-back-0"></div>
+                        <div class="icons" id="icons-friendly-back-0"></div>
+                        <div class="mana-orb" id="mana-friendly-back-0"></div>
                         <div class="atk-orb" id="atk-friendly-back-0"></div>
                         <div class="hp-orb" id="hp-friendly-back-0"></div>
                     </div>
                     <div class="friendly friendly-natial-space back-natial" id="friendly-back-1">
                         <div class="name-banner" id="name-friendly-back-1"></div>
+                        <div class="icons" id="icons-friendly-back-1"></div>
+                        <div class="mana-orb" id="mana-friendly-back-1"></div>
                         <div class="atk-orb" id="atk-friendly-back-1"></div>
                         <div class="hp-orb" id="hp-friendly-back-1"></div>
                     </div>
                     <div class="friendly friendly-natial-space back-natial" id="friendly-back-2">
                         <div class="name-banner" id="name-friendly-back-2"></div>
+                        <div class="icons" id="icons-friendly-back-2"></div>
+                        <div class="mana-orb" id="mana-friendly-back-2"></div>
                         <div class="atk-orb" id="atk-friendly-back-2"></div>
                         <div class="hp-orb" id="hp-friendly-back-2"></div>
                     </div>
@@ -103,31 +194,43 @@
                 <div id="friendly-hand-zone" class="container">
                     <div class="friendly friendly-hand-space" id="friendly-hand-0">
                         <div class="name-banner" id="name-friendly-hand-0"></div>
+                        <div class="icons" id="icons-friendly-hand-0"></div>
+                        <div class="mana-orb" id="mana-friendly-hand-0"></div>
                         <div class="atk-orb" id="atk-friendly-hand-0"></div>
                         <div class="hp-orb" id="hp-friendly-hand-0"></div>
                     </div>
                     <div class="friendly friendly-hand-space" id="friendly-hand-1">
                         <div class="name-banner" id="name-friendly-hand-1"></div>
+                        <div class="icons" id="icons-friendly-hand-1"></div>
+                        <div class="mana-orb" id="mana-friendly-hand-1"></div>
                         <div class="atk-orb" id="atk-friendly-hand-1"></div>
                         <div class="hp-orb" id="hp-friendly-hand-1"></div>
                     </div>
                     <div class="friendly friendly-hand-space" id="friendly-hand-2">
                         <div class="name-banner" id="name-friendly-hand-2"></div>
+                        <div class="icons" id="icons-friendly-hand-2"></div>
+                        <div class="mana-orb" id="mana-friendly-hand-2"></div>
                         <div class="atk-orb" id="atk-friendly-hand-2"></div>
                         <div class="hp-orb" id="hp-friendly-hand-2"></div>
                     </div>
                     <div class="friendly friendly-hand-space" id="friendly-hand-3">
                         <div class="name-banner" id="name-friendly-hand-3"></div>
+                        <div class="icons" id="icons-friendly-hand-3"></div>
+                        <div class="mana-orb" id="mana-friendly-hand-3"></div>
                         <div class="atk-orb" id="atk-friendly-hand-3"></div>
                         <div class="hp-orb" id="hp-friendly-hand-3"></div>
                     </div>
                     <div class="friendly friendly-hand-space" id="friendly-hand-4">
                         <div class="name-banner" id="name-friendly-hand-4"></div>
+                        <div class="icons" id="icons-friendly-hand-4"></div>
+                        <div class="mana-orb" id="mana-friendly-hand-4"></div>
                         <div class="atk-orb" id="atk-friendly-hand-4"></div>
                         <div class="hp-orb" id="hp-friendly-hand-4"></div>
                     </div>
                     <div class="friendly friendly-hand-space" id="friendly-hand-5">
                         <div class="name-banner" id="name-friendly-hand-5"></div>
+                        <div class="icons" id="icons-friendly-hand-5"></div>
+                        <div class="mana-orb" id="mana-friendly-hand-5"></div>
                         <div class="atk-orb" id="atk-friendly-hand-5"></div>
                         <div class="hp-orb" id="hp-friendly-hand-5"></div>
                     </div>
@@ -135,7 +238,9 @@
                 </div>
             </div>
             <div id="right-container">
-                <div id="card-detail-zone" class="container">card detail zone</div>
+                <div id="card-largepic-zone" class="container"></div>
+                <div id="card-detail-zone" class="container">detail zone</div>
+                <div id="feedback-zone" class="container">feedback zone</div>
                 <div id="controls-zone" class="container"><button id="end-turn">end turn</button></div>
             </div>
         </div>
