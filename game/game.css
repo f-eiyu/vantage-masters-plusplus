@@ -75,6 +75,57 @@ body {
 
     font-size: 9pt;
 }
+
+.friendly, .enemy {
+    position: relative;
+}
+
+.name-banner {
+    position: absolute;
+    top: 0px;
+
+    display: none;
+    text-align: center;
+
+    width: 100%;
+    background-color: rgba(180 , 180, 180, 0.7);
+}
+
+.hp-orb, .atk-orb {
+    position: absolute;
+    bottom: 0;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    height: 2em;
+    width: 2em;
+    margin: 2px;
+    border: solid black 1px;
+    border-radius: 100%;
+
+    font-weight: bold;
+}
+
+.hp-orb {
+    bottom: 0;
+    right: 0;
+
+    background-color: rgba(0, 255, 0, 0.8);
+}
+
+.atk-orb {
+    left: 0;
+
+    background-color: rgba(255, 0, 0, 0.8);
+}
+
+
+
+
+
+
 .dragging {
     opacity: 0.5;
     border: solid black 1px;

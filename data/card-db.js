@@ -781,7 +781,7 @@ const cardDB = [
     },
     {
         "name": "Tyrant",
-        "portrait": null,
+        "portrait": "https://static.wikia.nocookie.net/kiseki/images/1/12/Fighter_-_Vantage_Masters.png",
         "cost": 4,
         "type": "natial",
 

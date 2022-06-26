@@ -213,7 +213,7 @@ class BoardSpace {
     }
 
     // this function could use a good refactor or two
-    render() {
+    renderOld() {
         let cardStr = null;
 
         // empty spaces in card or hand render as blanks
@@ -242,6 +242,79 @@ class BoardSpace {
 
         this.DOM.innerText = cardStr;
         return cardStr;
+    }
+
+    render() {
+        const getDomIdName = () => {
+            // returns the id name of the DOM element associated with this space
+            let domName = "";
+
+            const playerStr = (this.owner === PLAYER_FRIENDLY ? "friendly" : "enemy");
+            let zoneStr = null;
+            if (this.isHand) { zoneStr = "hand"; }
+            else if (this.isFrontRow) { zoneStr = "front"; }
+            else { zoneStr = "back"; }
+            const indexStr = this.index;
+
+            domName = `${playerStr}-${zoneStr}-${indexStr}`
+
+            return domName;
+        }
+
+        const card = this.innerCard;
+        const domID = getDomIdName();
+        const nameBanner = document.getElementById(`name-${domID}`);
+        const hpOrb = document.getElementById(`hp-${domID}`);
+        const atkOrb = document.getElementById(`atk-${domID}`);
+
+        // always display blanks if no card is present
+        if (!this.hasCard) {
+            return;
+        }
+
+        // enemy hand cards are the only ones the player can't view
+        if (this.owner === PLAYER_ENEMY && this.isHand) {
+            if (this.hasCard) { this.DOM.innerText = "???"; }
+        }
+
+        if (!(this.owner === PLAYER_ENEMY && this.isHand)) {
+            nameBanner.style.display = "block";
+            hpOrb.style.display = "flex";
+            atkOrb.style.display = "flex";
+
+            nameBanner.innerText = card.name;
+            hpOrb.innerText = card.curHP;
+            atkOrb.innerText = card.attack;
+
+            this.DOM.style.backgroundImage = `url('${card.portraitURL}')`;
+            this.DOM.style.backgroundSize = "cover";
+            
+            let bgColor = "";
+            if (card.type === "spell") { bgColor = "green"; }
+            else {
+                switch (card.element) {
+                    case ELEMENT_FIRE:
+                        bgColor = "red";
+                        break;
+                    case ELEMENT_HEAVEN:
+                        bgColor = "lightgrey";
+                        break;
+                    case ELEMENT_EARTH:
+                        bgColor = "#d3ac8b";
+                        break;
+                    case ELEMENT_WATER:
+                        bgColor = "cyan";
+                        break;
+                    default:
+                        bgColor = "purple";
+                }
+            }
+            this.DOM.style.backgroundColor = bgColor;
+        }
+
+        if (this.owner === PLAYER_FRIENDLY && this.hasCard) {
+            this.setDraggable();
+        } else { this.clearDraggable(); }
     }
 
     setDraggable() {
@@ -330,7 +403,6 @@ class AuraHandler {
         // (this helps prevent wonky behavior with eg. cards immediately dying
         // when an aura is removed and instantly replaced)
         const toApply = this.removeIntersection(this._addQueueRaw, this._removeQueueRaw);
-        console.log(toApply);
         this._addQueue.push(...toApply[0]);
         this._removeQueue.push(...toApply[1]);
 
@@ -636,8 +708,6 @@ class NatialZone {
     moveNatial(originSpace, destSpace) {
         const originCard = originSpace.innerCard;
         const destCard = destSpace.innerCard;
-
-
 
         // onMove hook: place the appropriate aura additions/removals into
         // AuraHandler queues
