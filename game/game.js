@@ -1,18 +1,28 @@
-'use strict';
-
 const boardCardMouseover = (event) => {
     console.log(event);
-    const boardSpace = (new CardDOMEvent(event.target)).spaceObj;
+    const boardSpace = (new CardDOMEvent(event)).spaceObj;
+    const card = boardSpace.innerCard;
     if (!boardSpace.hasCard) { return; }
 
-    const detailZone = document.querySelector("#card-largepic-zone");
+    // set image
+    const largeCardZone = document.querySelector("#card-largepic-zone");
+    largeCardZone.style.backgroundImage = `url('${boardSpace.innerCard.portraitURL}')`;
+    largeCardZone.style.backgroundSize = "cover";
 
-    detailZone.innerText = boardSpace._DOM.innerText;
-    if (boardSpace.innerCard.type === "spell") {
-        detailZone.innerText += boardSpace.innerCard.longdesc;
-    }
-    detailZone.style.backgroundImage = `url('${boardSpace.innerCard.portraitURL}')`;
-    detailZone.style.backgroundSize = "cover";
+    // set description text
+    const detailZone = document.getElementById("card-detail-zone");
+    let detailStr = "";
+    if (card.skillDesc) { detailStr += `<p><strong>Active</strong>: ${card.skillDesc}${card.isMaster ? " (" + card.skillCost + " mana)" : ""}</p>`; }
+    if (card.passiveDesc) { detailStr += `<p><strong>Passive</strong>: ${card.passiveDesc}</p>`; }
+    if (card.longdesc) { detailStr += `<p><strong>Effect</strong>: ${card.longdesc}`; }
+    if (!detailStr) { detailStr += `<p>${card.name} has no special abilities.</p>`; }
+
+    detailStr = `<h3>${card.name}</h3>
+    ${card.isMaster ? "<p></p>" : "<p>Costs <strong>" + card.cost + "</strong> mana</p>"}
+    ${detailStr}`;
+
+    detailZone.innerHTML = detailStr;
+
     boardSpace._DOM.classList.add("hovered");
 }
 
@@ -20,9 +30,15 @@ const boardCardMouseleave = (event) => {
     const boardSpace = event.target;
     const largeCardZone = document.querySelector("#card-largepic-zone");
 
+    // reset large image to card background
     largeCardZone.innerText = "";
     largeCardZone.style.backgroundImage = `url('../data/img/misc/card-back.png')`;
     largeCardZone.style.backgroundSize = "cover";
+
+    // reset card detail text
+    const detailZone = document.getElementById("card-detail-zone");
+    detailZone.innerText = "";
+
     boardSpace.classList.remove("hovered");
 }
 
@@ -33,25 +49,19 @@ const cardToBoardDirect = (player, card, row, position, render = true) => {
     if (render) { game.renderAll(); }
 }
 
-const incrementTurnCounter = () => {
-    // one full turn consists of both players making a move. in this way, we
-    // can have an accurate counter for full turns regardless of who goes first.
-    turnCounter += 0.5;
-}
-
 const friendlyStartTurn = () => {
-    incrementTurnCounter();
-    renderTurnCounter();
+    game.incrementTurnCounter();
+    game.renderTurnCounter();
     
     friendlyPlayer.refreshNatials();
     friendlyPlayer.refreshMana();
     friendlyPlayer.drawCard();
 
-    playerCanInteract = true;
+    playerControl = true;
 }
 
 const friendlyEndTurn = () => {
-    playerCanInteract = false;
+    playerControl = false;
     
     // onTurnEnd hook
     friendlyPlayer.natialZone.forAllSpaces(sp => {
@@ -68,8 +78,8 @@ const friendlyEndTurn = () => {
 
 // most functions encoding actual AI behavior will be in the ai.js file
 const enemyStartTurn = () => {
-    incrementTurnCounter();
-    renderTurnCounter();
+    game.incrementTurnCounter();
+    game.renderTurnCounter();
 
     enemyPlayer.refreshNatials();
     enemyPlayer.refreshMana();
@@ -142,18 +152,18 @@ const initializeGameBoard = () => {
     const _enemyDeckTemplate = [];
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
+            _playerDeckTemplate.push(createCard(getFromDB("Magic Crystal")));
+            _playerDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _playerDeckTemplate.push(createCard(getFromDB("Requ")));
-            _playerDeckTemplate.push(createCard(getFromDB("Requ")));
-            _playerDeckTemplate.push(createCard(getFromDB("Amoltamis")));
-            _playerDeckTemplate.push(createCard(getFromDB("Amoltamis")));
-            _playerDeckTemplate.push(createCard(getFromDB("Amoltamis")));
+            _playerDeckTemplate.push(createCard(getFromDB("Blyx")));
+            _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
             _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Ranger")));
+        _playerDeckTemplate.push(createCard(getFromDB("Bard")));
         _enemyDeckTemplate.push(createCard(getFromDB("Tyrant")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);

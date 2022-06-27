@@ -23,9 +23,7 @@ const TYPE_CHART = [ // row = attacker, col = target
     [0, 2, 0, -2, 0] // ELEMENT_WATER attack
 ];
 
-let turnCounter = 0;
-
-let playerCanInteract = false;
+let playerControl = false;
 let gameEnd = false;
 
 let thisDragFrom = null;

@@ -72,13 +72,15 @@ class NatialCard extends Card {
         this._shieldedTurns = 0;
         this._protected = 0;
 
-        // passive callbacks - placeholder for now
-        this._cardPassiveCbName = cardProto.passiveCallbackName;
-
         // skill callbacks
         this._cardSkillCbName = cardProto.skillCallbackName;
         this._cardSkillReady = Boolean(this._cardSkillCbName);
         this._cardSkillCost = cardProto.skillCost;
+        this._cardSkillCbDesc = cardProto.skillCallbackDesc;
+
+        // passive callbacks
+        this._cardPassiveCbName = cardProto.passiveCallbackName;
+        this._cardPassiveCbDesc = cardProto.passiveCallbackDesc;
 
         // cosmetic
         this._playerIcon = cardProto.playerIcon;
@@ -97,12 +99,14 @@ class NatialCard extends Card {
     get sealed() { return this._sealedTurns; }
     get shielded() { return this._shieldedTurns; }
     get protected() { return this._protected; }
-    get hasPassive() { return Boolean(this._cardPassiveCbName); }
-    get passiveCbName() { return this._cardPassiveCbName; }
     get hasSkill() { return Boolean(this._cardSkillCbName); }
     get skillCbName() { return this._cardSkillCbName; }
     get skillReady() { return this._cardSkillReady; }
     get skillCost() { return this._cardSkillCost; }
+    get skillDesc() { return this._cardSkillCbDesc; }
+    get hasPassive() { return Boolean(this._cardPassiveCbName); }
+    get passiveCbName() { return this._cardPassiveCbName; }
+    get passiveDesc() { return this._cardPassiveCbDesc; }
     get playerIcon() { return this._playerIcon; }
 
     set element(newElement) {
@@ -216,40 +220,8 @@ class BoardSpace {
         this._clear();
     }
 
-    // this function could use a good refactor or two
-    renderOld() {
-        let cardStr = null;
-
-        // empty spaces in card or hand render as blanks
-        if (!this.hasCard) {
-            this.DOM.innerText = "";
-        } else if (this.innerCard.type === "natial") {
-            cardStr = `${this.innerCard.name}
-            Element: ${getElementName(this.innerCard.element)}
-            HP: ${this.innerCard.curHP}/${this.innerCard.maxHP}
-            ATK: ${this.innerCard.attack}
-            Cost: ${this.innerCard.isMaster ? this.innerCard.skillCost : this.innerCard.cost}
-            Actions: ${this.innerCard.currentActions}
-            ${this.innerCard.isRanged ? "R" : ""}${this.innerCard.isQuick ? "Q" : ""}
-            `;
-        } else { // (this.innerCard.type === "spell")
-            cardStr = `${this.innerCard.name}
-            Cost: ${this.innerCard.cost}
-            `
-        }
-
-        if (this.owner !== PLAYER_ENEMY && this.hasCard) {
-            this.setDraggable();
-        } else {
-            this.clearDraggable();
-        }
-
-        this.DOM.innerText = cardStr;
-        return cardStr;
-    }
-
-    // this function is pretty ugly but what can you do
-    render() {
+    // this is pretty ugly but what can you do
+    render(invis = false) {
         const getDomIdName = () => {
             // returns the id name of the DOM element associated with this space
             let domName = "";
@@ -268,12 +240,15 @@ class BoardSpace {
 
         const card = this.innerCard;
         const domID = getDomIdName();
-        console.log(domID);
+        const thisDOM = document.getElementById(domID);
         const nameBanner = document.getElementById(`name-${domID}`);
         const hpOrb = document.getElementById(`hp-${domID}`);
         const atkOrb = document.getElementById(`atk-${domID}`);
         const manaOrb = document.getElementById(`mana-${domID}`);
         const icons = document.getElementById(`icons-${domID}`);
+
+        if (invis) { thisDOM.style.opacity = 0; }
+        else { thisDOM.style.opacity = 1; }
 
         // enemy hand cards are the only ones the player can't view
         if (this.owner === PLAYER_ENEMY && this.isHand && this.hasCard) {
@@ -296,38 +271,40 @@ class BoardSpace {
         // render the card background and various properties
         else {
             nameBanner.style.display = "block";
-            hpOrb.style.display = "flex";
-            atkOrb.style.display = "flex";
+            if (card.type !== "spell") {
+                hpOrb.style.display = "flex";
+                atkOrb.style.display = "flex";
+            }
             manaOrb.style.display = "flex";
             icons.style.display = "flex";
 
             nameBanner.innerText = card.name;
             hpOrb.innerText = card.curHP;
             atkOrb.innerText = card.attack;
-            manaOrb.innerText = card.cost;
+            if (card.isMaster) { manaOrb.innerText = card.skillCost; }
+            else { manaOrb.innerText = card.cost; }
             icons.innerHTML = "";
             if (card.isRanged) { icons.innerHTML += "<img src='../data/img/misc/icon-ranged.png' class='icon' />"; }
             if (card.isQuick) { icons.innerHTML += "<img src='../data/img/misc/icon-quick.png' class='icon' />"; }
-            console.log(icons.innerHTML);
 
             let bgColor = "";
             if (card.type === "spell") { bgColor = "green"; }
             else {
                 switch (card.element) {
                     case ELEMENT_FIRE:
-                        bgColor = "red";
+                        bgColor = "rgba(255, 50, 50, 0.8)";
                         break;
                     case ELEMENT_HEAVEN:
-                        bgColor = "lightgrey";
+                        bgColor = "rgba(211, 211, 211, 0.8)";
                         break;
                     case ELEMENT_EARTH:
-                        bgColor = "#d3ac8b";
+                        bgColor = "rgba(210, 180, 140, 0.8)";
                         break;
                     case ELEMENT_WATER:
-                        bgColor = "cyan";
+                        bgColor = "rgba(40, 220, 230, 0.8)";
                         break;
                     default:
-                        bgColor = "purple";
+                        bgColor = "rgba(147, 112, 219, 0.8)";
                 }
             }
             nameBanner.style.backgroundColor = bgColor;
@@ -336,7 +313,7 @@ class BoardSpace {
             this.DOM.style.backgroundSize = "cover";
         }
 
-        if (this.owner === PLAYER_FRIENDLY && this.hasCard) {
+        if (this.owner === PLAYER_FRIENDLY && this.hasCard && !invis) {
             this.setDraggable();
         } else { this.clearDraggable(); }
     }
@@ -730,6 +707,9 @@ class NatialZone {
 
     // transfers the card instance in moverSpace to targetSpace
     moveNatial(originSpace, destSpace) {
+        // disable player control for the duration of the move
+        game.playerLoseControl(game.fadeoutTime + game.fadeinTime + 25);
+
         const originCard = originSpace.innerCard;
         const destCard = destSpace.innerCard;
 
@@ -760,7 +740,18 @@ class NatialZone {
         destSpace.auraHandler.applyAurasMovement(originSpace);
         originSpace.auraHandler.applyAurasMovement(destSpace);
 
-        game.renderAll();
+        // animate and re-render the board
+        setTimeout(game.renderAll, game.fadeoutTime + game.fadeinTime);
+        game.fadeout(originSpace, game.fadeoutTime);
+        if (destCard) { game.fadeout(destSpace, game.fadeoutTime); }
+        setTimeout(() => {
+            // invisibly update the DOMs for origin and destination...
+            originSpace.render(true);
+            destSpace.render(true);
+            // ... and then fade the card(s) in
+            game.fadein(destSpace, game.fadeinTime);
+            if (destCard) { game.fadein(originSpace, game.fadeinTime); }
+        }, game.fadeoutTime);
     }   
 
     // performs the indicated callback with each space in the indicated row.
@@ -942,12 +933,14 @@ class Player {
     // checks whether a natial can be summoned to the desired space. does not
     // actually summon the natial.
     validateSummon(toSummonSpace, targetSpace) {
-        // fail if the two spaces aren't owned by the same player
-        if (toSummonSpace.owner !== targetSpace.owner) { return false; }
-        // fail if the card to summon is a spell
-        if (toSummonSpace.innerCard.type === "spell") { return false; }
-        // fail if target space is occupied
-        if (targetSpace.hasCard) { return false; }
+        try {
+            // fail if the two spaces aren't owned by the same player
+            if (toSummonSpace.owner !== targetSpace.owner) { return false; }
+            // fail if the card to summon is a spell
+            if (toSummonSpace.innerCard.type === "spell") { return false; }
+            // fail if target space is occupied
+            if (targetSpace.hasCard) { return false; }
+        } catch(error) {debugger;}
         // fail if insufficient mana
         if (this.currentMana < toSummonSpace.innerCard.cost) { return false; }
 
@@ -956,6 +949,9 @@ class Player {
 
     // moves a natial from the hand to the board, deducting the necessary mana
     summonNatial(originHandSpace, destNatialSpace) {
+        // disable player control for the duration of the move
+        game.playerLoseControl(game.fadeoutTime + game.fadeinTime + 25);
+
         const summonedCard = originHandSpace.innerCard;
 
         // onSummon hook: tell AuraHandlers to prepare to parse potentially
@@ -986,8 +982,19 @@ class Player {
         // now, apply any aura effects to the summoned natial.
         destNatialSpace.auraHandler.applyAurasMovement(originHandSpace);
 
-        // summoning will always require a re-render
-        game.renderAll();
+        // animate and re-render the board
+        const fadeoutTime = game.fadeoutTime;
+        const fadeinTime = game.fadeinTime;
+        
+        setTimeout(game.renderAll, fadeoutTime + fadeinTime);
+        game.fadeout(originHandSpace, fadeoutTime);
+        setTimeout(() => {
+            // invisibly update the DOMs for origin and destination...
+            originHandSpace.render(true);
+            destNatialSpace.render(true);
+            // ... and then fade the card(s) in
+            game.fadein(destNatialSpace, fadeinTime);
+        }, fadeoutTime);
 
         return true;
     }
@@ -1013,7 +1020,6 @@ class Player {
         iconDOM.style.backgroundSize = "250px";
         iconDOM.style.backgroundRepeat = "no-repeat";
         iconDOM.style.backgroundPosition = "center";
-        console.log("loadicon", iconDOM)
     }
 
     // currently just renders the player's mana display, but may be expanded
@@ -1034,7 +1040,28 @@ class Player {
 }
 
 class GameBoard {
-    constructor() {}
+    constructor() {
+        this._turnCounter = 0;
+
+        // aesthetic parameters -- can tweak!
+        this._fadeoutTime = 600;
+        this._fadeinTime = 600;
+    }
+
+    get turnCounter() { return this._turnCounter; }
+    get fadeoutTime() { return this._fadeoutTime; }
+    get fadeinTime() { return this._fadeinTime; }
+
+    incrementTurnCounter() {
+        // one full turn consists of both players making a move. in this way, we
+        // can have an accurate counter for full turns regardless of who goes first.
+        this._turnCounter += 0.5;
+    }
+
+    renderTurnCounter() {
+        const turnDOM = document.getElementById("misc-container");
+        turnDOM.innerText = Math.ceil(this.turnCounter);
+    }
 
     renderAll() {
         for (let player of [PLAYER_FRIENDLY, PLAYER_ENEMY]) {
@@ -1043,8 +1070,58 @@ class GameBoard {
             thisPlayer.natialZone.render();
             thisPlayer.render();
         }
-    
-        renderTurnCounter();
+        game.renderTurnCounter();
+    }
+
+    playerLoseControl(time = 0) {
+        playerControl = false;
+        friendlyPlayer.natialZone.forAllSpaces(sp => sp.clearDraggable());
+        friendlyPlayer.hand.forAllSpaces(sp => sp.clearDraggable());
+        document.getElementById("end-turn").disabled = true;
+
+        if (time) { setTimeout(this.playerGainControl, time); }
+    }
+
+    playerGainControl() {
+        playerControl = true;
+        friendlyPlayer.natialZone.forAllSpaces(sp => sp.setDraggable());
+        friendlyPlayer.hand.forAllSpaces(sp => sp.setDraggable());
+        document.getElementById("end-turn").disabled = false;
+    }
+
+    fadeout(space, time = 1000) {
+        const thisDOM = space.DOM;
+        let opacity = thisDOM.style.opacity;
+        const numFrames = 60 * (time / 1000); // # of fade frames at 60 fps
+
+        const opDelta = opacity / numFrames;
+
+        let timer = setInterval(() => {
+            opacity = Math.max(opacity - opDelta, 0);
+            thisDOM.style.opacity = opacity;
+
+            if (opacity <= 0) {
+                clearInterval(timer);
+                thisDOM.style.opacity = 0;
+            }
+        }, 1000 / 60);
+    }
+
+    fadein(space, time = 1000) {
+        const thisDOM = space.DOM;
+        let opacity = 0.0;
+        const numFrames = 60 * (time / 1000); // # of fade frames at 60 fps
+        const opDelta = 1.0 / numFrames;
+
+        let timer = setInterval(() => {
+            opacity = Math.min(opacity + opDelta, 1);
+            thisDOM.style.opacity = opacity;
+
+            if (opacity >= 1) {
+                clearInterval(timer);
+                thisDOM.style.opacity = 1;
+            }
+        }, 1000 / 60);
     }
 
     // checks if either player has met the victory condition. returns true if the
@@ -1056,15 +1133,15 @@ class GameBoard {
 
         if (friendlyHP <= 0 && enemyHP <= 0) {
             console.log("it's a draw!");
-            playerCanInteract = false;
+            playerControl = false;
         }
         else if (friendlyHP <= 0) {
             console.log("computer wins!");
-            playerCanInteract = false;
+            playerControl = false;
         }
         else if (enemyHP <= 0) {
             console.log("you win!");
-            playerCanInteract = false;
+            playerControl = false;
         }
         else {
             return false;
@@ -1212,7 +1289,16 @@ class DestroyedCards {
 // objects on the board when needed, and the wrappers inside serve as shortcuts 
 // to give event listeners more convenient access to logic and validation.
 class CardDOMEvent {
-    constructor(cardDOM) {
+    constructor(cardDOMEvent) {
+        let cardDOM = cardDOMEvent.target;
+        // if the click/hover/drag events are called on children of a card's
+        // DOM, backtrack to the parent node that originally had the event
+        // listener attached, which will always have one of these two classes.
+        while (!cardDOM.classList.contains("enemy")
+                && !cardDOM.classList.contains("friendly")) {
+            cardDOM = cardDOM.parentNode;
+        }
+        
         this._spaceObj = this.domIDToSpaceObj(cardDOM.id);
     }
 
@@ -1230,9 +1316,6 @@ class CardDOMEvent {
     // fetches the BoardSpace instance corresponding to the desired DOM ID
     domIDToSpaceObj(domID) {
         const domIDParts = domID.split("-");
-        if (domIDParts[0] !== "friendly" && domIDParts[0] !== "enemy") {
-            domIDParts.shift();
-        }
         const owner = (domIDParts[0] === "friendly" ? friendlyPlayer : enemyPlayer);
         const zone = domIDParts[1];
         const index = parseInt(domIDParts[2]);

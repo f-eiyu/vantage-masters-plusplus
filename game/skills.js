@@ -155,7 +155,7 @@ const skillUseValidation = (userSpace, targetSpace) => {
 const natialRightClick = (event) => {
     event.preventDefault();
 
-    const thisRightClick = new CardDOMEvent(event.target);
+    const thisRightClick = new CardDOMEvent(event);
     const userSpace = thisRightClick.spaceObj;
     const userCard = userSpace.innerCard;
     const player = getPlayer(userSpace.owner);
@@ -179,7 +179,7 @@ const natialLeftClick = (event) => {
     if (!skillUsage.selected) { return; }
 
     const skillUser = skillUsage.userSpace;
-    const thisLeftClick = new CardDOMEvent(event.target);
+    const thisLeftClick = new CardDOMEvent(event);
     const thisLeftClickSpace = thisLeftClick.spaceObj;
 
     if (skillUseValidation(skillUser, thisLeftClickSpace)) {
@@ -579,8 +579,10 @@ const natialPassiveCallbacks = {
             if (prevHP >= 10 && curHP < 10) {
                 const player = getPlayer(damagedSpace.owner);
                 player.natialZone.forAllCards(card => {
-                    card.restoreHP(1);
-                    card.buffAtk(1);
+                    if (card !== damagedSpace.innerCard) {
+                        card.restoreHP(1);
+                        card.buffAtk(1);
+                    }
                 });
             }
         }

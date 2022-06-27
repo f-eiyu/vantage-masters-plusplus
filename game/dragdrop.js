@@ -2,19 +2,19 @@
 // refactoring in order to prevent its interactions from being a convoluted mess
 
 const dragStart = (event) => {
-    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
+    if (!playerControl || gameEnd || skillUsage.selected) { return; }
 
-    thisDragFrom = new CardDOMEvent(event.target);
+    thisDragFrom = new CardDOMEvent(event);
     event.target.classList.add("dragging");
 }
 
 const cardDragEnter = (event) => {
-    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; 
+    if (!playerControl || gameEnd || skillUsage.selected) { return; 
     }
     event.preventDefault();
 
     const fromSpace = thisDragFrom.spaceObj;
-    thisDragTo = new CardDOMEvent(event.target);
+    thisDragTo = new CardDOMEvent(event);
     const toSpace = thisDragTo.spaceObj;
 
     // sanity check
@@ -59,7 +59,7 @@ const cardDragEnter = (event) => {
 // hovered. this function's sole purpose is to call preventDefault() on the
 // dragover listener so that it's possible for the drop listener to fire.
 const cardDragOver = (event) => {
-    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
+    if (!playerControl || gameEnd || skillUsage.selected) { return; }
     
     event.preventDefault();
 }
@@ -75,14 +75,14 @@ const cardDragLeave = (event) => {
 }
 
 const cardDragDrop = (event) => {
-    if (!playerCanInteract || gameEnd || skillUsage.selected) { return; }
+    if (!playerControl || gameEnd || skillUsage.selected) { return; }
 
     event.preventDefault();
     clearDragVisuals(event);
     
     // extract destination information from the event object
     const fromSpace = thisDragFrom.spaceObj;
-    thisDragTo = new CardDOMEvent(event.target);
+    thisDragTo = new CardDOMEvent(event);
     const toSpace = thisDragTo.spaceObj;
     const isToFriendlyNatial = (thisDragTo.owner === PLAYER_FRIENDLY && thisDragTo.isNatial);
     const isToEnemyNatial = (thisDragTo.owner === PLAYER_ENEMY && thisDragTo.isNatial);

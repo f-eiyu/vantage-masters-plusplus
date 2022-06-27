@@ -39,22 +39,3 @@ const getElementName = (element) => {
             return "Error getting element name";
     }
 }
-
-// re-renders all cards in the specified player's hand.
-const renderHand = (player) => {
-    getPlayer(player).hand.forEach(space => space.renderCard());
-}
-
-// re-renders all cards in both of the specified player's natial zones. as
-// above, forEach will not work here.
-const renderNatials = (player) => {
-    natials[player][ROW_FRONT].forEach(space => space.renderCard());
-    natials[player][ROW_BACK].forEach(space => space.renderCard());
-}
-
-// displays the current turn
-const renderTurnCounter = () => {
-    const turnDOM = document.getElementById("misc-container");
-
-    turnDOM.innerText = Math.ceil(turnCounter);
-}

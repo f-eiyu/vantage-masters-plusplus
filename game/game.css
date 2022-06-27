@@ -17,11 +17,12 @@ body {
     top: 0;
     bottom: 0;
     
-    height: 850px;
-    width: 1200px;
+    height: 920px;
+    width: 1300px;
 
     background-color: #35654d;
     border: solid black 4px;
+    border-radius: 10px;
 
     display: grid;
     grid-template: 1fr / 2fr 5fr 2fr;
@@ -43,6 +44,9 @@ body {
 #center-container {
     display: grid;
     grid-template: 1fr 2fr 2fr 1fr / 1fr;
+
+    border-left: solid black 1px;
+    border-right: solid black 1px;
 }
 
 #right-container {
@@ -55,9 +59,30 @@ body {
     background-size: cover;
 }
 
-.container, .enemy-hand-space, .enemy-natial-space, .friendly-hand-space, .friendly-natial-space {
-    border: solid black 1px;
+#card-detail-zone {
+    justify-content: center;
+    align-content: flex-start;
+    flex-wrap: wrap;
 
+    font-size: 1.2em;
+}
+
+#card-detail-zone > h3 {
+    margin-bottom: 0px;
+}
+
+#card-detail-zone > p {
+    display: block;
+    width: 100%;
+    margin: 3px;
+}
+
+#feedback-zone {
+    border-top: solid black 1px;
+    border-bottom: solid black 1px;
+}
+
+.container, .enemy-hand-space, .enemy-natial-space, .friendly-hand-space, .friendly-natial-space {
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -66,17 +91,20 @@ body {
 #enemy-natial-zone {
     flex-wrap: wrap-reverse;
     padding: 0 20%;
+
+    border-bottom: solid black 1px;
 }
 
 #friendly-natial-zone {
     flex-wrap: wrap;
     padding: 0 20%;
+
+    border-top: solid black 1px;
 }
 
-/* not the final layout size -- retweak later */
-.enemy-hand-space, .enemy-natial-space, .friendly-hand-space, .friendly-natial-space {
-    height: 136px;
-    width: 85px;
+.space-wrapper {
+    border: solid 1px black;
+    border-radius: 5px;
 }
 
 .friendly, .enemy {
@@ -85,16 +113,10 @@ body {
 
 .name-banner {
     position: absolute;
-    bottom: 2px;
 
     display: none;
     text-align: center;
     font-family: "Satisfy";
-    font-weight: bold;
-    font-size: 1em;
-
-    width: 98%;
-    opacity: 0.8;
 }
 
 .hp-orb, .atk-orb, .mana-orb, .icons {
@@ -104,50 +126,133 @@ body {
     justify-content: center;
     align-items: center;
 
-    height: 1.5em;
-    width: 1.5em;
-    margin: 3px;
     border: solid black 1px;
     border-radius: 100%;
 
+    font-family: serif;
     font-weight: bold;
 }
 
 .hp-orb {
-    bottom: 24px;
-    right: 0;
-
     background-color: rgba(0, 255, 0, 0.8);
 }
 
 .atk-orb {
-    bottom: 24px;
-    left: 0;
-
     background-color: rgba(255, 0, 0, 0.8);
 }
 
 .mana-orb {
-    top: 2px;
-    right: 0;
-
-    background-color: steelblue;
+    background-color: rgba(66, 114, 244, 0.8);
 }
 
-.icons {
+/* formatting cards in natial zone */
+.enemy-natial-space, .friendly-natial-space {
+    height: 136px;
+    width: 85px;
+}
+
+.natial-zone .name-banner {
+    font-size: 1em;
+    font-weight: bold;
+    width: 97%;
+    bottom: 2px;
+}
+
+.natial-zone .hp-orb, 
+.natial-zone .atk-orb, 
+.natial-zone .mana-orb, 
+.natial-zone .icons {
+    font-size: 0.9em;
+    height: 1.3em;
+    width: 1.3em;
+    margin: 3px;
+}
+
+.natial-zone .hp-orb {
+    bottom: 23px;
+    right: 0;
+}
+
+.natial-zone .atk-orb {
+    bottom: 23px;
+    left: 0;
+}
+
+.natial-zone .mana-orb {
+    top: 2px;
+    right: 0;
+}
+
+.natial-zone .icons {
     left: 0;
     top: 2px;
     border: none;
     border-radius: 0;
-    width: 1.5em;
+    width: 1.35em;
     flex-wrap: wrap;
 }
 
-.icon {
+.natial-zone .icon {
     height: 1.5em;
     width: 1.5em;
     display: block;
 }
+
+/* formatting cards in hand zone */
+.enemy-hand-space, .friendly-hand-space {
+    height: 120px;
+    width: 75px;
+}
+
+.hand-zone .name-banner {
+    font-size: 0.8em;
+    width: 97%;
+    bottom: 2px;
+}
+
+.hand-zone .hp-orb, 
+.hand-zone .atk-orb, 
+.hand-zone .mana-orb, 
+.hand-zone .icons {
+    font-size: 0.84em;
+    height: 1.2em;
+    width: 1.2em;
+    margin: 2px;
+}
+
+.hand-zone .hp-orb {
+    bottom: 18px;
+    right: 0;
+}
+
+.hand-zone .atk-orb {
+    bottom: 18px;
+    left: 0;
+}
+
+.hand-zone .mana-orb {
+    top: 2px;
+    right: 0;
+}
+
+.hand-zone .icons {
+    left: 0;
+    top: 2px;
+    border: none;
+    border-radius: 0;
+    width: 1.2em;
+    flex-wrap: wrap;
+}
+
+.hand-zone .icon {
+    height: 1.4em;
+    width: 1.4em;
+    display: block;
+}
+
+
+
+
 
 
 

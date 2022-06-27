@@ -108,7 +108,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillDullmdalla",
-        "passiveCallbackName": "cbPassiveDullmdalla"
+        "skillCallbackDesc": "Targets an enemy. Deals 1 damage to all enemies in the same row as the target.",
+        "passiveCallbackName": "cbPassiveDullmdalla",
+        "passiveCallbackDesc": "This card gains +1 Attack each time it defeats an enemy."
     },
     {
         "name": "Blyx",
@@ -144,7 +146,8 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": "cbPassiveOonvievle"
+        "passiveCallbackName": "cbPassiveOonvievle",
+        "passiveCallbackDesc": "This card gains +1 Attack each time it defeats an enemy."
     },
     {
         "name": "Greon",
@@ -155,14 +158,15 @@ const cardDB = [
         "element": "ELEMENT_FIRE",
         "maxHP": 5,
         "attack": 5,
-        "maxActions": 1,
+        "maxActions": 2,
 
         "isRanged": true,
         "isQuick": false,
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": null,
+        "passiveCallbackDesc": "This card can act twice in one turn."
     },
     {
         "name": "Xenofiend",
@@ -180,7 +184,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillXenofiend",
-        "passiveCallbackName": "cbPassiveXenofiend"
+        "skillCallbackDesc": "Targets an enemy. Deals 5 damage to the target.",
+        "passiveCallbackName": "cbPassiveXenofiend",
+        "passiveCallbackDesc": "This card gains +2 Attack each time it defeats an enemy."
     },
     // Heaven Natials
     {
@@ -199,7 +205,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillPelitt",
-        "passiveCallbackName": "cbPassivePelitt"
+        "skillCallbackDesc": "Targets an ally. Removes Seal from the target.",
+        "passiveCallbackName": "cbPassivePelitt",
+        "passiveCallbackDesc": "This card gains +2 Attack each time it defeats an enemy."
     },
     {
         "name": "Guene-Foss",
@@ -217,6 +225,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillGueneFoss",
+        "skillCallbackDesc": "Targets an enemy. Deals 2 damage to the target.",
         "passiveCallbackName": null
     },
     {
@@ -235,6 +244,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillKyrierBell",
+        "skillCallbackDesc": "Targets an enemy. Deals 2 damage to all enemies in the same row as the target.",
         "passiveCallbackName": null
     },
     {
@@ -253,7 +263,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillFifenall",
-        "passiveCallbackName": "cbPassiveFifenall"
+        "skillCallbackDesc": "Targets an ally. Restores 6 HP to the target.",
+        "passiveCallbackName": "cbPassiveFifenall",
+        "passiveCallbackDesc": "When this card is destroyed, draw a card."
     },
     {
         "name": "Amoltamis",
@@ -271,7 +283,8 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": "cbPassiveAmoltamis"
+        "passiveCallbackName": "cbPassiveAmoltamis",
+        "passiveCallbackDesc": "When this card is in the front row, it temporarily gains +2 Attack."
     },
     {
         "name": "Regna-Croix",
@@ -289,7 +302,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillRegnaCroix",
-        "passiveCallbackName": "cbPassiveRegnaCroix"
+        "skillCallbackDesc": "Targets an enemy. Deals 3 damage to all enemies in the same row as the target.",
+        "passiveCallbackName": "cbPassiveRegnaCroix",
+        "passiveCallbackDesc": "All allied Heaven-attribute cards gain +1 Attack."
     },
     // Earth Natials
     {
@@ -308,7 +323,8 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": "cbPassivePaRancell"
+        "passiveCallbackName": "cbPassivePaRancell",
+        "passiveCallbackDesc": "Protects cards to the left and right."
     },
     {
         "name": "D-Arma",
@@ -319,14 +335,16 @@ const cardDB = [
         "element": "ELEMENT_EARTH",
         "maxHP": 3,
         "attack": 1,
-        "maxActions": 1,
+        "maxActions": 2,
 
         "isRanged": false,
         "isQuick": false,
         "isMaster": false,
 
         "skillCallbackName": "cbSkillDArma",
-        "passiveCallbackName": null
+        "skillCallbackDesc": "Targets an ally. Restores 2 HP to the target.",
+        "passiveCallbackName": null,
+        "passiveCallbackDesc": "This card can act twice in one turn."
     },
     {
         "name": "Ae-Ferrion",
@@ -362,6 +380,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillGiaBro",
+        "skillCallbackDesc": "Targets an enemy. Deals 1 damage to all enemies in the same row as the target.",
         "passiveCallbackName": null
     },
     {
@@ -380,7 +399,8 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": "cbPassiveDaColm"
+        "passiveCallbackName": "cbPassiveDaColm",
+        "passiveCallbackDesc": "Temporarily grants +1 HP to any card in the same row as itself."
     },
     {
         "name": "Ma-Gorb",
@@ -398,7 +418,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillMaGorb",
-        "passiveCallbackName": "cbPassiveMaGorb"
+        "skillCallbackDesc": "Targets an enemy. Seals the target for 2 turns.",
+        "passiveCallbackName": "cbPassiveMaGorb",
+        "passiveCallbackDesc": "This card gains +1 Attack every time it defeats an enemy."
     },
     // Water Natials
     {
@@ -417,7 +439,8 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": "cbPassiveRequ"
+        "passiveCallbackName": "cbPassiveRequ",
+        "passiveCallbackDesc": "When this card is destroyed, draw a card."
     },
     {
         "name": "Marme",
@@ -435,6 +458,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillMarme",
+        "skillCallbackDesc": "Targets an ally. Restores 3 HP to the target.",
         "passiveCallbackName": null
     },
     {
@@ -453,6 +477,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillZamilpen",
+        "skillCallbackDesc": "Targets an enemy. Seals the target for 1 turn.",
         "passiveCallbackName": null
     },
     {
@@ -471,7 +496,8 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": null,
-        "passiveCallbackName": "cbPassiveTarbyss"
+        "passiveCallbackName": "cbPassiveTarbyss",
+        "passiveCallbackDesc": "When this card is destroyed, draw a card."
     },
     {
         "name": "Neptjuno",
@@ -489,7 +515,9 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillNeptjuno",
-        "passiveCallbackName": "cbPassiveNeptjuno"
+        "skillCallbackDesc": "Targets an enemy. Deals 2 damage to the target.",
+        "passiveCallbackName": "cbPassiveNeptjuno",
+        "passiveCallbabckDesc": "Protects cards to the left and right."
     },
     {
         "name": "Tentarch",
@@ -507,6 +535,7 @@ const cardDB = [
         "isMaster": false,
 
         "skillCallbackName": "cbSkillTentarch",
+        "skillCallbackDesc": "Targets an enemy. Deals 4 damage to all enemies.",
         "passiveCallbackName": null
     },
     
@@ -589,6 +618,7 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillSister",
+        "skillCallbackDesc": "Targets an ally. Restores 2 HP to the target.",
         "skillCost": 2,
         "passiveCallbackName": null
     },
@@ -609,6 +639,7 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillKnight",
+        "skillCallbackDesc": "Targets itself. All allied cards gain +1 Attack.",
         "skillCost": 3,
         "passiveCallbackName": null
     },
@@ -629,8 +660,10 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillThief",
+        "skillCallbackDesc": "Targets itself. Draw a card.",
         "skillCost": 2,
-        "passiveCallbackName": null
+        "passiveCallbackName": null,
+        "passiveCallbackDesc": "This card can act twice in one turn."
     },
     {
         "name": "Witch",
@@ -649,6 +682,7 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillWitch",
+        "skillCallbackDesc": "Targets an enemy. Deals 4 damage to the target.",
         "skillCost": 3,
         "passiveCallbackName": null
     },
@@ -669,8 +703,10 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillPaladin",
+        "skillCallbackName": "Targets itself. Revives one random Natial to your Natial Zone.",
         "skillCost": 4,
-        "passiveCallbackName": "cbPassivePaladin"
+        "passiveCallbackName": "cbPassivePaladin",
+        "passiveCallbackDesc": "The Paladin restores 1 HP at the end of every turn."
     },
     {
         "name": "Beast",
@@ -689,6 +725,7 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillBeast",
+        "skillCallbackDesc": "Targets itself. Draw a card.",
         "skillCost": 1,
         "passiveCallbackName": null
     },
@@ -709,8 +746,10 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillSwordsman",
+        "skillCallbackDesc": "Targets an enemy. Deals 1 damage to all enemies in the same row.",
         "skillCost": 2,
-        "passiveCallbackName": "cbPassiveSwordsman"
+        "passiveCallbackName": "cbPassiveSwordsman",
+        "passiveCallbackDesc": "This card gains +1 Attack each time it defeats an enemy."
     },
     {
         "name": "Sorcerer",
@@ -729,6 +768,7 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillSorcerer",
+        "skillCallbackDesc": "Targets itself. Creates a Magic Crystal Spell card.",
         "skillCost": 3,
         "hasPassive": false,
         "passiveCallbackName": null
@@ -750,8 +790,10 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillShadow",
+        "skillCallbackDesc": "Targets a card in the opponent's hand. Destroy the targeted card.",
         "skillCost": 4,
-        "passiveCallbackName": null
+        "passiveCallbackName": null,
+        "passiveCallbackDesc": "This card can always perform a counterattack, regardless of attacker or positioning."
     },
     {
         "name": "Spirit",
@@ -770,8 +812,10 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillSpirit",
+        "skillCallbackDesc": "Targets an ally. The targeted ally gains one action.",
         "skillCost": 3,
-        "passiveCallbackName": "cbPassiveSpirit"
+        "passiveCallbackName": "cbPassiveSpirit",
+        "passiveCallbackDesc": "When the Spirit's HP reached 10 or less, all other allied cards permanently gain +1 HP and +1 ATK."
     },
     {
         "name": "Bard",
@@ -790,6 +834,7 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillBard",
+        "skillCallbackDesc": "Targets an enemy. Seals the target for 1 turn.",
         "skillCost": 3,
         "passiveCallbackName": null
     },
@@ -810,8 +855,10 @@ const cardDB = [
         "isMaster": true,
 
         "skillCallbackName": "cbSkillTyrant",
+        "skillCallbackDesc": "Targets an enemy. Deals 3 damage to all enemies.",
         "skillCost": 7,
-        "passiveCallbackName": "cbPassiveTyrant"
+        "passiveCallbackName": "cbPassiveTyrant",
+        "passiveCallbackDesc": "Allies to the left and right temporarily gain +2 HP and +2 ATK."
     },
 
     // ========== Spells ==========
@@ -822,10 +869,7 @@ const cardDB = [
         "type": "spell",
 
         "callbackName": "cbSpellMagicCrystal",
-        "longdesc": `
-        Target gains +1 HP/ATK and can
-        use its Skill again (if it has
-        one). Player receives +1 mana.`
+        "longdesc": "Targets an ally. Target gains +1 HP and Attack. If the target is a natial with a spent Active Skill, its Active Skill can be used again."
     },
     {
         "name": "Medic",
