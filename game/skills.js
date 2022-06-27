@@ -597,5 +597,18 @@ const natialPassiveCallbacks = {
             // restores 1 HP for the Paladin
             paladinSpace.innerCard.restoreHP(1);
         }
+    },
+    // callback to modify counterattack damage
+    onCounterattack: {
+        genericCounterDmgUp: function(dmgBoost) {
+            return dmgBoost;
+        },
+
+        cbPassiveFighter: function() {
+            return this.genericCounterDmgUp(1);
+        },
+        cbPassiveBeast: function() {
+            return this.genericCounterDmgUp(2);
+        }
     }
 }

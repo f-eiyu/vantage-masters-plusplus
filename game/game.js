@@ -203,13 +203,13 @@ const initializeGameBoard = () => {
             _playerDeckTemplate.push(createCard(getFromDB("Requ")));
             _playerDeckTemplate.push(createCard(getFromDB("Blyx")));
             _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Pelitt")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
+            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Bard")));
+        _playerDeckTemplate.push(createCard(getFromDB("Beast")));
         _enemyDeckTemplate.push(createCard(getFromDB("Tyrant")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);

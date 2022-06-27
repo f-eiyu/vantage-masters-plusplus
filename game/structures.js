@@ -1250,7 +1250,18 @@ class GameBoard {
         // all damage is floored at zero, and counterattacks do 1 less damage
         // than a directed attack
         let attackerDmg = Math.max(myAtk + TYPE_CHART[myElement][oppElement], 0);
-        let counterDmg = Math.max(oppAtk + TYPE_CHART[oppElement][myElement] - 1, 0);
+        const counterDmgInitial = Math.max(oppAtk + TYPE_CHART[oppElement][myElement] - 1, 0);
+        let counterDmg = counterDmgInitial;
+
+        // override for Shadow master
+        if (attacker.isMaster && attacker.name === "Shadow") {
+            return [attackerDmg, counterDmg];
+        }
+
+        // adjustments for damage boost from passives
+        if (natialPassiveCallbacks.onCounterattack[target.passiveCbName]) {
+            counterDmg += natialPassiveCallbacks.onCounterattack[target.passiveCbName]();
+        }
 
         // sealed natials do not counterattack
         if (target.sealed) { counterDmg = 0; }

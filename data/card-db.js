@@ -579,7 +579,7 @@ const cardDB = [
 
         "skillCallbackName": null,
         "skillCost": null,
-        "passiveCallbackName": null,
+        "passiveCallbackName": "cbPassiveFighter",
         "passiveCallbackDesc": "Counterattacks deal 1 bonus damage."
     },
     {
@@ -728,7 +728,7 @@ const cardDB = [
         "skillCallbackName": "cbSkillBeast",
         "skillCallbackDesc": "Targets itself. Draw a card.",
         "skillCost": 1,
-        "passiveCallbackName": null,
+        "passiveCallbackName": "cbPassiveBeast",
         "passiveCallbackDesc": "Counterattacks deal 2 bonus damage."
     },
     {
