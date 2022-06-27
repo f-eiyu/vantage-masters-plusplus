@@ -188,6 +188,7 @@ const attachEventListeners = () => {
     document.addEventListener("contextmenu", e => e.preventDefault());
 
     document.querySelector("#end-turn").addEventListener("click", friendlyEndTurn);
+    document.querySelector("#restart-game").addEventListener("click", initializeGameBoard);
 }
 
 const initializeGameBoard = () => {
@@ -199,8 +200,8 @@ const initializeGameBoard = () => {
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
             _playerDeckTemplate.push(createCard(getFromDB("Magic Crystal")));
-            _playerDeckTemplate.push(createCard(getFromDB("Tentarch")));
-            _playerDeckTemplate.push(createCard(getFromDB("Requ")));
+            _playerDeckTemplate.push(createCard(getFromDB("Vanish")));
+            _playerDeckTemplate.push(createCard(getFromDB("Uptide")));
             _playerDeckTemplate.push(createCard(getFromDB("Blyx")));
             _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
             _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
@@ -209,7 +210,7 @@ const initializeGameBoard = () => {
             _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
             _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
         }
-        _playerDeckTemplate.push(createCard(getFromDB("Beast")));
+        _playerDeckTemplate.push(createCard(getFromDB("Thief")));
         _enemyDeckTemplate.push(createCard(getFromDB("Tyrant")));
     }
     friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);

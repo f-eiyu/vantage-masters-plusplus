@@ -34,9 +34,9 @@ const aiSummonNatials = () => {
         if (!emptyNatialSpaces.length) { return; }
 
         const thisEmptySpace = emptyNatialSpaces[0];
-        if (!game.validateSummon(toSummonSpace, thisEmptySpace)) { return false; }
 
         setTimeout(() => {
+            if (!game.validateSummon(toSummonSpace, thisEmptySpace)) { return false; }
             game.summonNatial(toSummonSpace, thisEmptySpace);
         }, summonTime);
         emptyNatialSpaces.shift();

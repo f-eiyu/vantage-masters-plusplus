@@ -272,12 +272,18 @@ class BoardSpace {
         // render the card background and various properties
         else {
             nameBanner.style.display = "block";
-            if (card.type !== "spell") {
+            console.log(card.name, card.type === "spell");
+            if (card.type === "spell") {
+                hpOrb.style.display = "none";
+                atkOrb.style.display = "none";
+                icons.style.display = "none";
+            }
+            else {
                 hpOrb.style.display = "flex";
                 atkOrb.style.display = "flex";
+                icons.style.display = "flex";
             }
             manaOrb.style.display = "flex";
-            icons.style.display = "flex";
 
             nameBanner.innerText = card.name;
             hpOrb.innerText = card.curHP;
@@ -1091,7 +1097,7 @@ class GameBoard {
         playerControl = false;
         friendlyPlayer.natialZone.forAllSpaces(sp => sp.clearDraggable());
         friendlyPlayer.hand.forAllSpaces(sp => sp.clearDraggable());
-        document.getElementById("end-turn").disabled = true;
+        document.querySelectorAll("button").forEach(el => el.disabled = true);
 
         if (time) { setTimeout(this.playerGainControl, time); }
     }
@@ -1100,7 +1106,7 @@ class GameBoard {
         playerControl = true;
         friendlyPlayer.natialZone.forAllSpaces(sp => sp.setDraggable());
         friendlyPlayer.hand.forAllSpaces(sp => sp.setDraggable());
-        document.getElementById("end-turn").disabled = false;
+        document.querySelectorAll("button").forEach(el => el.disabled = false);
     }
 
     fadeout(space, time = this.fadeoutTime) {
