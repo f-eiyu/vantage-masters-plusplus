@@ -1,33 +1,65 @@
-const boardCardMouseover = (event) => {
-    console.log(event);
-    const boardSpace = (new CardDOMEvent(event)).spaceObj;
+const canUpdateFeedback = (boardSpace) => {
+    const canUpdate =  !(game.enemyTurn
+            || !playerControl
+            || skillUsage.selected);
+
+    return canUpdate;
+}
+
+const hoverLongdesc = (boardSpace) => {
     const card = boardSpace.innerCard;
+    let detailStr = "";
+
+    if (card.skillDesc) { detailStr += `<p><strong>Active</strong>: ${card.skillDesc}${card.isMaster ? " (" + card.skillCost + " mana)" : ""}</p>`; }
+    if (card.passiveDesc) { detailStr += `<p><strong>Passive</strong>: ${card.passiveDesc}</p>`; }
+    if (card.longdesc) { detailStr += `<p><strong>Effect</strong>: ${card.longdesc}`; }
+    if (!detailStr) { detailStr += `<p>${card.name} has no special abilities.</p>`; }
+    detailStr = `<h3>${card.name}</h3>
+    ${card.isMaster ? "<p>Deck Master</p>" : "<p>Costs <strong>" + card.cost + "</strong> mana</p>"}
+    ${detailStr}`;
+
+    return detailStr;
+}
+
+const hoverFeedback = (boardSpace) => {
+    const card = boardSpace.innerCard;
+    let feedbackStr = "";
+
+    if (boardSpace.owner !== PLAYER_FRIENDLY) { feedbackStr += "<p>You cannot control this card.</p>"; }
+    else if (!card.currentActions && boardSpace.isNatial) { feedbackStr += "<p>This card is out of actions.</p>"; }
+    else if (friendlyPlayer.currentMana < card.cost && !card.isMaster && boardSpace.isHand) { feedbackStr += "<p>Insufficient mana.</p>"}
+    else if (boardSpace.isHand && card.type === "spell") { feedbackStr += "<p>Click and drag to a target to activate this spell.</p>"; }
+    else if (boardSpace.isHand && card.type === "natial") { feedbackStr += "<p>Click and drag to an open space to summon this natial.</p>"; }
+    else {
+        if (card.canMove) { feedbackStr += "<p>Click and drag to move.</p>"; }
+        feedbackStr += "<p>Click and drag to an enemy to attack.</p>";
+        if (card.skillReady || (card.isMaster && friendlyPlayer.currentMana >= card.cost)) { feedbackStr += "<p>Right click to activate this card's skill.</p>"; }
+    }
+
+    return feedbackStr;
+}
+
+const boardCardMouseover = (event) => {
+    const boardSpace = (new CardDOMEvent(event)).spaceObj;
     if (!boardSpace.hasCard) { return; }
+
+    boardSpace.DOM.classList.add("hovered");
 
     // set image
     const largeCardZone = document.querySelector("#card-largepic-zone");
     largeCardZone.style.backgroundImage = `url('${boardSpace.innerCard.portraitURL}')`;
     largeCardZone.style.backgroundSize = "cover";
 
-    // set description text
     const detailZone = document.getElementById("card-detail-zone");
-    let detailStr = "";
-    if (card.skillDesc) { detailStr += `<p><strong>Active</strong>: ${card.skillDesc}${card.isMaster ? " (" + card.skillCost + " mana)" : ""}</p>`; }
-    if (card.passiveDesc) { detailStr += `<p><strong>Passive</strong>: ${card.passiveDesc}</p>`; }
-    if (card.longdesc) { detailStr += `<p><strong>Effect</strong>: ${card.longdesc}`; }
-    if (!detailStr) { detailStr += `<p>${card.name} has no special abilities.</p>`; }
+    detailZone.innerHTML = hoverLongdesc(boardSpace);
 
-    detailStr = `<h3>${card.name}</h3>
-    ${card.isMaster ? "<p></p>" : "<p>Costs <strong>" + card.cost + "</strong> mana</p>"}
-    ${detailStr}`;
-
-    detailZone.innerHTML = detailStr;
-
-    boardSpace._DOM.classList.add("hovered");
+    if (!canUpdateFeedback(boardSpace)) { return; }
+    const feedbackZone = document.getElementById("feedback-zone");
+    feedbackZone.innerHTML = hoverFeedback(boardSpace);
 }
 
 const boardCardMouseleave = (event) => {
-    const boardSpace = event.target;
+    const boardSpace = (new CardDOMEvent(event)).spaceObj;
     const largeCardZone = document.querySelector("#card-largepic-zone");
 
     // reset large image to card background
@@ -37,9 +69,15 @@ const boardCardMouseleave = (event) => {
 
     // reset card detail text
     const detailZone = document.getElementById("card-detail-zone");
-    detailZone.innerText = "";
+    detailZone.innerHTML = "";
 
-    boardSpace.classList.remove("hovered");
+    // reset feedback text
+    if (canUpdateFeedback(boardSpace)) {
+        const feedbackZone = document.getElementById("feedback-zone");
+        feedbackZone.innerHTML = "";
+    }
+
+    boardSpace.DOM.classList.remove("hovered");
 }
 
 const cardToBoardDirect = (player, card, row, position, render = true) => {
@@ -52,16 +90,20 @@ const cardToBoardDirect = (player, card, row, position, render = true) => {
 const friendlyStartTurn = () => {
     game.incrementTurnCounter();
     game.renderTurnCounter();
+    game.enemyTurn = false;
+
+    const feedback = document.getElementById("feedback-zone");
+    feedback.innerHTML = "<p>It's your turn!</p>";
     
     friendlyPlayer.refreshNatials();
     friendlyPlayer.refreshMana();
     friendlyPlayer.drawCard();
 
-    playerControl = true;
+    game.playerGainControl();
 }
 
 const friendlyEndTurn = () => {
-    playerControl = false;
+    game.playerLoseControl();
     
     // onTurnEnd hook
     friendlyPlayer.natialZone.forAllSpaces(sp => {
@@ -80,6 +122,10 @@ const friendlyEndTurn = () => {
 const enemyStartTurn = () => {
     game.incrementTurnCounter();
     game.renderTurnCounter();
+    game.enemyTurn = true;
+
+    const feedback = document.getElementById("feedback-zone");
+    feedback.innerHTML = "<p>Enemy's turn!</p>";
 
     enemyPlayer.refreshNatials();
     enemyPlayer.refreshMana();
@@ -153,7 +199,7 @@ const initializeGameBoard = () => {
     { // all of this is for debugging until the deck builder goes in
         for (let i = 0; i < 4; i++) {
             _playerDeckTemplate.push(createCard(getFromDB("Magic Crystal")));
-            _playerDeckTemplate.push(createCard(getFromDB("Pelitt")));
+            _playerDeckTemplate.push(createCard(getFromDB("Tentarch")));
             _playerDeckTemplate.push(createCard(getFromDB("Requ")));
             _playerDeckTemplate.push(createCard(getFromDB("Blyx")));
             _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
@@ -183,7 +229,12 @@ const initializeGameBoard = () => {
     game.renderAll();
 
     // choose a random player to start
-    (Math.random() > 0.5) ? friendlyStartTurn() : enemyStartTurn();
+    if (Math.random() > 0.5) {
+        friendlyStartTurn();
+    } else {
+        game.playerLoseControl();
+        enemyStartTurn();
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

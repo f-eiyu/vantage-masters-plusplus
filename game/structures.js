@@ -217,6 +217,7 @@ class BoardSpace {
     // removes a card from the board or hand and adds it to the discard list
     destroyCard() {
         destroyedCards.byPlayer(this.owner).push(this.innerCard);
+        game.fadeout(this);
         this._clear();
     }
 
@@ -313,7 +314,10 @@ class BoardSpace {
             this.DOM.style.backgroundSize = "cover";
         }
 
-        if (this.owner === PLAYER_FRIENDLY && this.hasCard && !invis) {
+        if (this.owner === PLAYER_FRIENDLY
+            && this.hasCard
+            && !invis
+            && !game.enemyTurn) {
             this.setDraggable();
         } else { this.clearDraggable(); }
     }
@@ -708,7 +712,9 @@ class NatialZone {
     // transfers the card instance in moverSpace to targetSpace
     moveNatial(originSpace, destSpace) {
         // disable player control for the duration of the move
-        game.playerLoseControl(game.fadeoutTime + game.fadeinTime + 25);
+        if (originSpace.owner === PLAYER_FRIENDLY) {
+            game.playerLoseControl(game.fadeoutTime + game.fadeinTime + 25);
+        }
 
         const originCard = originSpace.innerCard;
         const destCard = destSpace.innerCard;
@@ -924,9 +930,12 @@ class Player {
             const drawnCard = this.deck.pop();
 
             this.hand.cardToHand(firstEmpty, drawnCard);
+            if (render) {
+                const handSpace = this.hand.getSpaceAt(firstEmpty)
+                handSpace.render(true);
+                game.fadein(handSpace);
+            }
         }
-
-        if (render) { game.renderAll(); }
         return true;
     }
 
@@ -949,8 +958,10 @@ class Player {
 
     // moves a natial from the hand to the board, deducting the necessary mana
     summonNatial(originHandSpace, destNatialSpace) {
-        // disable player control for the duration of the move
-        game.playerLoseControl(game.fadeoutTime + game.fadeinTime + 25);
+        // disable player control for the duration of the summon
+        if (originHandSpace.owner === PLAYER_FRIENDLY) {
+            game.playerLoseControl(game.fadeoutTime + game.fadeinTime + 25);
+        }
 
         const summonedCard = originHandSpace.innerCard;
 
@@ -983,18 +994,15 @@ class Player {
         destNatialSpace.auraHandler.applyAurasMovement(originHandSpace);
 
         // animate and re-render the board
-        const fadeoutTime = game.fadeoutTime;
-        const fadeinTime = game.fadeinTime;
-        
-        setTimeout(game.renderAll, fadeoutTime + fadeinTime);
-        game.fadeout(originHandSpace, fadeoutTime);
+        setTimeout(game.renderAll, game.fadeoutTime + game.fadeinTime);
+        game.fadeout(originHandSpace, game.fadeoutTime);
         setTimeout(() => {
             // invisibly update the DOMs for origin and destination...
             originHandSpace.render(true);
             destNatialSpace.render(true);
             // ... and then fade the card(s) in
-            game.fadein(destNatialSpace, fadeinTime);
-        }, fadeoutTime);
+            game.fadein(destNatialSpace, game.fadeinTime);
+        }, game.fadeoutTime);
 
         return true;
     }
@@ -1042,15 +1050,21 @@ class Player {
 class GameBoard {
     constructor() {
         this._turnCounter = 0;
+        this._enemyTurn = null;
 
         // aesthetic parameters -- can tweak!
-        this._fadeoutTime = 600;
+        this._fadeoutTime = 400;
         this._fadeinTime = 600;
+        this._attackTime = 1200;
     }
 
     get turnCounter() { return this._turnCounter; }
+    get enemyTurn() { return this._enemyTurn; }
     get fadeoutTime() { return this._fadeoutTime; }
     get fadeinTime() { return this._fadeinTime; }
+    get attackTime() { return this._attackTime; }
+
+    set enemyTurn(turn) { this._enemyTurn = turn; }
 
     incrementTurnCounter() {
         // one full turn consists of both players making a move. in this way, we
@@ -1089,7 +1103,7 @@ class GameBoard {
         document.getElementById("end-turn").disabled = false;
     }
 
-    fadeout(space, time = 1000) {
+    fadeout(space, time = this.fadeoutTime) {
         const thisDOM = space.DOM;
         let opacity = thisDOM.style.opacity;
         const numFrames = 60 * (time / 1000); // # of fade frames at 60 fps
@@ -1107,7 +1121,7 @@ class GameBoard {
         }, 1000 / 60);
     }
 
-    fadein(space, time = 1000) {
+    fadein(space, time = this.fadeinTime) {
         const thisDOM = space.DOM;
         let opacity = 0.0;
         const numFrames = 60 * (time / 1000); // # of fade frames at 60 fps
@@ -1122,6 +1136,60 @@ class GameBoard {
                 thisDOM.style.opacity = 1;
             }
         }, 1000 / 60);
+    }
+
+    attackFade(spaceDOM, time = this.attackTime, minAlpha = 0.5) {
+        let opacity = 1;
+        const numFrames = 60 * (time / 1000); // # of fade frames at 60 fps
+
+        const opDelta = 2 * (1 - minAlpha) * (opacity / numFrames);
+        let direction = -1;
+
+        let timer = setInterval(() => {
+            opacity = Math.max(opacity + direction * opDelta, 0);
+            spaceDOM.style.opacity = opacity;
+
+            if (opacity <= minAlpha) { direction = 1; }
+
+            if (opacity > 1) {
+                clearInterval(timer);
+                spaceDOM.opacity = 1;
+            }
+        }, 1000 / 60);
+    }
+
+    animateAttack(attackerSpace, targetSpace, atkDamage, time = this.attackTime) {
+        const attackerDOM = attackerSpace.DOM;
+        const attackerCard = attackerSpace.innerCard;
+        const attackerContainer = attackerDOM.parentNode;
+        const attackerRibbon = attackerDOM.querySelector(".dmg-ribbon");
+        const targetDOM = targetSpace.DOM;
+        const targetCard = targetSpace.innerCard;
+        const targetContainer = targetDOM.parentNode;
+        const targetRibbon = targetDOM.querySelector(".dmg-ribbon");
+
+        attackerDOM.style.opacity = 1;
+        targetDOM.style.opacity = 1;
+
+        attackerContainer.style.backgroundColor = "darkred";        
+        targetContainer.style.backgroundColor = "darkred";
+
+        this.attackFade(attackerDOM, time);
+        this.attackFade(targetDOM, time);
+        setTimeout(() => {
+            attackerRibbon.innerText = `-${atkDamage[1]}`;
+            attackerRibbon.style.display = "block";
+            attackerContainer.style.backgroundColor = "";
+            attackerDOM.querySelector(".hp-orb").innerText = Math.max(attackerCard.curHP - atkDamage[1], 0);
+            targetRibbon.innerText = `-${atkDamage[0]}`;
+            targetRibbon.style.display = "block";
+            targetContainer.style.backgroundColor = "";
+            targetDOM.querySelector(".hp-orb").innerText = Math.max(targetCard.curHP - atkDamage[0], 0);
+        }, time);
+        setTimeout(() => {
+            attackerRibbon.style.display = "none";
+            targetRibbon.style.display = "none";
+        }, 2 * time)
     }
 
     // checks if either player has met the victory condition. returns true if the
@@ -1213,15 +1281,22 @@ class GameBoard {
         const attackerOwner = getPlayer(attackerSpace.owner);
         const target = targetSpace.innerCard;
         const targetOwner = getPlayer(targetSpace.owner);
+        const feedback = document.getElementById("feedback-zone");
 
+        // fail if the card can't act
+        if (!attacker.currentActions) {
+            if (!game.enemyTurn) {  feedback.innerText = "This card is out of actions."; }
+            return false;
+        }
         // fail if either attacker or target does not exist
         if (!attacker || !target) { return false; }
         // fail if the target is protected
-        if (target.protected) { return false; }
+        if (target.protected) {
+            if (!game.enemyTurn) { feedback.innerText = "That target is being protected!"; }
+            return false;
+        }
         // fail if attacker and target aren't opposed
         if (attackerSpace.owner === targetSpace.owner) { return false; }
-        // fail if the card can't act
-        if (!attacker.currentActions) { return false; }
         // fail if the attacker is sealed
         if (attacker.sealed) { return false; }
         // fail if the attacker is not ranged and targeting occluded back row
@@ -1243,16 +1318,24 @@ class GameBoard {
     // performs an attack on the natial in targetSpace using the natial
     // in attackerSpace, and a counterattack vice versa
     attackNatial(attackerSpace, targetSpace) {
+        // disable player control for the duration of the attack
+        if (attackerSpace.owner === PLAYER_FRIENDLY) {
+            game.playerLoseControl(game.attackTime + 25);
+        }
+
         const thisAttack = this.calculateDamage(attackerSpace, targetSpace);
         const attacker = attackerSpace.innerCard;
 
-        // deduct an action and perform attack and counterattack
-        attacker.expendAction();
-        targetSpace.dealDamage(thisAttack[0], attackerSpace);
-        attackerSpace.dealDamage(thisAttack[1], targetSpace);
-
-        this.renderAll();
-        this.checkVictory();
+        setTimeout(() => {
+            // deduct an action and perform attack and counterattack
+            attacker.expendAction();
+            targetSpace.dealDamage(thisAttack[0], attackerSpace);
+            attackerSpace.dealDamage(thisAttack[1], targetSpace);
+            if (attackerSpace.hasCard) { attackerSpace.render(); }
+            if (targetSpace.hasCard) { targetSpace.render(); }
+            this.checkVictory();
+        }, 2 * game.attackTime);
+        game.animateAttack(attackerSpace, targetSpace, thisAttack);
     }
 
     // wrapper for validating a natial summon
@@ -1289,13 +1372,14 @@ class DestroyedCards {
 // objects on the board when needed, and the wrappers inside serve as shortcuts 
 // to give event listeners more convenient access to logic and validation.
 class CardDOMEvent {
-    constructor(cardDOMEvent) {
-        let cardDOM = cardDOMEvent.target;
+    constructor(event) {
+        let cardDOM = event.target;
         // if the click/hover/drag events are called on children of a card's
         // DOM, backtrack to the parent node that originally had the event
         // listener attached, which will always have one of these two classes.
         while (!cardDOM.classList.contains("enemy")
                 && !cardDOM.classList.contains("friendly")) {
+            console.log(cardDOM.nodeName);
             cardDOM = cardDOM.parentNode;
         }
         

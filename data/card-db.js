@@ -99,8 +99,8 @@ const cardDB = [
         "type": "natial",
 
         "element": "ELEMENT_FIRE",
-        "maxHP": 1,
-        "attack": 3,
+        "maxHP": 3,
+        "attack": 1,
         "maxActions": 1,
 
         "isRanged": false,
@@ -559,7 +559,7 @@ const cardDB = [
 
         "skillCallbackName": null,
         "skillCost": null,
-        "passive": null
+        "passiveCallbackName": null,
     },
     {
         "name": "Fighter",
@@ -579,7 +579,8 @@ const cardDB = [
 
         "skillCallbackName": null,
         "skillCost": null,
-        "passiveCallbackName": null
+        "passiveCallbackName": null,
+        "passiveCallbackDesc": "Counterattacks deal 1 bonus damage."
     },
     {
         "name": "Ranger",
@@ -727,7 +728,8 @@ const cardDB = [
         "skillCallbackName": "cbSkillBeast",
         "skillCallbackDesc": "Targets itself. Draw a card.",
         "skillCost": 1,
-        "passiveCallbackName": null
+        "passiveCallbackName": null,
+        "passiveCallbackDesc": "Counterattacks deal 2 bonus damage."
     },
     {
         "name": "Swordsman",

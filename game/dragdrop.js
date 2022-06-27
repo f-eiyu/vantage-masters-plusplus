@@ -1,6 +1,3 @@
-// as the CardDOMEvent object is updated, this code will need additional
-// refactoring in order to prevent its interactions from being a convoluted mess
-
 const dragStart = (event) => {
     if (!playerControl || gameEnd || skillUsage.selected) { return; }
 

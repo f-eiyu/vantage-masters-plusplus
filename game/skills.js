@@ -159,6 +159,7 @@ const natialRightClick = (event) => {
     const userSpace = thisRightClick.spaceObj;
     const userCard = userSpace.innerCard;
     const player = getPlayer(userSpace.owner);
+    const feedback = document.getElementById("feedback-zone");
 
     if (!userSpace.hasCard) { return; }
     if (!userCard.skillReady) { return; }
@@ -167,9 +168,12 @@ const natialRightClick = (event) => {
     if (skillUsage.selected) {
         skillUsage.purge();
         event.target.classList.remove("skill-selected");
+        feedback.innerHTML = "<p>Skill deselected.</p>"
     } else if (!userCard.isMaster || player.currentMana >= userCard.skillCost) {
         skillUsage = new NatialSkillEvent(userSpace);
         event.target.classList.add("skill-selected");
+        feedback.innerHTML = `<p>Left click a target to use the skill.</p>
+        <p>Right click to deselect the skill.</p>`
     }
 }
 
@@ -302,7 +306,7 @@ const natialActiveCallbacks = {
     },
     // ========== Regular natial active skills ==========
     // Fire natials
-    cbSkillDullmdalla: function (targetSpace) {
+    cbSkillDullmdalla: function (userSpace, targetSpace) {
         // deals 1 damage to the row containing the target
         this.genericDamageRow(userSpace, targetSpace, 1);
     },
