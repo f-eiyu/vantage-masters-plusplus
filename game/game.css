@@ -191,9 +191,11 @@ body {
     align-items: center;
 
     font-size: 0.85em;
-    border: solid black 1px;
+    font-weight: bold;
+    border-top: solid black 1px;
+    border-bottom: solid black 1px;
 
-    background: rgba(125, 125, 125, 0.7);
+    background: rgba(200, 200, 200, 0.8);
 }
 
 .hp-orb {

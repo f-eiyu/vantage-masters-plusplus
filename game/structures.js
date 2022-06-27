@@ -1070,6 +1070,28 @@ class Player {
         iconDOM.style.backgroundPosition = "center";
     }
 
+    // displays the potential change to mana by playing a card
+    friendlyManaHover(cost) {
+        if (this._playerID !== PLAYER_FRIENDLY) { return; }
+        const manaDOM = document.getElementById(`friendly-mana`);
+        const manaList = manaDOM.querySelectorAll(".mana");
+
+        const manaArray = [];
+        manaList.forEach((mana, i) => {
+            manaArray.push((i + 1 <= friendlyPlayer.currentMana));
+        });
+
+        // iterate through manaArray backwards, looking for available mana and
+        // replacing the specified amount with red "to be consumed" mana
+        for(let i = manaArray.length - 1; i >= 0; i--) {
+            if (manaArray[i]) {
+                manaList[i].style.backgroundImage = `url("../data/img/misc/mana-hover.png")`
+                cost--;
+            }
+            if (cost === 0) { return; }
+        }
+    }
+
     // updates the player's mana and other stats
     render() {
         const playerStr = (this === friendlyPlayer ? "friendly" : "enemy");

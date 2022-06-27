@@ -169,11 +169,15 @@ const natialRightClick = (event) => {
         skillUsage.purge();
         event.target.classList.remove("skill-selected");
         feedback.innerHTML = "<p>Skill deselected.</p>"
+        friendlyPlayer.render();
     } else if (!userCard.isMaster || player.currentMana >= userCard.skillCost) {
         skillUsage = new NatialSkillEvent(userSpace);
         event.target.classList.add("skill-selected");
         feedback.innerHTML = `<p>Left click a target to use the skill.</p>
         <p>Right click to deselect the skill.</p>`
+        if (userCard.isMaster && userCard.skillCost) {
+            friendlyPlayer.friendlyManaHover(userCard.skillCost);
+        }
     }
 }
 

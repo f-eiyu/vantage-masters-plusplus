@@ -26,6 +26,7 @@ const cardDragEnter = (event) => {
     // spell: handle differently based on the specific spell
     if (thisDragFrom.isSpell
         && spellDragValidation(fromSpace, toSpace)) {
+            friendlyPlayer.friendlyManaHover(fromSpace.innerCard.cost);
             toSpace.DOM.classList.add("target-valid");
     }
     // natial dragged onto empty friendly space: movement possible
@@ -44,6 +45,7 @@ const cardDragEnter = (event) => {
     else if (thisDragFrom.isHand
         && isToFriendlyNatial
         && game.validateSummon(fromSpace, toSpace)) {
+        friendlyPlayer.friendlyManaHover(fromSpace.innerCard.cost);
         toSpace.DOM.classList.add("target-valid");
     }
     // no other moves are legal
@@ -69,6 +71,8 @@ const clearDragVisuals = (event) => {
 
 const cardDragLeave = (event) => {
     clearDragVisuals(event);
+    // clear any potential hovered mana
+    friendlyPlayer.render();
 }
 
 const cardDragDrop = (event) => {
