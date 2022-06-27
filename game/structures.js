@@ -283,7 +283,10 @@ class BoardSpace {
                 atkOrb.style.display = "flex";
                 icons.style.display = "flex";
             }
-            if (!(card.isMaster && card.skillCost === null)) {
+            if (card.isMaster && card.skillCost === null) {
+                // don't display mana orbs for skill-less masters
+                manaOrb.style.display = "none";
+            } else {
                 manaOrb.style.display = "flex";
             }
 
@@ -1284,11 +1287,6 @@ class GameBoard {
         const counterDmgInitial = Math.max(oppAtk + TYPE_CHART[oppElement][myElement] - 1, 0);
         let counterDmg = counterDmgInitial;
 
-        // override for Shadow master
-        if (attacker.isMaster && attacker.name === "Shadow") {
-            return [attackerDmg, counterDmg];
-        }
-
         // adjustments for damage boost from passives
         if (natialPassiveCallbacks.onCounterattack[target.passiveCbName]) {
             counterDmg += natialPassiveCallbacks.onCounterattack[target.passiveCbName]();
@@ -1311,6 +1309,11 @@ class GameBoard {
             && targetSpace.isBackRow
             && targetOwner.natialZone.isOccluded(targetSpace)) {
             counterDmg = 0;
+        }
+
+        // override for Shadow master
+        if (target.isMaster && target.name === "Shadow") {
+            counterDmg = counterDmgInitial;
         }
 
         return [attackerDmg, counterDmg];
