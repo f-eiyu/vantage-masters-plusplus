@@ -96,14 +96,25 @@ const spellCallbacks = {
     cbSpellTransmute: function(targetSpace) {
         // seals the target card for 2 (more) turns, or 3 if the user's master
         // is Witch
-        targetSpace.innerCard.sealed += 2;
-        // the Witch master does not exist yet, so this card's 3-turn sealing
-        // functionality is not implemented yet either
+        const masterName = (targetSpace.owner === PLAYER_FRIENDLY ? enemyPlayer : friendlyPlayer).master.name;
+        if (masterName === "Witch")
+        {
+            targetSpace.innerCard.sealed += 3;
+        } else {
+            targetSpace.innerCard.sealed += 2;
+        }
     },
     cbSpellVanish: function(targetSpace) {
         // deals 6 damage to the target card, or 7 if the user's master is
         // Paladin
-        targetSpace.dealDamage(6);
+        const masterName = (targetSpace.owner === PLAYER_FRIENDLY ? enemyPlayer : friendlyPlayer).master.name;
+        if (masterName === "Paladin")
+        {
+            targetSpace.dealDamage(7);
+        } else {
+            targetSpace.dealDamage(6);
+        }
+
         // the Paladin master does not exist yet, so this card's bonus damage
         // functionality is not implemented yet either
     },

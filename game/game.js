@@ -93,13 +93,15 @@ const friendlyStartTurn = () => {
     game.enemyTurn = false;
 
     const feedback = document.getElementById("feedback-zone");
-    feedback.innerHTML = "<p>It's your turn!</p>";
+    feedback.innerHTML = "<p><h1>It's your turn!</h1></p>";
     
-    friendlyPlayer.refreshNatials();
-    friendlyPlayer.refreshMana();
-    friendlyPlayer.drawCard();
-
-    game.playerGainControl();
+    setTimeout(() => {
+        friendlyPlayer.refreshNatials();
+        friendlyPlayer.refreshMana();
+        friendlyPlayer.drawCard();
+    
+        game.playerGainControl();
+    }, 1000)
 }
 
 const friendlyEndTurn = () => {
@@ -125,7 +127,7 @@ const enemyStartTurn = () => {
     game.enemyTurn = true;
 
     const feedback = document.getElementById("feedback-zone");
-    feedback.innerHTML = "<p>Enemy's turn!</p>";
+    feedback.innerHTML = "<p>The computer is thinking...</p>";
 
     enemyPlayer.refreshNatials();
     enemyPlayer.refreshMana();
@@ -191,39 +193,45 @@ const attachEventListeners = () => {
     document.querySelector("#restart-game").addEventListener("click", initializeGameBoard);
 }
 
+const generateDeck = (player) => {
+    const permittedCards = [];
+    const generatedDeck = []
+
+    for(let i = NATIAL_ID_START; i <= NATIAL_ID_END; i++) {
+        permittedCards.push(cardDB.find(card => card.id === i));
+    }
+    if (player === PLAYER_FRIENDLY) {
+        for(let i = SPELL_ID_START; i <= SPELL_ID_END; i++) {
+            permittedCards.push(cardDB.find(card => card.id === i));
+        }
+    }
+
+    for (let i = 0; i < DECK_SIZE_LIMIT; i++) {
+        const randomCardID = Math.floor(Math.random() * permittedCards.length);
+        generatedDeck.push(createCard(permittedCards[randomCardID]));
+    }
+
+    const randomMasterID = Math.floor(Math.random() * (MASTER_ID_END - MASTER_ID_START) + MASTER_ID_START);
+    generatedDeck.push(createCard(cardDB.find(card => card.id === randomMasterID)));
+
+    return generatedDeck;
+}
+
 const initializeGameBoard = () => {
+
     attachEventListeners();
     
-    // instantiate players
-    const _playerDeckTemplate = [];
-    const _enemyDeckTemplate = [];
-    { // all of this is for debugging until the deck builder goes in
-        for (let i = 0; i < 4; i++) {
-            _playerDeckTemplate.push(createCard(getFromDB("Magic Crystal")));
-            _playerDeckTemplate.push(createCard(getFromDB("Vanish")));
-            _playerDeckTemplate.push(createCard(getFromDB("Uptide")));
-            _playerDeckTemplate.push(createCard(getFromDB("Blyx")));
-            _playerDeckTemplate.push(createCard(getFromDB("Dullmdalla")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
-            _enemyDeckTemplate.push(createCard(getFromDB("Fifenall")));
-        }
-        _playerDeckTemplate.push(createCard(getFromDB("Thief")));
-        _enemyDeckTemplate.push(createCard(getFromDB("Tyrant")));
-    }
-    friendlyPlayer = new Player(PLAYER_FRIENDLY, _playerDeckTemplate);
-    friendlyPlayer._maxMana = 10;
-    enemyPlayer = new Player(PLAYER_ENEMY, _enemyDeckTemplate);
+    const playerDeckTemplate = generateDeck(PLAYER_FRIENDLY);
+    const enemyDeckTemplate = generateDeck(PLAYER_ENEMY);
+    friendlyPlayer = new Player(PLAYER_FRIENDLY, playerDeckTemplate);
+    enemyPlayer = new Player(PLAYER_ENEMY, enemyDeckTemplate);
     skillUsage = new NatialSkillEvent(null, false);
     game = new GameBoard();
+    game.playerLoseControl();
     destroyedCards = new DestroyedCards();
     friendlyPlayer.loadIcon();
     enemyPlayer.loadIcon();
 
-    // both players start with three cards in hand.
-    // a mulligan feature will be added... later.
     friendlyPlayer.drawCard(3, false);
     enemyPlayer.drawCard(3, false);
 

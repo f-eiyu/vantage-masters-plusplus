@@ -30,7 +30,18 @@ body {
 
 #left-container {
     display: grid;
-    grid-template: 6fr 1fr 6fr 6fr 1fr / 1fr;
+    grid-template: 5fr 1fr 1fr 4fr 5fr 1fr 1fr / 1fr;
+}
+
+#enemy-master-info, #friendly-master-info {
+    display: flex;
+    justify-content: center;
+    align-content: space-around;
+    font-size: 1.1em;
+}
+
+#enemy-master-info > p, #friendly-master-info > p {
+    margin: auto;
 }
 
 .mana {
@@ -170,6 +181,21 @@ body {
     pointer-events: none;
 }
 
+.sealed {
+    position: absolute;
+    width: 97%;
+    height: 10%;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 0.85em;
+    border: solid black 1px;
+
+    background: rgba(125, 125, 125, 0.7);
+}
+
 .hp-orb {
     background-color: rgba(0, 255, 0, 0.8);
 }
@@ -207,7 +233,7 @@ body {
 
 .natial-zone .hp-orb {
     bottom: 23px;
-    right: 0;
+    right: 1px;
 }
 
 .dmg-ribbon {
@@ -223,16 +249,16 @@ body {
 
 .natial-zone .atk-orb {
     bottom: 23px;
-    left: 0;
+    left: 1px;
 }
 
 .natial-zone .mana-orb {
     top: 2px;
-    right: 0;
+    right: 1px;
 }
 
 .natial-zone .icons {
-    left: 0;
+    left: 2px;
     top: 2px;
     border: none;
     border-radius: 0;
@@ -270,21 +296,21 @@ body {
 
 .hand-zone .hp-orb {
     bottom: 20px;
-    right: 0;
+    right: 2px;
 }
 
 .hand-zone .atk-orb {
     bottom: 20px;
-    left: 0;
+    left: 2px;
 }
 
 .hand-zone .mana-orb {
     top: 2px;
-    right: 0;
+    right: 2px;
 }
 
 .hand-zone .icons {
-    left: 0;
+    left: 2px;
     top: 2px;
     border: none;
     border-radius: 0;
@@ -313,7 +339,7 @@ body {
     z-index: 1;
 
     border-radius: 5px;
-    box-shadow: 0px 0px 20px 8px limegreen inset;
+    box-shadow: 0px 0px 20px 6px limegreen inset;
 }
 
 .target-invalid:before {
@@ -326,7 +352,7 @@ body {
     z-index: 1;
 
     border-radius: 5px;
-    box-shadow: 0px 0px 20px 8px red inset;
+    box-shadow: 0px 0px 20px 6px red inset;
 }
 
 .target-attack:before {
@@ -339,7 +365,7 @@ body {
     z-index: 1;
 
     border-radius: 5px;
-    box-shadow: 0px 0px 20px 8px darkorange inset;
+    box-shadow: 0px 0px 20px 6px darkorange inset;
 }
 
 .skill-selected:before {
@@ -352,7 +378,7 @@ body {
     z-index: 1;
 
     border-radius: 5px;
-    box-shadow: 0px 0px 20px 8px rgb(66, 114, 244) inset;
+    box-shadow: 0px 0px 20px 6px rgb(66, 114, 244) inset;
 }
 
 .hovered {

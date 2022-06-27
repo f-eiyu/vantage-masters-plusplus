@@ -16,6 +16,7 @@
         <div id="game-container">
             <div id="left-container">
                 <div id="enemy-portrait" class="container"></div>
+                <div id="enemy-master-info"></div>
                 <div id="enemy-mana" class="container">
                     <div class="mana" id="enemy-mana-1"></div>
                     <div class="mana" id="enemy-mana-2"></div>
@@ -28,8 +29,9 @@
                     <div class="mana" id="enemy-mana-9"></div>
                     <div class="mana" id="enemy-mana-10"></div>
                 </div>
-                <div id="misc-container" class="container">misc container</div>
+                <div id="misc-container" class="container"></div>
                 <div id="friendly-portrait" class="container"></div>
+                <div id="friendly-master-info"></div>
                 <div id="friendly-mana" class="container">
                     <div class="mana" id="friendly-mana-1"></div>
                     <div class="mana" id="friendly-mana-2"></div>
@@ -116,6 +118,7 @@
                             <div class="atk-orb" id="atk-enemy-front-0"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-front-0"></div>
                             <div class="hp-orb" id="hp-enemy-front-0"></div>
+                            <div class="sealed" id="seal-enemy-front-0"></div>
                         </div>
                     </div>
 
@@ -127,6 +130,7 @@
                             <div class="atk-orb" id="atk-enemy-front-1"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-front-1"></div>
                             <div class="hp-orb" id="hp-enemy-front-1"></div>
+                            <div class="sealed" id="seal-enemy-front-1"></div>
                         </div>
                     </div>
 
@@ -138,6 +142,7 @@
                             <div class="atk-orb" id="atk-enemy-front-2"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-front-2"></div>
                             <div class="hp-orb" id="hp-enemy-front-2"></div>
+                            <div class="sealed" id="seal-enemy-front-2"></div>
                         </div>
                     </div>
 
@@ -149,6 +154,7 @@
                             <div class="atk-orb" id="atk-enemy-front-3"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-front-3"></div>
                             <div class="hp-orb" id="hp-enemy-front-3"></div>
+                            <div class="sealed" id="seal-enemy-front-3"></div>
                         </div>
                     </div>
 
@@ -162,6 +168,7 @@
                             <div class="atk-orb" id="atk-enemy-back-0"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-back-0"></div>
                             <div class="hp-orb" id="hp-enemy-back-0"></div>
+                            <div class="sealed" id="seal-enemy-back-0"></div>
                         </div>
                     </div>
 
@@ -173,6 +180,7 @@
                             <div class="atk-orb" id="atk-enemy-back-1"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-back-1"></div>
                             <div class="hp-orb" id="hp-enemy-back-1"></div>
+                            <div class="sealed" id="seal-enemy-back-1"></div>
                         </div>
                     </div>
 
@@ -184,6 +192,7 @@
                             <div class="atk-orb" id="atk-enemy-back-2"></div>
                             <div class="dmg-ribbon" id="dmg-enemy-back-2"></div>
                             <div class="hp-orb" id="hp-enemy-back-2"></div>
+                            <div class="sealed" id="seal-enemy-back-2"></div>
                         </div>
                     </div>
                 </div>
@@ -197,6 +206,7 @@
                             <div class="atk-orb" id="atk-friendly-front-0"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-front-0"></div>
                             <div class="hp-orb" id="hp-friendly-front-0"></div>
+                            <div class="sealed" id="seal-friendly-front-0"></div>
                         </div>
                     </div>
 
@@ -208,6 +218,7 @@
                             <div class="atk-orb" id="atk-friendly-front-1"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-front-1"></div>
                             <div class="hp-orb" id="hp-friendly-front-1"></div>
+                            <div class="sealed" id="seal-friendly-front-1"></div>
                         </div>
                     </div>
 
@@ -219,6 +230,7 @@
                             <div class="atk-orb" id="atk-friendly-front-2"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-front-2"></div>
                             <div class="hp-orb" id="hp-friendly-front-2"></div>
+                            <div class="sealed" id="seal-friendly-front-2"></div>
                         </div>
                     </div>
 
@@ -230,6 +242,7 @@
                             <div class="atk-orb" id="atk-friendly-front-3"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-front-3"></div>
                             <div class="hp-orb" id="hp-friendly-front-3"></div>
+                            <div class="sealed" id="seal-friendly-front-3"></div>
                         </div>
                     </div>
 
@@ -243,6 +256,7 @@
                             <div class="atk-orb" id="atk-friendly-back-0"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-back-0"></div>
                             <div class="hp-orb" id="hp-friendly-back-0"></div>
+                            <div class="sealed" id="seal-friendly-back-0"></div>
                         </div>
                     </div>
 
@@ -254,6 +268,7 @@
                             <div class="atk-orb" id="atk-friendly-back-1"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-back-1"></div>
                             <div class="hp-orb" id="hp-friendly-back-1"></div>
+                            <div class="sealed" id="seal-friendly-back-1"></div>
                         </div>
                     </div>
 
@@ -265,6 +280,7 @@
                             <div class="atk-orb" id="atk-friendly-back-2"></div>
                             <div class="dmg-ribbon" id="dmg-friendly-back-2"></div>
                             <div class="hp-orb" id="hp-friendly-back-2"></div>
+                            <div class="sealed" id="seal-friendly-back-2"></div>
                         </div>
                     </div>
                 </div>

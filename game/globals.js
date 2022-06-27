@@ -11,6 +11,7 @@ const ROW_FRONT = 0;
 const ROW_BACK = 1;
 const ZONE_HAND = 2;
 
+const DECK_SIZE_LIMIT = 20;
 const HAND_SIZE_LIMIT = 6;
 const NATIAL_FRONT_CAPACITY = 4;
 const NATIAL_BACK_CAPACITY = 3;

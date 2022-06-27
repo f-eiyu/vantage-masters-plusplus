@@ -52,15 +52,13 @@ const aiAttack = () => {
     const attackers = aiFindNatials(enemyPlayer);
     const attackTargets = aiFindNatials(friendlyPlayer);
 
-    console.log(attackers);
-    console.log(attackTargets);
-
     let attackTime = aiThinkingTime();
     while (attackers.length && attackTargets.length && !gameEnd) {
         // each natial attacks once
         const attackerSpace = attackers.shift();
 
         setTimeout(() => {
+            if (gameEnd) { return; }
             if (!attackTargets.length)  { return; }
             let targetSpace = attackTargets[0];
             while (!targetSpace.hasCard) {
@@ -72,8 +70,6 @@ const aiAttack = () => {
             if (!game.validateAttack(attackerSpace, targetSpace)) { return; }
 
             game.attackNatial(attackerSpace, targetSpace);
-            // remove target from attackTargets if destroyed
-            // if (!targetSpace.hasCard) { attackTargets.shift(); }
         }, attackTime);
 
         attackTime += 2 * game.attackTime + aiThinkingTime();

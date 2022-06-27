@@ -134,7 +134,7 @@ class NatialCard extends Card {
     takeDamage(dmg) {
         if (dmg <= 0) { return; } // taking 0 damage should not break shields
         else if (this.shielded) { this.shielded--; }
-        else { this.curHP -= dmg; }
+        else { this.curHP = Math.max(this.curHP - dmg, 0); }
     }
 
     // restores the card's HP by the specified amount.
@@ -247,6 +247,7 @@ class BoardSpace {
         const atkOrb = document.getElementById(`atk-${domID}`);
         const manaOrb = document.getElementById(`mana-${domID}`);
         const icons = document.getElementById(`icons-${domID}`);
+        const sealBanner = document.getElementById(`seal-${domID}`);
 
         if (invis) { thisDOM.style.opacity = 0; }
         else { thisDOM.style.opacity = 1; }
@@ -272,7 +273,6 @@ class BoardSpace {
         // render the card background and various properties
         else {
             nameBanner.style.display = "block";
-            console.log(card.name, card.type === "spell");
             if (card.type === "spell") {
                 hpOrb.style.display = "none";
                 atkOrb.style.display = "none";
@@ -283,7 +283,9 @@ class BoardSpace {
                 atkOrb.style.display = "flex";
                 icons.style.display = "flex";
             }
-            manaOrb.style.display = "flex";
+            if (!(card.isMaster && card.skillCost === null)) {
+                manaOrb.style.display = "flex";
+            }
 
             nameBanner.innerText = card.name;
             hpOrb.innerText = card.curHP;
@@ -293,6 +295,10 @@ class BoardSpace {
             icons.innerHTML = "";
             if (card.isRanged) { icons.innerHTML += "<img src='../data/img/misc/icon-ranged.png' class='icon' />"; }
             if (card.isQuick) { icons.innerHTML += "<img src='../data/img/misc/icon-quick.png' class='icon' />"; }
+            if (this.isNatial && card.sealed && !this.isHand) {
+                sealBanner.style.display = "flex";
+                sealBanner.innerText = `Sealed: ${card.sealed}`;
+            } else if (!this.isHand) { sealBanner.style.display = "none"; }
 
             let bgColor = "";
             if (card.type === "spell") { bgColor = "green"; }
@@ -323,7 +329,8 @@ class BoardSpace {
         if (this.owner === PLAYER_FRIENDLY
             && this.hasCard
             && !invis
-            && !game.enemyTurn) {
+            && !game.enemyTurn
+            && !card.sealed) {
             this.setDraggable();
         } else { this.clearDraggable(); }
     }
@@ -507,10 +514,25 @@ class NatialSpace extends BoardSpace {
 
     // wrapper for dealing damage to the contained card instance
     dealDamage(dmg, attackerSpace = null) {
+        game.playerLoseControl();
+
         const target = this.innerCard;
         const attacker = (attackerSpace ? attackerSpace.innerCard : null);
+        const dmgRibbon = this.DOM.querySelector(".dmg-ribbon");
 
+        // disallow overkilling target
+        if (dmg > target.curHP) { dmg = target.curHP; }
         target.takeDamage(dmg);
+
+        dmgRibbon.innerText = `-${dmg}`;
+        dmgRibbon.style.display = "block";
+        this.DOM.querySelector(".hp-orb").innerText = target.curHP;
+
+        if (game.checkVictory()) { return; }
+        setTimeout(() => {
+            dmgRibbon.style.display = "none";
+            if (!game.enemyTurn) { game.playerGainControl(); }
+        }, game.attackTime)
 
         // onDamageTaken hook
         if (target.hasPassive
@@ -603,7 +625,7 @@ class NatialZone {
         nonEmpty.push(...this._back.filter(sp => sp.hasCard));
 
         // at least one natial (the master) should always be in the natial zone
-        if (!nonEmpty.length) { throw "error: no natials found on the board!"; }
+        if (!nonEmpty.length) { debugger; throw "error: no natials found on the board!"; }
         return nonEmpty;
     }
     // returns all empty NatialSpace instances
@@ -725,13 +747,14 @@ class NatialZone {
         const originCard = originSpace.innerCard;
         const destCard = destSpace.innerCard;
 
+        /* 
         // onMove hook: place the appropriate aura additions/removals into
         // AuraHandler queues
         // moving originCard to destSpace
         if (natialPassiveCallbacks.onMove[originCard.passiveCbName]) {
             natialPassiveCallbacks.onMove[originCard.passiveCbName](originSpace, destSpace);
         }
-        // moving potential destCard to originSpace
+        
         if (destCard
             && natialPassiveCallbacks.onMove[destCard.passiveCbName]) {
             natialPassiveCallbacks.onMove[destCard.passiveCbName](destSpace, originSpace);
@@ -743,14 +766,17 @@ class NatialZone {
         // in their new position before their aura calculation is intended to
         // take place.
         this.doAuraHandlerQueues();
+        */
 
         // swap origin and target cards
         this.swapCards(originSpace, destSpace);
         originCard.canMove = false;
 
+        /*
         // now, calculate and apply auras to the moved cards
         destSpace.auraHandler.applyAurasMovement(originSpace);
         originSpace.auraHandler.applyAurasMovement(destSpace);
+        */
 
         // animate and re-render the board
         setTimeout(game.renderAll, game.fadeoutTime + game.fadeinTime);
@@ -786,6 +812,7 @@ class NatialZone {
     // removes one turn of seal from every card
     decrementSeal() {
         this.forAllCards(card => card.sealed--);
+        game.renderAll();
     }
 
     // re-draws each NatialSpace instance, including empty ones
@@ -971,6 +998,7 @@ class Player {
 
         const summonedCard = originHandSpace.innerCard;
 
+        /*
         // onSummon hook: tell AuraHandlers to prepare to parse potentially
         // new auras
         if (natialPassiveCallbacks.onSummon[summonedCard.passiveCbName]) {
@@ -981,6 +1009,7 @@ class Player {
         // specifically placed so that the summoned card does NOT benefit from 
         // its own (or any other auras) too early; that's handled below.
         this.natialZone.doAuraHandlerQueues();
+        */
 
         // deduct mana and transfer the card to the board
         this.currentMana -= summonedCard.cost;
@@ -996,8 +1025,10 @@ class Player {
             summonedCard.canMove = false;
         }
 
+        /*
         // now, apply any aura effects to the summoned natial.
         destNatialSpace.auraHandler.applyAurasMovement(originHandSpace);
+        */
 
         // animate and re-render the board
         setTimeout(game.renderAll, game.fadeoutTime + game.fadeinTime);
@@ -1036,10 +1067,17 @@ class Player {
         iconDOM.style.backgroundPosition = "center";
     }
 
-    // currently just renders the player's mana display, but may be expanded
-    // in the future
+    // updates the player's mana and other stats
     render() {
         const playerStr = (this === friendlyPlayer ? "friendly" : "enemy");
+
+        const infoDOM = document.getElementById(`${playerStr}-master-info`);
+        let infoDOMText = "";
+        const masterName = this.master.name;
+
+        infoDOMText = `<p>${masterName} | HP: ${this.master.curHP}/${this.master.maxHP} | In Deck: ${this.deck.length}</p>`;
+        infoDOM.innerHTML = infoDOMText;
+
         const manaDOM = document.getElementById(`${playerStr}-mana`);
         const manaList = manaDOM.querySelectorAll(".mana");
 
@@ -1080,7 +1118,7 @@ class GameBoard {
 
     renderTurnCounter() {
         const turnDOM = document.getElementById("misc-container");
-        turnDOM.innerText = Math.ceil(this.turnCounter);
+        turnDOM.innerHTML = `<h1>Turn ${Math.ceil(this.turnCounter)}</h1>`;
     }
 
     renderAll() {
@@ -1145,6 +1183,8 @@ class GameBoard {
     }
 
     attackFade(spaceDOM, time = this.attackTime, minAlpha = 0.5) {
+        let spaceContainer = spaceDOM.parentNode;
+        spaceContainer.style.backgroundColor = "darkred";
         let opacity = 1;
         const numFrames = 60 * (time / 1000); // # of fade frames at 60 fps
 
@@ -1160,19 +1200,16 @@ class GameBoard {
             if (opacity > 1) {
                 clearInterval(timer);
                 spaceDOM.opacity = 1;
+                spaceContainer.style.backgroundColor = "";
             }
         }, 1000 / 60);
     }
 
-    animateAttack(attackerSpace, targetSpace, atkDamage, time = this.attackTime) {
+    animateAttack(attackerSpace, targetSpace) {
         const attackerDOM = attackerSpace.DOM;
-        const attackerCard = attackerSpace.innerCard;
         const attackerContainer = attackerDOM.parentNode;
-        const attackerRibbon = attackerDOM.querySelector(".dmg-ribbon");
         const targetDOM = targetSpace.DOM;
-        const targetCard = targetSpace.innerCard;
         const targetContainer = targetDOM.parentNode;
-        const targetRibbon = targetDOM.querySelector(".dmg-ribbon");
 
         attackerDOM.style.opacity = 1;
         targetDOM.style.opacity = 1;
@@ -1180,49 +1217,37 @@ class GameBoard {
         attackerContainer.style.backgroundColor = "darkred";        
         targetContainer.style.backgroundColor = "darkred";
 
-        this.attackFade(attackerDOM, time);
-        this.attackFade(targetDOM, time);
-        setTimeout(() => {
-            attackerRibbon.innerText = `-${atkDamage[1]}`;
-            attackerRibbon.style.display = "block";
-            attackerContainer.style.backgroundColor = "";
-            attackerDOM.querySelector(".hp-orb").innerText = Math.max(attackerCard.curHP - atkDamage[1], 0);
-            targetRibbon.innerText = `-${atkDamage[0]}`;
-            targetRibbon.style.display = "block";
-            targetContainer.style.backgroundColor = "";
-            targetDOM.querySelector(".hp-orb").innerText = Math.max(targetCard.curHP - atkDamage[0], 0);
-        }, time);
-        setTimeout(() => {
-            attackerRibbon.style.display = "none";
-            targetRibbon.style.display = "none";
-        }, 2 * time)
+        this.attackFade(attackerDOM, this.attackTime);
+        this.attackFade(targetDOM, this.attackTime);
     }
 
     // checks if either player has met the victory condition. returns true if the
-    // game ends and false if it does not. the game-ending code right now is VERY
-    // rudimentary, but will work for a MVP. it will be significantly expanded on.
+    // game ends and false if it does not.
     checkVictory() {
         let friendlyHP = friendlyPlayer.master.curHP;
         let enemyHP = enemyPlayer.master.curHP;
 
+        const feedbackZone = document.getElementById("feedback-zone");
+        let feedbackStr = null;
+
         if (friendlyHP <= 0 && enemyHP <= 0) {
-            console.log("it's a draw!");
-            playerControl = false;
+            feedbackStr = "It's a tie!";
         }
         else if (friendlyHP <= 0) {
-            console.log("computer wins!");
-            playerControl = false;
+            feedbackStr = "You are defeated!";
         }
         else if (enemyHP <= 0) {
-            console.log("you win!");
-            playerControl = false;
+            feedbackStr = "You are victorious!";
         }
         else {
             return false;
         }
 
+        game.playerLoseControl();
+        feedbackZone.innerHTML = `<h2>${feedbackStr}</h2>`;
         gameEnd = true;
-        document.getElementById("end-turn").disabled = true;
+        document.getElementById("end-turn").style.display = "none";
+        document.getElementById("restart-game").disabled = false;
         return true;
     }
 
@@ -1337,7 +1362,7 @@ class GameBoard {
     attackNatial(attackerSpace, targetSpace) {
         // disable player control for the duration of the attack
         if (attackerSpace.owner === PLAYER_FRIENDLY) {
-            game.playerLoseControl(game.attackTime + 25);
+            game.playerLoseControl(); // control is regained in dealDamage()
         }
 
         const thisAttack = this.calculateDamage(attackerSpace, targetSpace);
@@ -1350,9 +1375,8 @@ class GameBoard {
             attackerSpace.dealDamage(thisAttack[1], targetSpace);
             if (attackerSpace.hasCard) { attackerSpace.render(); }
             if (targetSpace.hasCard) { targetSpace.render(); }
-            this.checkVictory();
-        }, 2 * game.attackTime);
-        game.animateAttack(attackerSpace, targetSpace, thisAttack);
+        }, game.attackTime);
+        game.animateAttack(attackerSpace, targetSpace);
     }
 
     // wrapper for validating a natial summon
@@ -1396,7 +1420,6 @@ class CardDOMEvent {
         // listener attached, which will always have one of these two classes.
         while (!cardDOM.classList.contains("enemy")
                 && !cardDOM.classList.contains("friendly")) {
-            console.log(cardDOM.nodeName);
             cardDOM = cardDOM.parentNode;
         }
         
