@@ -7,20 +7,85 @@ had a lot of fun playing Vantage Masters, so I figured I would try my hand at
 re-creating it, at a baseline, and maybe even adding some cool new stuff to it
 (hence the ++)!
 
-## todo
-- give wall and seal visual feedback
-- remove ability to drag other cards while skill is selected
-- allow movement on an occupied space to swap the two natials
+## Rules
+Fundamentally, players battle each other's Deck Masters using Natial cards. Each
+player starts with their Master pre-placed in the Natial zone. The objective is
+to kill the opposing Deck Master by reducing its health (green orb on the bottom
+right) to zero. A player whose Master is killed will lose immediately.
 
-### needed hooks
-- defend left and right: check for protected property on targeted spaces
-    - move protected property from card to space
-    - ondeath, for the card that's defending
-- card can act twice: no passive needed (that's just having 2 actions)
-- bonus stats to cards in the same row: onsummon, onmove, and ondeath
-- bonus stats when enemy defeated: check attacker ondeath
-- draws a card when defeated: ondeath
-- all matching cards gain stats: onsummon, ondeath
+Natials in the player's hand (back row) can be summoned to the Natial Zone if
+the player can pay the mana cost (blue orb on the card's top right). The Natial
+Zone has a front row and a back row. Natials in the back row cannot attack
+unless they're Ranged (icon on the card's top left), but as long as there is
+at least one Natial in the front row, they cannot be attacked either.
+
+Immediately after summoning, Natials will usually have to wait until the next
+turn before taking an action, unless the Natial is Quick (icon on the card's
+top left). Otherwise, Natials can both move and attack every turn, but movement
+must happen before attacking. To either move or attack, simply drag the Natial
+to the appropriate space on the board. Natials can move onto other Natials,
+which will cause them to swap places.
+
+When Natials attack, they will deal damage equal to their Attack stat (red orb
+on the card's bottom left) and, in some circumstances, be counterattacked for
+1 less than the opponent's Attack stat. Damage is deducted directly from a
+Natial's Health.
+
+There are elemental advantages and disadvantages as well, which will grant a +2
+damage boost or a -2 damage penalty respectively. Fire Natials beat Heaven
+Natials beat Earth Natials beat Water Natials. Masters do not have an element.
+
+Some Natials and Deck Masters have activated Skills, which can be used by 
+right-clicking on them and then left-clicking the appropriate target. Deck
+Master skills can be used as long as the Master can act, and have an associated
+mana cost (blue orb on the card's top right). Natial skills do not require mana,
+but can generally only be used once.
+
+Other Natials and Masters even have passive abilities that trigger under
+specific circumstances and do not need to be activated.
+
+Finally, various Spells also exist to help you achieve victory. Spells are used
+from the hand by dragging them to an appropriate target, and usually have a mana
+cost as well.
+
+## Technologies used
+Everything was done in vanilla JS and CSS. I considered using Bootstrap to draw
+the game board, but decided I wanted more fundamental experience with grid and
+flexboxes. There are definitely things that may have been easier with jQuery,
+but again, just to practice my JS fundamentals, I opted not to.
+
+## Approach taken
+Primarily, I wanted to practice my OOP approaches and just get some practice in.
+I slowly rolled more features into each class and did several huge rounds of
+refactoring to make the code look like it wasn't awful. I didn't manage to
+finish refactoring everything into the classes that I wanted them to be in,
+unfortunately.
+
+The structure I ended up settling on involved hierarchical board elements: a
+card is contained in a space on the board, which is contained in a specific zone
+of the board, which is owned by the player. I've never created a complex
+framework like this by myself before, so I really got the chance to appreciate
+just *how freaking difficult* it is to create class architecture in a robust,
+convenient, partitioned, and future-friendly way. It's a really fun challenge
+though, definitely something I'm looking to keep practicing.
+
+I did intend to break up the `structures.js` file so it wouldn't be absolutely
+freaking enormous, but since I never finished refactoring I never actually got
+around to that. Very sad.
+
+## Installation instructions
+Not applicable to this project.
+
+## Unsolved problems
+The only core feature I did not manage to get working was passive auras. The
+logic behind the auras worked fine... until I realized that I forgot to actually
+implement natial move swapping, and it was extremely hard to fit all of the
+logic around that. All of that code is just commented out and those passives
+simply do not work at the moment.
+
+Someday, I'll get those stretch features implemented as well! A deck builder
+would be fantastic, and an AI that can actually calculate its moves ahead of
+time would be pretty nice too.
 
 ## User stories
 ### MVP goals
@@ -85,13 +150,15 @@ with as many cards as possible on its turn.
 1. Implement the back-and-forth between player turns and enemy turns, with the
 first turn-taker being random.
 1. Implement victory and loss conditions and a reset button.
-1. **Workflow is complete up to here. I now have a functional MVP for the game.**
 1. Create a framework for spell card functionality via callbacks and create two
 straightforward spells to debug with.
 1. Create a framework for card active ability functionality via callbacks and
 create two straightforward active effects to debug with.
-1. **At this stage, all core gameplay features are functional. Anything after
-this point can be considered a stretch goal..**
+1. Implement all the cards that exist in Trails of Cold Steel IV's Vantage
+Masters II minigame.
+1. Improve the aesthetics of every page to look like a game instead of a bunch
+of wireframes.
+1. **Everything up to this point has been completed.**
 1. Create a wireframe of the deck builder, game start screen, and title screen.
 1. Implement the deck builder, which lets the player choose cards to form their
 deck with and save a list of decks in local storage for long term replayability.
@@ -101,10 +168,6 @@ create two opponent decks to debug with.
 and opponent.
 1. Implement the title screen, which simply links to the deck builder and
 the game start screen.
-1. Implement all the cards that exist in Trails of Cold Steel IV's Vantage
-Masters II minigame.
-1. Improve the aesthetics of every page to look like a game instead of a bunch
-of wireframes.
 1. Any extras that I have time to finish will go here: more computer opponents,
 more advanced AI scripts, a game tutorial, a "progress mode" where beating each
 opponent for the first time unlocks a card for the deck, new cards and mechanics
